@@ -217,3 +217,39 @@
   </script>
 </body>
 </html>
+_________________________________________________________________________________________________
+Erklärung zum Code:
+Um nur die Audios und die angezeigten Begriffe anzupassen, musst du diesen Abschnitt ändern:
+
+// 1) Daten: Begriff + Audio-URL
+const pairs = [
+  { term: "akutes Delir",       audio: "https://…/akutes%20Delir.mp3" },
+  { term: "Exsikkose",          audio: "https://…/Exsikkose.mp3" },
+  { term: "vaskuläre Demenz",   audio: "https://…/vaskuläre%20Demenz.mp3" },
+  { term: "Halluzination",      audio: "https://…/Halluzination.mp3" },
+  { term: "Nestelbewegungen",   audio: "https://…/Nestelbewegungen.mp3" },
+  { term: "Sturzprophylaxe",    audio: "https://…/Sturzprophylaxe.mp3" }
+];
+
+So passt du es an:
+Begriff (term) ändern:
+Ersetze den Text in den Anführungszeichen hinter "term:" durch deinen eigenen Begriff.
+
+// statt
+{ term: "akutes Delir", … }
+// z.B.
+{ term: "Herzinfarkt", … }
+
+
+Audio-URL (audio) anpassen:
+Trage hinter "audio:" die URL oder den Pfad zu deiner MP3-Datei ein.
+
+// statt
+audio: "https://…/akutes%20Delir.mp3"
+// z.B.
+audio: "https://…/Herzinfarkt.mp3"
+
+
+Anzahl der Paare
+– Möchtest du weniger oder mehr Einträge, lösche oder füge einfach Zeilen hinzu.
+– Achte darauf, dass jede Zeile mit einem Komma endet (außer die letzte).
