@@ -1,219 +1,222 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Bild–Audio-Matching (5×5-Anordnung)</title>
+  <meta charset="UTF-8">
+  <title>Audio Drag-&-Drop Übung (angepasste Icons & Farben)</title>
+  <!-- Google Fonts: Open Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* ===== Hintergrund auf Weiß setzen ===== */
     html, body {
-      background-color: #ffffff !important;
-      margin: 0;
+      font-family: 'Open Sans', sans-serif;
       padding: 20px;
     }
-    body {
-      font-family: sans-serif;
-      display: flex;
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .wrapper {
+      text-align: center;
+    }
+    .container {
+      display: inline-flex;
       flex-direction: column;
-      align-items: center;
-      overflow-x: hidden;
+      align-items: flex-start;
+      gap: 20px;
     }
-    .game-wrapper {
+    #audios, #dropzones {
       display: flex;
-      flex-direction: column;
-      gap: 30px;
-      max-width: 800px;
-      width: 100%;
+      gap: 20px;
     }
-    .image-row, .audio-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 10px;
+    /* Zentrierte Dropzones */
+    #dropzones {
+      align-self: center;
     }
-    @media (max-width: 400px) {
-      .image-row, .audio-row {
-        grid-template-columns: repeat(2, 1fr);
-      }
+    /* Meldungen direkt unter Dropzones, zentriert */
+    #result {
+      align-self: center;
+      text-align: center;
+      font-size: 1.4em;
+      height: 1.5em;
+      margin: 0;
     }
-    .image-item {
+    /* Button direkt unter Meldung, zentriert */
+    #controls {
+      align-self: center;
       display: flex;
-      align-items: center;
       justify-content: center;
-      background: #fff;
-      border: 2px solid #0000ff;
-      border-radius: 8px;
-      cursor: grab;
-      user-select: none;
-      overflow: hidden;
-      aspect-ratio: 1 / 1;
     }
-    .image-item img {
-      max-width: 100%;
-      max-height: 100%;
-    }
-    .audio-target {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #0000ff;
-      border: 2px solid #0000ff;
+    #controls button {
+      background: #153BFF;
       color: #fff;
-      font-size: 32px;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    .audio-item, .dropzone, .placeholder {
+      width: 150px;
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       border-radius: 8px;
       user-select: none;
-      aspect-ratio: 2.5 / 1;
-      transition: background 0.2s, border-color 0.2s;
+      font-size: 2em;
     }
-    .audio-target.over {
-      background: #ff00ff;
-      border-color: #ff00ff;
+    .audio-item {
+      border: 2px solid #153BFF;
+      background: #153BFF;
+      color: #fff;
+      cursor: grab;
+      transition: transform 0.2s;
     }
-    .image-item.wrong {
-      animation: shake 0.3s;
+    .audio-item:active { cursor: grabbing; }
+    .dropzone {
+      border: 3px dashed #888;
+      font-size: 1.2em;
+      color: #555;
+      transition: background 0.3s;
+    }
+    .dropzone.over { background-color: #FF33CC; }
+    .dropzone.correct-flash { background-color: #FF33CC !important; }
+    /* Platzhalter sehen aus wie Dropzones */
+    .placeholder {
+      border: 3px dashed #888;
+      background: none;
+      color: #555;
+      font-size: 1.2em;
     }
     @keyframes shake {
       0%,100% { transform: translateX(0); }
-      20%,60% { transform: translateX(-5px); }
-      40%,80% { transform: translateX(5px); }
+      20%,60% { transform: translateX(-10px); }
+      40%,80% { transform: translateX(10px); }
     }
-    .image-item.matched,
-    .audio-target.matched {
-      background: #9900ff;
-      border-color: #9900ff;
-      cursor: default;
-    }
-    #restart {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background: #0000ff;
-      color: #ffffff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      align-self: flex-start;
-    }
-    #restart:hover {
-      opacity: 0.9;
+    .shake {
+      animation: shake 0.5s;
+      border-color: red;
     }
   </style>
 </head>
 <body>
-  <div class="game-wrapper">
-    <div class="image-row" id="imageList"></div>
-    <div class="audio-row" id="audioList"></div>
-    <button id="restart">Noch einmal spielen</button>
+  <h1></h1>
+  <div class="wrapper">
+    <div class="container">
+      <div id="audios"></div>
+      <div id="dropzones">
+        <div class="dropzone" id="correct">Richtig</div>
+        <div class="dropzone" id="wrong">Falsch</div>
+      </div>
+      <div id="result"></div>
+      <div id="controls">
+        <button id="reshuffle">Noch einmal spielen</button>
+      </div>
+    </div>
   </div>
-
   <script>
-    // Globale Flagge, ob gerade ein Audio läuft
-    let isPlaying = false;
-
-    // Pärchen mit eindeutigen IDs
-    const pairs = [
-      { id: 0, term: "Arm",   image: "https://raw.githubusercontent.com/LingodaStacy/Content/main/atem.jpg",      audio: "https://raw.githubusercontent.com/LingodaStacy/Content/main/atemnot.mp3" },
-      { id: 1, term: "Herz",  image: "https://raw.githubusercontent.com/LingodaStacy/Content/main/monitor.jpg",   audio: "https://raw.githubusercontent.com/LingodaStacy/Content/main/blutdruck.mp3" },
-      { id: 2, term: "Kopf",  image: "https://raw.githubusercontent.com/LingodaStacy/Content/main/bike.jpg",      audio: "https://raw.githubusercontent.com/LingodaStacy/Content/main/fahrrad.mp3" },
-      { id: 3, term: "Lunge", image: "https://raw.githubusercontent.com/LingodaStacy/Content/main/child.jpg",     audio: "https://raw.githubusercontent.com/LingodaStacy/Content/main/kind.mp3" },
-      { id: 4, term: "Lunge", image: "https://raw.githubusercontent.com/LingodaStacy/Content/main/head.jpg",      audio: "https://raw.githubusercontent.com/LingodaStacy/Content/main/Kopfschmerzen.mp3" }
+    const audioData = [
+      { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Modul%206/Teil%201/DOC_M6_Teil%201_bauchaorta.mp3', correct: true },
+      { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Modul%206/Teil%201/DOC_M6_Teil%201_checkup35.mp3', correct: false },
+      { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Modul%206/Teil%201/DOC_M6_Teil%201_koloskopie.mp3', correct: true },
+      { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Modul%206/Teil%201/DOC_M6_Teil%201_screening.mp3', correct: false },
+      { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Modul%206/Teil%201/DOC_M6_Teil%201_stuhltest.mp3', correct: false }
     ];
+    const origin = document.getElementById('audios');
+    const dropzones = document.querySelectorAll('.dropzone');
+    const resultBox = document.getElementById('result');
+    const reshuffleBtn = document.getElementById('reshuffle');
+    let initialCount = audioData.length;
 
-    const imageList = document.getElementById('imageList');
-    const audioList = document.getElementById('audioList');
-    const restartBtn = document.getElementById('restart');
-
-    function shuffle(arr) {
+    function shuffleArray(arr) {
       for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [arr[i], arr[j]] = [arr[j], arr[i]];
       }
-      return arr;
     }
 
-    function initGame() {
-      // Rücksetzen
-      imageList.innerHTML = '';
-      audioList.innerHTML = '';
-      isPlaying = false;
+    function createPlaceholder(index) {
+      const pl = document.createElement('div');
+      pl.className = 'placeholder';
+      pl.dataset.index = index;
+      return pl;
+    }
 
-      const imgs = shuffle(pairs.map(p => ({ ...p })));
-      const auds = shuffle(pairs.map(p => ({ ...p })));
-
-      // Bilder erzeugen
-      imgs.forEach(item => {
-        const el = document.createElement('div');
-        el.className = 'image-item';
-        el.draggable = true;
-        el.dataset.id = item.id;
-        const img = document.createElement('img');
-        img.src = item.image;
-        img.alt = item.term;
-        el.appendChild(img);
-
-        el.addEventListener('dragstart', e => {
-          if (el.classList.contains('matched')) {
-            e.preventDefault();
-            return;
-          }
-          e.dataTransfer.setData('text/plain', item.id);
-        });
-
-        imageList.appendChild(el);
+    function createCard(itemData, index) {
+      const card = document.createElement('div');
+      card.className = 'audio-item';
+      card.dataset.src = itemData.src;
+      card.dataset.correct = itemData.correct;
+      card.dataset.index = index;
+      card.id = 'item' + index;
+      card.textContent = '🔊';
+      card.addEventListener('click', () => {
+        if (card.dataset.playing === 'true') return;
+        const audio = new Audio(card.dataset.src);
+        card.dataset.playing = 'true';
+        audio.play();
+        audio.addEventListener('ended', () => { card.dataset.playing = 'false'; });
       });
+      card.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', card.id); });
+      card.draggable = true;
+      return card;
+    }
 
-      // Audio-Drop-Zonen erzeugen
-      auds.forEach(item => {
-        const el = document.createElement('div');
-        el.className = 'audio-target';
-        el.dataset.id = item.id;
-        el.innerHTML = '🔊';
+    function renderSlots(items, placeholders) {
+      const slots = new Array(initialCount);
+      placeholders.forEach(pl => { slots[pl.dataset.index] = pl; });
+      let itemIdx = 0;
+      for (let i = 0; i < initialCount; i++) {
+        if (!slots[i]) slots[i] = items[itemIdx++];
+      }
+      origin.innerHTML = '';
+      slots.forEach(el => origin.appendChild(el));
+    }
 
-        // Klick zum Abspielen
-        el.addEventListener('click', () => {
-          if (isPlaying || el.classList.contains('matched')) return;
-          isPlaying = true;
-          // alle Buttons deaktivieren
-          audioList.querySelectorAll('.audio-target').forEach(btn => {
-            btn.style.pointerEvents = 'none';
-          });
+    let cards = audioData.map((d, i) => createCard(d, i));
+    let placeholders = [];
+    renderSlots(cards, placeholders);
 
-          const audio = new Audio(item.audio);
-          audio.play();
-          audio.addEventListener('ended', () => {
-            isPlaying = false;
-            // nur noch nicht gematchte Buttons reaktivieren
-            audioList.querySelectorAll('.audio-target:not(.matched)').forEach(btn => {
-              btn.style.pointerEvents = 'auto';
-            });
-          });
-        });
-
-        // Drag & Drop
-        el.addEventListener('dragover', e => {
-          e.preventDefault();
-          if (!el.classList.contains('matched')) el.classList.add('over');
-        });
-        el.addEventListener('dragleave', () => el.classList.remove('over'));
-        el.addEventListener('drop', e => {
-          e.preventDefault();
-          el.classList.remove('over');
-          const draggedId = e.dataTransfer.getData('text/plain');
-          const imgEl = imageList.querySelector(`.image-item[data-id="${draggedId}"]`);
-          if (draggedId === String(item.id)) {
-            el.classList.add('matched');
-            imgEl.classList.add('matched');
+    dropzones.forEach(zone => {
+      zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
+      zone.addEventListener('dragleave', () => { zone.classList.remove('over'); });
+      zone.addEventListener('drop', e => {
+        e.preventDefault(); zone.classList.remove('over');
+        const id = e.dataTransfer.getData('text/plain');
+        const card = document.getElementById(id);
+        const correct = card.dataset.correct === 'true';
+        const isZoneCorrect = zone.id === 'correct';
+        if ((isZoneCorrect && correct) || (!isZoneCorrect && !correct)) {
+          zone.classList.add('correct-flash');
+          setTimeout(() => { zone.classList.remove('correct-flash'); }, 500);
+          const idx = parseInt(card.dataset.index, 10);
+          placeholders.push(createPlaceholder(idx));
+          cards = cards.filter(c => c.id !== card.id);
+          renderSlots(cards, placeholders);
+          if (cards.length === 0) {
+            resultBox.style.color = 'green';
+            resultBox.textContent = '✔ Super! Du hast alles richtig zugeordnet.';
           } else {
-            imgEl.classList.add('wrong');
-            setTimeout(() => imgEl.classList.remove('wrong'), 300);
+            resultBox.style.color = 'green';
+            resultBox.textContent = '✔ Richtig!';
           }
-        });
-
-        audioList.appendChild(el);
+          setTimeout(() => { resultBox.textContent = ''; }, 2000);
+        } else {
+          resultBox.style.color = 'red';
+          resultBox.textContent = '❌ Falsch!';
+          setTimeout(() => { resultBox.textContent = ''; }, 2000);
+          card.classList.add('shake');
+          card.addEventListener('animationend', () => { card.classList.remove('shake'); }, { once: true });
+        }
       });
-    }
+    });
 
-    restartBtn.addEventListener('click', initGame);
-    initGame();
+    reshuffleBtn.addEventListener('click', () => {
+      shuffleArray(cards);
+      renderSlots(cards, placeholders);
+      resultBox.textContent = '';
+    });
   </script>
 </body>
 </html>
