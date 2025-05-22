@@ -2,59 +2,55 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Audio Drag-&-Drop Übung (angepasste Icons & Farben)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio Drag-&-Drop Übung (responsive für Handy/Tablets)</title>
   <!-- Google Fonts: Open Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
   <style>
     html, body {
       font-family: 'Open Sans', sans-serif;
+      margin: 0;
       padding: 20px;
+      height: 100%;
     }
     h1 {
       text-align: center;
       margin-bottom: 30px;
     }
-    .wrapper {
-      text-align: center;
-    }
     .container {
-      display: inline-flex;
+      display: inline-flex; /* passt sich der Kartenbreite an */
       flex-direction: column;
       align-items: flex-start;
       gap: 20px;
     }
-    #audios, #dropzones {
+    /* Karten links */
+    #audios {
+      display: flex;
+      gap: 20px;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+    }
+    /* Aktion-Bereich (Dropzones + Meldung) zentriert unter den Karten */
+    #action-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      align-self: center;
+    }
+    /* Dropzones nebeneinander mit gleichem Abstand wie Karten */
+    #dropzones {
       display: flex;
       gap: 20px;
     }
-    /* Zentrierte Dropzones */
-    #dropzones {
-      align-self: center;
-    }
-    /* Meldungen direkt unter Dropzones, zentriert */
+    /* Meldung zentriert */
     #result {
-      align-self: center;
       text-align: center;
       font-size: 1.4em;
       height: 1.5em;
       margin: 0;
-    }
-    /* Button direkt unter Meldung, zentriert */
-    #controls {
-      align-self: center;
-      display: flex;
-      justify-content: center;
-    }
-    #controls button {
-      background: #153BFF;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      padding: 10px 20px;
-      font-size: 1em;
-      cursor: pointer;
     }
     .audio-item, .dropzone, .placeholder {
       width: 150px;
@@ -73,16 +69,22 @@
       cursor: grab;
       transition: transform 0.2s;
     }
-    .audio-item:active { cursor: grabbing; }
+    .audio-item:active {
+      cursor: grabbing;
+    }
     .dropzone {
       border: 3px dashed #888;
       font-size: 1.2em;
       color: #555;
       transition: background 0.3s;
     }
-    .dropzone.over { background-color: #FF33CC; }
-    .dropzone.correct-flash { background-color: #FF33CC !important; }
-    /* Platzhalter sehen aus wie Dropzones */
+    .dropzone.over {
+      background-color: #FF33CC;
+    }
+    .dropzone.correct-flash {
+      background-color: #FF33CC !important;
+    }
+    /* Platzhalter im Dropzone-Stil */
     .placeholder {
       border: 3px dashed #888;
       background: none;
@@ -98,24 +100,45 @@
       animation: shake 0.5s;
       border-color: red;
     }
+    /* Responsive Anpassungen */
+    @media (max-width: 768px) {
+      .audio-item, .dropzone, .placeholder {
+        width: 120px;
+        height: 120px;
+        font-size: 1.5em;
+      }
+      #audios { gap: 15px; }
+      #dropzones { gap: 15px; }
+    }
+    @media (max-width: 480px) {
+      .audio-item, .dropzone, .placeholder {
+        width: 100px;
+        height: 100px;
+        font-size: 1.2em;
+      }
+      #audios { gap: 10px; }
+      #dropzones {
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      #action-area { width: 100%; }
+    }
   </style>
 </head>
 <body>
-  <h1></h1>
-  <div class="wrapper">
-    <div class="container">
-      <div id="audios"></div>
+  <div class="container">
+    <div id="audios"></div>
+    <div id="action-area">
       <div id="dropzones">
         <div class="dropzone" id="correct">Richtig</div>
         <div class="dropzone" id="wrong">Falsch</div>
       </div>
       <div id="result"></div>
-      <div id="controls">
-        <button id="reshuffle">Noch einmal spielen</button>
-      </div>
     </div>
   </div>
   <script>
+    let isPlaying = false;
     const audioData = [
       { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Modul%206/Teil%201/DOC_M6_Teil%201_bauchaorta.mp3', correct: true },
       { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Modul%206/Teil%201/DOC_M6_Teil%201_checkup35.mp3', correct: false },
@@ -126,15 +149,7 @@
     const origin = document.getElementById('audios');
     const dropzones = document.querySelectorAll('.dropzone');
     const resultBox = document.getElementById('result');
-    const reshuffleBtn = document.getElementById('reshuffle');
-    let initialCount = audioData.length;
-
-    function shuffleArray(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-    }
+    const initialCount = audioData.length;
 
     function createPlaceholder(index) {
       const pl = document.createElement('div');
@@ -143,57 +158,70 @@
       return pl;
     }
 
-    function createCard(itemData, index) {
+    function createCard(data, index) {
       const card = document.createElement('div');
       card.className = 'audio-item';
-      card.dataset.src = itemData.src;
-      card.dataset.correct = itemData.correct;
+      card.dataset.src = data.src;
+      card.dataset.correct = data.correct;
       card.dataset.index = index;
       card.id = 'item' + index;
       card.textContent = '🔊';
+
       card.addEventListener('click', () => {
-        if (card.dataset.playing === 'true') return;
+        if (isPlaying) return;
+        isPlaying = true;
         const audio = new Audio(card.dataset.src);
-        card.dataset.playing = 'true';
         audio.play();
-        audio.addEventListener('ended', () => { card.dataset.playing = 'false'; });
+        audio.addEventListener('ended', () => { isPlaying = false; });
       });
-      card.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', card.id); });
+
+      card.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', card.id);
+      });
       card.draggable = true;
       return card;
     }
 
-    function renderSlots(items, placeholders) {
+    function renderSlots(cards, placeholders) {
       const slots = new Array(initialCount);
-      placeholders.forEach(pl => { slots[pl.dataset.index] = pl; });
-      let itemIdx = 0;
+      placeholders.forEach(pl => slots[pl.dataset.index] = pl);
+      let ci = 0;
       for (let i = 0; i < initialCount; i++) {
-        if (!slots[i]) slots[i] = items[itemIdx++];
+        if (!slots[i]) slots[i] = cards[ci++];
       }
       origin.innerHTML = '';
       slots.forEach(el => origin.appendChild(el));
     }
 
-    let cards = audioData.map((d, i) => createCard(d, i));
+    let cards = audioData.map((d,i) => createCard(d, i));
     let placeholders = [];
     renderSlots(cards, placeholders);
 
     dropzones.forEach(zone => {
-      zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
-      zone.addEventListener('dragleave', () => { zone.classList.remove('over'); });
+      zone.addEventListener('dragover', e => {
+        e.preventDefault();
+        zone.classList.add('over');
+      });
+      zone.addEventListener('dragleave', () => {
+        zone.classList.remove('over');
+      });
       zone.addEventListener('drop', e => {
-        e.preventDefault(); zone.classList.remove('over');
+        e.preventDefault();
+        zone.classList.remove('over');
         const id = e.dataTransfer.getData('text/plain');
         const card = document.getElementById(id);
         const correct = card.dataset.correct === 'true';
-        const isZoneCorrect = zone.id === 'correct';
-        if ((isZoneCorrect && correct) || (!isZoneCorrect && !correct)) {
+        const zoneIsCorrect = zone.id === 'correct';
+
+        if ((zoneIsCorrect && correct) || (!zoneIsCorrect && !correct)) {
           zone.classList.add('correct-flash');
-          setTimeout(() => { zone.classList.remove('correct-flash'); }, 500);
+          setTimeout(() => zone.classList.remove('correct-flash'), 500);
+
           const idx = parseInt(card.dataset.index, 10);
           placeholders.push(createPlaceholder(idx));
           cards = cards.filter(c => c.id !== card.id);
           renderSlots(cards, placeholders);
+
           if (cards.length === 0) {
             resultBox.style.color = 'green';
             resultBox.textContent = '✔ Super! Du hast alles richtig zugeordnet.';
@@ -201,21 +229,15 @@
             resultBox.style.color = 'green';
             resultBox.textContent = '✔ Richtig!';
           }
-          setTimeout(() => { resultBox.textContent = ''; }, 2000);
         } else {
           resultBox.style.color = 'red';
           resultBox.textContent = '❌ Falsch!';
-          setTimeout(() => { resultBox.textContent = ''; }, 2000);
           card.classList.add('shake');
-          card.addEventListener('animationend', () => { card.classList.remove('shake'); }, { once: true });
+          card.addEventListener('animationend', () => card.classList.remove('shake'), { once: true });
         }
-      });
-    });
 
-    reshuffleBtn.addEventListener('click', () => {
-      shuffleArray(cards);
-      renderSlots(cards, placeholders);
-      resultBox.textContent = '';
+        setTimeout(() => { resultBox.textContent = ''; }, 2000);
+      });
     });
   </script>
 </body>
