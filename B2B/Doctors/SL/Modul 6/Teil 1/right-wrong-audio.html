@@ -2,10 +2,14 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Audio Drag-&-Drop Übung (Platzhalter, Button & zentrierte Felder)</title>
+  <title>Audio Drag-&-Drop Übung (angepasste Icons & Farben)</title>
+  <!-- Google Fonts: Open Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: sans-serif;
+    html, body {
+      font-family: 'Open Sans', sans-serif;
       padding: 20px;
     }
     h1 {
@@ -25,9 +29,23 @@
       display: flex;
       gap: 20px;
     }
-    /* Zentriert die Dropzones innerhalb des Containers */
+    /* Zentrierte Dropzones */
     #dropzones {
       align-self: center;
+    }
+    /* Meldungen direkt unter Dropzones, zentriert */
+    #result {
+      align-self: center;
+      text-align: center;
+      font-size: 1.4em;
+      height: 1.5em;
+      margin: 0;
+    }
+    /* Button direkt unter Meldung, zentriert */
+    #controls {
+      align-self: center;
+      display: flex;
+      justify-content: center;
     }
     #controls button {
       background: #153BFF;
@@ -64,27 +82,22 @@
     }
     .dropzone.over { background-color: #FF33CC; }
     .dropzone.correct-flash { background-color: #FF33CC !important; }
+    /* Platzhalter sehen aus wie Dropzones */
     .placeholder {
-      border: 2px solid #153BFF;
-      background: #153BFF;
-      color: #fff;
-    }
-    #controls {
-      /* Button direkt unter den Dropzones */
-      margin-top: -10px;
-    }
-    #result {
-      text-align: center;
-      font-size: 1.4em;
-      min-height: 1.4em;
-      margin-top: 20px;
+      border: 3px dashed #888;
+      background: none;
+      color: #555;
+      font-size: 1.2em;
     }
     @keyframes shake {
       0%,100% { transform: translateX(0); }
       20%,60% { transform: translateX(-10px); }
       40%,80% { transform: translateX(10px); }
     }
-    .shake { animation: shake 0.5s; border-color: red; }
+    .shake {
+      animation: shake 0.5s;
+      border-color: red;
+    }
   </style>
 </head>
 <body>
@@ -96,12 +109,12 @@
         <div class="dropzone" id="correct">Richtig</div>
         <div class="dropzone" id="wrong">Falsch</div>
       </div>
+      <div id="result"></div>
       <div id="controls">
         <button id="reshuffle">Noch einmal spielen</button>
       </div>
     </div>
   </div>
-  <div id="result"></div>
   <script>
     const audioData = [
       { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Modul%206/Teil%201/DOC_M6_Teil%201_bauchaorta.mp3', correct: true },
@@ -115,18 +128,21 @@
     const resultBox = document.getElementById('result');
     const reshuffleBtn = document.getElementById('reshuffle');
     let initialCount = audioData.length;
+
     function shuffleArray(arr) {
       for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [arr[i], arr[j]] = [arr[j], arr[i]];
       }
     }
+
     function createPlaceholder(index) {
       const pl = document.createElement('div');
       pl.className = 'placeholder';
       pl.dataset.index = index;
       return pl;
     }
+
     function createCard(itemData, index) {
       const card = document.createElement('div');
       card.className = 'audio-item';
@@ -146,6 +162,7 @@
       card.draggable = true;
       return card;
     }
+
     function renderSlots(items, placeholders) {
       const slots = new Array(initialCount);
       placeholders.forEach(pl => { slots[pl.dataset.index] = pl; });
@@ -156,9 +173,11 @@
       origin.innerHTML = '';
       slots.forEach(el => origin.appendChild(el));
     }
+
     let cards = audioData.map((d, i) => createCard(d, i));
     let placeholders = [];
     renderSlots(cards, placeholders);
+
     dropzones.forEach(zone => {
       zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
       zone.addEventListener('dragleave', () => { zone.classList.remove('over'); });
@@ -171,18 +190,28 @@
         if ((isZoneCorrect && correct) || (!isZoneCorrect && !correct)) {
           zone.classList.add('correct-flash');
           setTimeout(() => { zone.classList.remove('correct-flash'); }, 500);
-          resultBox.textContent = '✅ Richtig!'; resultBox.style.color = 'green';
           const idx = parseInt(card.dataset.index, 10);
           placeholders.push(createPlaceholder(idx));
           cards = cards.filter(c => c.id !== card.id);
           renderSlots(cards, placeholders);
+          if (cards.length === 0) {
+            resultBox.style.color = 'green';
+            resultBox.textContent = '✔ Super! Du hast alles richtig zugeordnet.';
+          } else {
+            resultBox.style.color = 'green';
+            resultBox.textContent = '✔ Richtig!';
+          }
+          setTimeout(() => { resultBox.textContent = ''; }, 2000);
         } else {
-          resultBox.textContent = '❌ Falsch!'; resultBox.style.color = 'red';
+          resultBox.style.color = 'red';
+          resultBox.textContent = '❌ Falsch!';
+          setTimeout(() => { resultBox.textContent = ''; }, 2000);
           card.classList.add('shake');
           card.addEventListener('animationend', () => { card.classList.remove('shake'); }, { once: true });
         }
       });
     });
+
     reshuffleBtn.addEventListener('click', () => {
       shuffleArray(cards);
       renderSlots(cards, placeholders);
