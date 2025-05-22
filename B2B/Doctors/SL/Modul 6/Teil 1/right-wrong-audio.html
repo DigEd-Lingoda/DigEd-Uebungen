@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Audio Drag-&-Drop Übung (Fixierte Reihenfolge)</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    #audios, #dropzones {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .audio-item, .dropzone {
+      width: 150px;
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      user-select: none;
+      font-size: 2em;
+    }
+
+    .audio-item {
+      border: 2px solid #153BFF;
+      background: #153BFF;
+      color: #fff;
+      cursor: grab;
+      transition: transform 0.2s;
+      position: relative;
+    }
+    .audio-item:active { cursor: grabbing; }
+
+    .dropzone {
+      border: 3px dashed #888;
+      font-size: 1.2em;
+      color: #555;
+      transition: background 0.3s;
+    }
+    .dropzone.over { background: #e0f7fa; }
+    .dropzone.correct-flash { background-color: #FF33CC !important; }
+
+    #result {
+      text-align: center;
+      font-size: 1.4em;
+      min-height: 1.4em;
+      margin-top: 10px;
+    }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%,60% { transform: translateX(-10px); }
+      40%,80% { transform: translateX(10px); }
+    }
+    .shake {
+      animation: shake 0.5s;
+      border-color: red;
+    }
+  </style>
+</head>
+<body>
+  <h1>Audio Übung: Richtig oder Falsch?</h1>
+
+  <div id="audios">
+    <div class="audio-item" draggable="true" data-correct="true"  data-src="audio1.mp3" id="item1">🔊</div>
+    <div class="audio-item" draggable="true" data-correct="false" data-src="audio2.mp3" id="item2">🔊</div>
+    <div class="audio-item" draggable="true" data-correct="true"  data-src="audio3.mp3" id="item3">🔊</div>
+    <div class="audio-item" draggable="true" data-correct="false" data-src="audio4.mp3" id="item4">🔊</div>
+    <div class="audio-item" draggable="true" data-correct="true"  data-src="audio5.mp3" id="item5">🔊</div>
+  </div>
+
+  <div id="dropzones">
+    <div class="dropzone" id="correct">Richtig</div>
+    <div class="dropzone" id="wrong">Falsch</div>
+  </div>
+
+  <div id="result"></div>
+
+  <script>
+    const origin = document.getElementById('audios');
+    const items = Array.from(document.querySelectorAll('.audio-item'));
+    const dropzones = document.querySelectorAll('.dropzone');
+    const resultBox = document.getElementById('result');
+
+    // Ursprüngliche Position speichern
+    items.forEach((item, index) => {
+      item.dataset.index = index;
+      // Klick zum Abspielen, Klick deaktiviert während Wiedergabe
+      item.addEventListener('click', () => {
+        if (item.dataset.playing === 'true') return;
+        const audio = new Audio(item.dataset.src);
+        item.dataset.playing = 'true';
+        audio.play();
+        audio.addEventListener('ended', () => { item.dataset.playing = 'false'; });
+      });
+      // Dragstart
+      item.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', item.id);
+      });
+    });
+
+    dropzones.forEach(zone => {
+      zone.addEventListener('dragover', e => {
+        e.preventDefault();
+        zone.classList.add('over');
+      });
+      zone.addEventListener('dragleave', () => {
+        zone.classList.remove('over');
+      });
+      zone.addEventListener('drop', e => {
+        e.preventDefault();
+        zone.classList.remove('over');
+
+        const id = e.dataTransfer.getData('text/plain');
+        const dragged = document.getElementById(id);
+        const correct = dragged.dataset.correct === 'true';
+        const isZoneCorrect = zone.id === 'correct';
+
+        if ((isZoneCorrect && correct) || (!isZoneCorrect && !correct)) {
+          // Richtig: Feld pink flashen und Karte entfernen
+          zone.classList.add('correct-flash');
+          setTimeout(() => { zone.classList.remove('correct-flash'); }, 500);
+          resultBox.textContent = '✅ Richtig!';
+          resultBox.style.color = 'green';
+          dragged.remove();
+        } else {
+          // Falsch: Karte schütteln und an Originalposition zurück
+          resultBox.textContent = '❌ Falsch!';
+          resultBox.style.color = 'red';
+          dragged.classList.add('shake');
+          dragged.addEventListener('animationend', () => {
+            dragged.classList.remove('shake');
+            const idx = parseInt(dragged.dataset.index, 10);
+            const refNode = origin.children[idx] || null;
+            origin.insertBefore(dragged, refNode);
+          }, { once: true });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
