@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Audio Drag-&-Drop Übung (Fixierte Reihenfolge)</title>
+  <title>Audio Drag-&-Drop Übung (Platzhalter, Button & zentrierte Felder)</title>
   <style>
     body {
       font-family: sans-serif;
@@ -12,15 +12,33 @@
       text-align: center;
       margin-bottom: 30px;
     }
-
+    .wrapper {
+      text-align: center;
+    }
+    .container {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
     #audios, #dropzones {
       display: flex;
       gap: 20px;
-      justify-content: center;
-      margin-bottom: 20px;
     }
-
-    .audio-item, .dropzone {
+    /* Zentriert die Dropzones innerhalb des Containers */
+    #dropzones {
+      align-self: center;
+    }
+    #controls button {
+      background: #153BFF;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    .audio-item, .dropzone, .placeholder {
       width: 150px;
       height: 150px;
       display: flex;
@@ -30,122 +48,145 @@
       user-select: none;
       font-size: 2em;
     }
-
     .audio-item {
       border: 2px solid #153BFF;
       background: #153BFF;
       color: #fff;
       cursor: grab;
       transition: transform 0.2s;
-      position: relative;
     }
     .audio-item:active { cursor: grabbing; }
-
     .dropzone {
       border: 3px dashed #888;
       font-size: 1.2em;
       color: #555;
       transition: background 0.3s;
     }
-    .dropzone.over { background: #e0f7fa; }
+    .dropzone.over { background-color: #FF33CC; }
     .dropzone.correct-flash { background-color: #FF33CC !important; }
-
+    .placeholder {
+      border: 2px solid #153BFF;
+      background: #153BFF;
+      color: #fff;
+    }
+    #controls {
+      /* Button direkt unter den Dropzones */
+      margin-top: -10px;
+    }
     #result {
       text-align: center;
       font-size: 1.4em;
       min-height: 1.4em;
-      margin-top: 10px;
+      margin-top: 20px;
     }
-
     @keyframes shake {
       0%,100% { transform: translateX(0); }
       20%,60% { transform: translateX(-10px); }
       40%,80% { transform: translateX(10px); }
     }
-    .shake {
-      animation: shake 0.5s;
-      border-color: red;
-    }
+    .shake { animation: shake 0.5s; border-color: red; }
   </style>
 </head>
 <body>
   <h1></h1>
-
-  <div id="audios">
-    <div class="audio-item" draggable="true" data-correct="true"  data-src="https://github.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Modul%206/Teil%201/DOC_M6_Teil%201_bauchaorta.mp3" id="item1">🔊</div>
-    <div class="audio-item" draggable="true" data-correct="false" data-src="https://github.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Modul%206/Teil%201/DOC_M6_Teil%201_checkup35.mp3" id="item2">🔊</div>
-    <div class="audio-item" draggable="true" data-correct="true"  data-src="https://github.com/DigEd-Lingoda/DigEd-Uebungen/blob/main/B2B/Doctors/SL/Modul%206/Teil%201/DOC_M6_Teil%201_koloskopie.mp3" id="item3">🔊</div>
-    <div class="audio-item" draggable="true" data-correct="false" data-src="https://github.com/DigEd-Lingoda/DigEd-Uebungen/blob/main/B2B/Doctors/SL/Modul%206/Teil%201/DOC_M6_Teil%201_screening.mp3" id="item4">🔊</div>
-    <div class="audio-item" draggable="true" data-correct="false"  data-src="https://github.com/DigEd-Lingoda/DigEd-Uebungen/blob/main/B2B/Doctors/SL/Modul%206/Teil%201/DOC_M6_Teil%201_stuhltest.mp3" id="item5">🔊</div>
+  <div class="wrapper">
+    <div class="container">
+      <div id="audios"></div>
+      <div id="dropzones">
+        <div class="dropzone" id="correct">Richtig</div>
+        <div class="dropzone" id="wrong">Falsch</div>
+      </div>
+      <div id="controls">
+        <button id="reshuffle">Noch einmal spielen</button>
+      </div>
+    </div>
   </div>
-
-  <div id="dropzones">
-    <div class="dropzone" id="correct">Richtig</div>
-    <div class="dropzone" id="wrong">Falsch</div>
-  </div>
-
   <div id="result"></div>
-
   <script>
+    const audioData = [
+      { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Modul%206/Teil%201/DOC_M6_Teil%201_bauchaorta.mp3', correct: true },
+      { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Modul%206/Teil%201/DOC_M6_Teil%201_checkup35.mp3', correct: false },
+      { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Modul%206/Teil%201/DOC_M6_Teil%201_koloskopie.mp3', correct: true },
+      { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Modul%206/Teil%201/DOC_M6_Teil%201_screening.mp3', correct: false },
+      { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Modul%206/Teil%201/DOC_M6_Teil%201_stuhltest.mp3', correct: false }
+    ];
     const origin = document.getElementById('audios');
-    const items = Array.from(document.querySelectorAll('.audio-item'));
     const dropzones = document.querySelectorAll('.dropzone');
     const resultBox = document.getElementById('result');
-
-    // Ursprüngliche Position speichern
-    items.forEach((item, index) => {
-      item.dataset.index = index;
-      // Klick zum Abspielen, Klick deaktiviert während Wiedergabe
-      item.addEventListener('click', () => {
-        if (item.dataset.playing === 'true') return;
-        const audio = new Audio(item.dataset.src);
-        item.dataset.playing = 'true';
+    const reshuffleBtn = document.getElementById('reshuffle');
+    let initialCount = audioData.length;
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+    function createPlaceholder(index) {
+      const pl = document.createElement('div');
+      pl.className = 'placeholder';
+      pl.dataset.index = index;
+      return pl;
+    }
+    function createCard(itemData, index) {
+      const card = document.createElement('div');
+      card.className = 'audio-item';
+      card.dataset.src = itemData.src;
+      card.dataset.correct = itemData.correct;
+      card.dataset.index = index;
+      card.id = 'item' + index;
+      card.textContent = '🔊';
+      card.addEventListener('click', () => {
+        if (card.dataset.playing === 'true') return;
+        const audio = new Audio(card.dataset.src);
+        card.dataset.playing = 'true';
         audio.play();
-        audio.addEventListener('ended', () => { item.dataset.playing = 'false'; });
+        audio.addEventListener('ended', () => { card.dataset.playing = 'false'; });
       });
-      // Dragstart
-      item.addEventListener('dragstart', e => {
-        e.dataTransfer.setData('text/plain', item.id);
-      });
-    });
-
+      card.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', card.id); });
+      card.draggable = true;
+      return card;
+    }
+    function renderSlots(items, placeholders) {
+      const slots = new Array(initialCount);
+      placeholders.forEach(pl => { slots[pl.dataset.index] = pl; });
+      let itemIdx = 0;
+      for (let i = 0; i < initialCount; i++) {
+        if (!slots[i]) slots[i] = items[itemIdx++];
+      }
+      origin.innerHTML = '';
+      slots.forEach(el => origin.appendChild(el));
+    }
+    let cards = audioData.map((d, i) => createCard(d, i));
+    let placeholders = [];
+    renderSlots(cards, placeholders);
     dropzones.forEach(zone => {
-      zone.addEventListener('dragover', e => {
-        e.preventDefault();
-        zone.classList.add('over');
-      });
-      zone.addEventListener('dragleave', () => {
-        zone.classList.remove('over');
-      });
+      zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
+      zone.addEventListener('dragleave', () => { zone.classList.remove('over'); });
       zone.addEventListener('drop', e => {
-        e.preventDefault();
-        zone.classList.remove('over');
-
+        e.preventDefault(); zone.classList.remove('over');
         const id = e.dataTransfer.getData('text/plain');
-        const dragged = document.getElementById(id);
-        const correct = dragged.dataset.correct === 'true';
+        const card = document.getElementById(id);
+        const correct = card.dataset.correct === 'true';
         const isZoneCorrect = zone.id === 'correct';
-
         if ((isZoneCorrect && correct) || (!isZoneCorrect && !correct)) {
-          // Richtig: Feld pink flashen und Karte entfernen
           zone.classList.add('correct-flash');
           setTimeout(() => { zone.classList.remove('correct-flash'); }, 500);
-          resultBox.textContent = '✅ Richtig!';
-          resultBox.style.color = 'green';
-          dragged.remove();
+          resultBox.textContent = '✅ Richtig!'; resultBox.style.color = 'green';
+          const idx = parseInt(card.dataset.index, 10);
+          placeholders.push(createPlaceholder(idx));
+          cards = cards.filter(c => c.id !== card.id);
+          renderSlots(cards, placeholders);
         } else {
-          // Falsch: Karte schütteln und an Originalposition zurück
-          resultBox.textContent = '❌ Falsch!';
-          resultBox.style.color = 'red';
-          dragged.classList.add('shake');
-          dragged.addEventListener('animationend', () => {
-            dragged.classList.remove('shake');
-            const idx = parseInt(dragged.dataset.index, 10);
-            const refNode = origin.children[idx] || null;
-            origin.insertBefore(dragged, refNode);
-          }, { once: true });
+          resultBox.textContent = '❌ Falsch!'; resultBox.style.color = 'red';
+          card.classList.add('shake');
+          card.addEventListener('animationend', () => { card.classList.remove('shake'); }, { once: true });
         }
       });
+    });
+    reshuffleBtn.addEventListener('click', () => {
+      shuffleArray(cards);
+      renderSlots(cards, placeholders);
+      resultBox.textContent = '';
     });
   </script>
 </body>
