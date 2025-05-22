@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Audio Drag-&-Drop Übung (angepasste Icons & Farben)</title>
+  <title>Audio Drag-&-Drop Übung (zentrierte Aktion unter Karten)</title>
   <!-- Google Fonts: Open Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -10,42 +10,50 @@
   <style>
     html, body {
       font-family: 'Open Sans', sans-serif;
+      margin: 0;
       padding: 20px;
     }
     h1 {
       text-align: center;
       margin-bottom: 30px;
     }
-    .wrapper {
-      text-align: center;
-    }
     .container {
-      display: inline-flex;
+      display: inline-flex; /* inline so it shrink-wraps to cards */
       flex-direction: column;
       align-items: flex-start;
       gap: 20px;
     }
-    #audios, #dropzones {
+    /* Karten links */
+    #audios {
+      display: flex;
+      gap: 20px;
+      justify-content: flex-start; /* links ausrichten */
+      /* width removed to allow shrink-wrap */
+    }
+    /* Aktion-Bereich (Dropzones, Meldung, Button) zentriert unter Karten */
+    #action-area {
+      width: fit-content;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    /* Dropzones nebeneinander */
+    #dropzones {
       display: flex;
       gap: 20px;
     }
-    /* Zentrierte Dropzones */
-    #dropzones {
-      align-self: center;
-    }
-    /* Meldungen direkt unter Dropzones, zentriert */
+    /* Meldung zentriert */
     #result {
-      align-self: center;
       text-align: center;
       font-size: 1.4em;
       height: 1.5em;
       margin: 0;
     }
-    /* Button direkt unter Meldung, zentriert */
+    /* Button zentriert */
     #controls {
-      align-self: center;
       display: flex;
-      justify-content: center;
     }
     #controls button {
       background: #153BFF;
@@ -73,16 +81,22 @@
       cursor: grab;
       transition: transform 0.2s;
     }
-    .audio-item:active { cursor: grabbing; }
+    .audio-item:active {
+      cursor: grabbing;
+    }
     .dropzone {
       border: 3px dashed #888;
       font-size: 1.2em;
       color: #555;
       transition: background 0.3s;
     }
-    .dropzone.over { background-color: #FF33CC; }
-    .dropzone.correct-flash { background-color: #FF33CC !important; }
-    /* Platzhalter sehen aus wie Dropzones */
+    .dropzone.over {
+      background-color: #FF33CC;
+    }
+    .dropzone.correct-flash {
+      background-color: #FF33CC !important;
+    }
+    /* Platzhalter im Dropzone-Stil */
     .placeholder {
       border: 3px dashed #888;
       background: none;
@@ -90,9 +104,9 @@
       font-size: 1.2em;
     }
     @keyframes shake {
-      0%,100% { transform: translateX(0); }
-      20%,60% { transform: translateX(-10px); }
-      40%,80% { transform: translateX(10px); }
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-10px); }
+      40%, 80% { transform: translateX(10px); }
     }
     .shake {
       animation: shake 0.5s;
@@ -101,10 +115,9 @@
   </style>
 </head>
 <body>
-  <h1></h1>
-  <div class="wrapper">
-    <div class="container">
-      <div id="audios"></div>
+  <div class="container">
+    <div id="audios"></div>
+    <div id="action-area">
       <div id="dropzones">
         <div class="dropzone" id="correct">Richtig</div>
         <div class="dropzone" id="wrong">Falsch</div>
