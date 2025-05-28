@@ -1,0 +1,90 @@
+const cardsData = [
+      { q: 'q1', question: 'Warum ist die Fremdanamnese nicht immer die erste Wahl?', opts: ['Der Patient kann oft selbst Auskunft geben.', 'Sie ist ungenau.', 'Sie ist teuer.', 'Nicht gesetzlich definiert.'], correct: 'Der Patient kann oft selbst Auskunft geben.' },
+      { q: 'q2', question: 'Warum sind auch Pflegekräfte für Fremdanamnese geeignet?', opts: ['Gesetzliche Pflicht', 'Wie Familie', 'Keine Schweigepflicht', 'Kennen den Patienten'], correct: 'Kennen den Patienten' },
+      { q: 'q3', question: 'Worauf basiert die Fremdanamnese hauptsächlich?', opts: ['Laborwerte', 'Subjektive Einschätzungen Dritter', 'Röntgen', 'Arztbriefe'], correct: 'Subjektive Einschätzungen Dritter' },
+      { q: 'q4', question: 'Worauf stützt sich Fremdanamnese bei Bewusstlosigkeit?', opts: ['Schweigepflicht', 'Rettungsdienst', 'Einwilligung der Pflege', 'Mutmaßlicher Wille'], correct: 'Mutmaßlicher Wille' },
+      { q: 'q5', question: 'Welcher Aspekt gehört NICHT zur Fremdanamnese?', opts: ['Medikationen', 'Allergien', 'Familienstand', 'Psychosoziale Faktoren'], correct: 'Familienstand' },
+      { q: 'q6', question: 'Was gehört zu psychosozialen Faktoren?', opts: ['Blutdruckwerte', 'Medikamentendosierung', 'Familiäre/berufliche Unterstützung', 'Bildgebung'], correct: 'Familiäre/berufliche Unterstützung' },
+      { q: 'q7', question: 'Was eignet sich zur Validierung fremdanamnestischer Angaben?', opts: ['Tagebücher', 'Arzt-/Pflegeberichte', 'Soziale Medien', 'Arzneibroschüren'], correct: 'Arzt-/Pflegeberichte' },
+      { q: 'q8', question: 'Wozu dienen standardisierte Fragen?', opts: ['Reaktion auf Gesprächsdynamik', 'Ja/Nein erzwingen', 'Systematische Abdeckung', 'Gespräch verkürzen'], correct: 'Systematische Abdeckung' }
+    ];
+
+    const game = document.getElementById('game');
+    let currentCard = null;
+    let currentIndex = 0;
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function updateFinalMessage() {
+      if (document.querySelectorAll('.card.matched').length === cardsData.length) {
+        document.getElementById('final-message').style.display = 'block';
+      }
+    }
+
+    function createCards() {
+      cardsData.forEach((data, index) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.dataset.index = index;
+        card.innerHTML = `
+          <div class="card-inner">
+            <div class="card-front">Frage ${index + 1}</div>
+            <div class="card-back">
+              <div class="question">${data.question}</div>
+              <div class="options">
+                ${shuffle([...data.opts]).map((o, i) => `
+                  <label data-text="${o}">
+                    <span class="option-letter">${String.fromCharCode(65 + i)})</span>
+                    <span class="option-text">${o}</span>
+                    <input type="radio" name="${data.q}" />
+                  </label>
+                `).join('')}
+              </div>
+              <div class="feedback" id="feedback-${index}"></div>
+            </div>
+          </div>`;
+        game.appendChild(card);
+
+        card.addEventListener('click', () => {
+          if (card.classList.contains('matched') || currentCard !== null && currentCard !== card) return;
+          if (parseInt(card.dataset.index) !== currentIndex) return;
+          card.classList.add('flipped');
+          currentCard = card;
+        });
+
+        card.querySelectorAll(`input[name="${data.q}"]`).forEach(input => {
+          input.addEventListener('change', () => {
+            const selected = input.closest('label').dataset.text;
+            const feedback = document.getElementById(`feedback-${index}`);
+            if (selected === data.correct) {
+              feedback.textContent = 'Richtig!';
+              feedback.className = 'feedback correct';
+              card.classList.add('matched');
+              currentCard = null;
+              currentIndex++;
+              updateFinalMessage();
+            } else {
+              feedback.textContent = 'Leider falsch. Versuche es noch einmal.';
+              feedback.className = 'feedback wrong';
+            }
+          });
+        });
+      });
+    }
+
+    function resetGame() {
+      game.innerHTML = '';
+      document.getElementById('final-message').style.display = 'none';
+      currentCard = null;
+      currentIndex = 0;
+      createCards();
+    }
+
+    document.getElementById('restart').addEventListener('click', resetGame);
+
+    createCards();
+  </script>
+</body>
+</html>
