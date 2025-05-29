@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="de" style="background: transparent !important; border: none !important;">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flip-Quiz: 8 Multiple-Choice-Karten</title>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    html, body, iframe { background: transparent !important; border: none !important; box-shadow: none !important; margin: 0; padding: 0; }
+    body { font-family: 'Open Sans', sans-serif; padding: 20px; }
+    .game-wrapper { width:100%; max-width:660px; margin:0 auto; }
+    .memory-game { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:20px; }
+    .card { 
+      width:100%; 
+      height:200px; 
+      min-height:200px;
+      perspective:1000px; 
+      cursor:pointer; 
+      position:relative; 
+    }
+    .card.disabled { pointer-events: none; opacity: 0.5; }
+    .card-inner { 
+      width:100%; 
+      height:100%;
+      position:relative; 
+      transition:transform 0.6s; 
+      transform-style:preserve-3d; 
+      text-align:left; 
+    }
+    .card.flipped .card-inner { transform:rotateY(180deg); }
+    .card-front, .card-back {
+      position:absolute; 
+      width:100%; 
+      height:100%;
+      backface-visibility:hidden; 
+      border-radius:8px;
+      display:flex; 
+      justify-content:center; 
+      align-items:center;
+      padding:8px; 
+      box-sizing:border-box; 
+      user-select:none;
+    }
+    .card-front { 
+      background:#0000ff; 
+      color:#fff; 
+      font-size:18px; 
+      font-weight:600; 
+    }
+    .card-back {
+      background:#fff; 
+      color:#000; 
+      transform:rotateY(180deg);
+      overflow-y:auto; 
+      font-size:14px; 
+      line-height:1.4;
+      flex-direction:column; 
+      align-items:flex-start;
+      justify-content:flex-start;
+    }
+    .card.flipped:not(.mismatch):not(.matched) .card-back { border:2px solid #0000ff; }
+    .card.matched .card-back { background:#ff00ff; color:#fff; border:none; }
+    @keyframes shake-180 { 0%,100% { transform:rotateY(180deg) translateX(0); } 20%,60% { transform:rotateY(180deg) translateX(-10px); } 40%,80% { transform:rotateY(180deg) translateX(10px); } }
+    .card.flipped.mismatch .card-back { background:#ff0000; color:#fff; border:none; }
+    .card.flipped.mismatch .card-inner { animation:shake-180 0.6s; }
+    #restart { display:block; margin:0 auto; padding:8px 16px; font-size:14px; background:#0000ff; color:#fff; border:none; border-radius:6px; cursor:pointer; }
+    #restart:hover { opacity:0.9; }
+    
+    /* Success Modal Styles */
+    .success-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .success-modal.show {
+      display: flex;
+    }
+    .success-content {
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      max-width: 400px;
+      width: 90%;
+      animation: modalAppear 0.3s ease-out;
+    }
+    @keyframes modalAppear {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .success-content h2 {
+      color: #00aa00;
+      margin-bottom: 15px;
+      font-size: 24px;
+    }
+    .success-content p {
+      font-size: 16px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .success-button {
+      background: #00aa00;
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    .success-button:hover {
+      background: #008800;
+    }
+    .success-button.secondary {
+      background: #0000ff;
+    }
+    .success-button.secondary:hover {
+      background: #0000cc;
+    }
+    
+    @media(max-width:600px){ 
+      .memory-game{grid-template-columns:repeat(2,1fr);} 
+      .game-wrapper{max-width:100%;} 
+      .card { height:220px; min-height:220px; }
+      .success-content {
+        padding: 20px;
+        margin: 10px;
+      }
+    }
+    .question{font-weight:600; margin-bottom:0.4rem;}
+    .options label{display:flex; align-items:flex-start; margin:0.2rem 0; cursor:pointer; font-size:12px;}
+    .option-letter { font-weight:600; margin-right:0.3em; min-width:20px; }
+    .option-text { flex:1; }
+  </style>
+</head>
+<body>
+  <div class="game-wrapper">
+    <div class="memory-game" id="game"></div>
+    <button id="restart">Noch einmal spielen!</button>
+  </div>
+
+  <!-- Success Modal -->
+  <div class="success-modal" id="successModal">
+    <div class="success-content">
+      <h2>🎉 Gut gemacht!</h2>
+      <p>Nun geh zurück in das Selbstlernmodul.</p>
+      <button class="success-button" onclick="closeSuccessModal()">Verstanden</button>
+      <button class="success-button secondary" onclick="restartGame()">Nochmal spielen</button>
+    </div>
+  </div>
+
+  <script>
+    function shuffleOptions(container) {
+      const labels = Array.from(container.querySelectorAll('label'));
+      const texts = labels.map(lbl => lbl.dataset.text).sort(() => Math.random() - 0.5);
+      labels.forEach((lbl, idx) => {
+        const text = texts[idx];
+        lbl.dataset.text = text;
+        lbl.querySelector('.option-text').textContent = text;
+        const letter = String.fromCharCode(65 + idx) + ')';
+        lbl.querySelector('.option-letter').textContent = letter;
+        lbl.querySelector('input').value = letter.charAt(0);
+      });
+    }
+
+    const cardsData = [
+      { q: 'q1', question: 'Was ist das Hauptziel des gelben U-Hefts?', opts: ['die Dokumentation von Geburtsdaten', 'die frühzeitige Einschulung des Kindes', 'die systematische Vorsorgeuntersuchung und Früherkennung von Auffälligkeiten', 'der Nachweis ärztlicher Leistungen für die Krankenkasse'], correct: 'die systematische Vorsorgeuntersuchung und Früherkennung von Auffälligkeiten' },
+      { q: 'q2', question: 'Die J2-Untersuchung …', opts: ['… ist gesetzlich vorgeschrieben.', '… findet im Alter von 12 Jahren statt.', '… wird von allen Krankenkassen erstattet.', '… wird nicht von allen Krankenkassen erstattet.'], correct: '… wird nicht von allen Krankenkassen erstattet.' },
+      { q: 'q3', question: 'Was gehört NICHT zu den Zielen der U-Untersuchungen?', opts: ['frühzeitige Erkennung von Vernachlässigung', 'schulische Leistungsdiagnostik', 'Feststellung körperlicher Entwicklungsverzögerungen', 'Diagnostik neurologischer Störungen'], correct: 'schulische Leistungsdiagnostik' },
+      { q: 'q4', question: 'Die Eltern erhalten das gelbe U-Heft in der Regel …', opts: ['bei der Geburtsanmeldung im Rathaus', 'in der Schule', 'in der Geburtsklinik', 'beim Gesundheitsamt'], correct: 'in der Geburtsklinik' },
+      { q: 'q5', question: 'Was bedeutet „evidenzbasiert" im medizinischen Kontext?', opts: ['auf Vermutungen beruhend', 'durch wissenschaftliche Studien abgesichert', 'von Fachärzten empfohlen', 'im Einzelfall unterschiedlich geregelt'], correct: 'durch wissenschaftliche Studien abgesichert' },
+      { q: 'q6', question: 'Was versteht man unter „Primärprävention"?', opts: ['Vorbeugung, bevor eine Krankheit entsteht', 'Behandlung von akuten Infekten', 'Impfung gegen seltene Erkrankungen', 'Rehabilitation nach schwerer Krankheit'], correct: 'Vorbeugung, bevor eine Krankheit entsteht' },
+      { q: 'q7', question: 'Was bedeutet „psychosoziales Umfeld"?', opts: ['die medizinischen Laborwerte eines Kindes', 'die Erziehung durch Psychologen', 'die Beziehungen und Lebensbedingungen, die das seelische Wohl beeinflussen', 'Ergebnis eines Intelligenztests'], correct: 'die Beziehungen und Lebensbedingungen, die das seelische Wohl beeinflussen' },
+      { q: 'q8', question: 'Was zeigt sich laut Studien zum Nutzen der U-Untersuchungen?', opts: ['Sie können Impfungen ersetzen.', 'Sie können Erkrankungen bei Babies und Kleinkindern vermeiden.', 'Sie führen zu besseren schulischen Leistungen.', 'Sie ermöglichen frühzeitige Intervention bei Entwicklungsstörungen.'], correct: 'Sie ermöglichen frühzeitige Intervention bei Entwicklungsstörungen.' }
+    ];
+
+    const game = document.getElementById('game');
+
+    cardsData.forEach(data => {
+      const card = document.createElement('div');
+      card.className = 'card disabled';
+      card.dataset.q = data.q;
+      card.tabIndex = 0;
+      card.innerHTML = `
+        <div class="card-inner">
+          <div class="card-front">${data.q.toUpperCase()}</div>
+          <div class="card-back">
+            <div class="question">${data.question}</div>
+            <div class="options">
+              ${data.opts.map((o,i) => 
+                `<label data-text="${o}">
+                  <span class="option-letter">${String.fromCharCode(65+i)})</span>
+                  <span class="option-text">${o}</span>
+                  <input type="radio" name="${data.q}" style="display:none;" />
+                </label>`
+              ).join('')}
+            </div>
+          </div>
+        </div>`;
+      game.appendChild(card);
+      shuffleOptions(card.querySelector('.options'));
+    });
+
+    function shuffleCards(){
+      Array.from(game.children).sort(() => Math.random() - 0.5).forEach(c => game.appendChild(c));
+    }
+    
+    function sortCardsChronologically(){
+      Array.from(game.children)
+        .sort((a, b) => {
+          const numA = parseInt(a.dataset.q.replace('q', ''));
+          const numB = parseInt(b.dataset.q.replace('q', ''));
+          return numA - numB;
+        })
+        .forEach(c => game.appendChild(c));
+    }
+    
+    // Standardmäßig chronologisch sortieren
+    sortCardsChronologically();
+
+    // Reihenfolge speichern und erste Karte freigeben
+    const cardOrder = Array.from(game.children);
+    let currentIndex = 0;
+    function updateAccess() {
+      cardOrder.forEach((c,i) => {
+        c.classList.toggle('disabled', i !== currentIndex);
+      });
+      // Fokus auf aktuelle Karte
+      cardOrder[currentIndex].focus();
+    }
+    updateAccess();
+
+    let busy = false;
+
+    // Success Modal Functions
+    function showSuccessModal() {
+      document.getElementById('successModal').classList.add('show');
+    }
+
+    function closeSuccessModal() {
+      document.getElementById('successModal').classList.remove('show');
+    }
+
+    function restartGame() {
+      closeSuccessModal();
+      document.getElementById('restart').click();
+    }
+
+    cardOrder.forEach((card, idx) => {
+      const options = card.querySelectorAll('input');
+
+      card.addEventListener('click', e => {
+        if (busy || card.classList.contains('matched')) return;
+        if (e.target.closest('.options')) return;
+        card.classList.toggle('flipped');
+      });
+      card.addEventListener('keydown', e => {
+        if ((e.key === 'Enter' || e.key === ' ') && !busy && !card.classList.contains('matched')) {
+          e.preventDefault();
+          card.classList.toggle('flipped');
+        }
+      });
+
+      options.forEach(input => {
+        input.addEventListener('change', () => {
+          if (!card.classList.contains('flipped')) return;
+          busy = true;
+          const selText = input.closest('label').dataset.text;
+          const data = cardsData.find(d => d.q === card.dataset.q);
+
+          if (selText !== data.correct) {
+            card.classList.add('mismatch');
+            setTimeout(() => {
+              card.classList.remove('mismatch','flipped');
+              options.forEach(i => i.checked = false);
+              shuffleOptions(card.querySelector('.options'));
+              card.focus();
+              busy = false;
+            }, 1500);
+          } else {
+            card.classList.add('matched');
+            setTimeout(() => {
+              options.forEach(i => i.disabled = true);
+              currentIndex++;
+              if (currentIndex < cardOrder.length) {
+                updateAccess();
+              } else {
+                // Alle Karten erfolgreich beantwortet - Erfolgsmeldung anzeigen
+                setTimeout(() => {
+                  showSuccessModal();
+                }, 800);
+              }
+              busy = false;
+            }, 600);
+          }
+        });
+      });
+    });
+
+    document.getElementById('restart').addEventListener('click', () => {
+      busy = false;
+      shuffleCards();
+      const newOrder = Array.from(game.children);
+      cardOrder.splice(0, cardOrder.length, ...newOrder);
+      currentIndex = 0;
+      cardOrder.forEach(c => {
+        c.classList.remove('flipped','matched','mismatch');
+        const opts = c.querySelectorAll('input');
+        shuffleOptions(c.querySelector('.options'));
+        opts.forEach(i => { i.checked = false; i.disabled = false; });
+      });
+      updateAccess();
+    });
+  </script>
+</body>
+</html>
