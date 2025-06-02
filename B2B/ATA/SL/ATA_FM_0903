@@ -100,10 +100,10 @@
 
     // 1) Daten: Begriff + Audio-URL
     const pairs = [
-      { term: "Es ist normal, sich nach so einer Operation erst neu zurechtzufinden. Ich bin da, wenn Sie reden möchten.",    audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/Ich fühle mich irgendwie ....mp3" },
-      { term: "Diese Sorge kann ich gut nachvollziehen. Möchten Sie darüber sprechen?",    audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/Ich habe Angst ....mp3" },
-      { term: "Das ist eine ganz verständliche Reaktion. Sie sind nicht allein damit.",    audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/Ich schäme mich so, meinen Körper anzusehen..mp3" },
-      { term: "Die Genesung braucht Zeit. Wir unterstützen Sie Schritt für Schritt.",    audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/Ich weiß nicht, ob ich je wieder glücklich sein kann..mp3" },
+      { term: "Es ist normal, sich nach so einer Operation erst neu zurechtzufinden. Ich bin da, wenn Sie reden möchten.",    audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/irgendwie3mp3" },
+      { term: "Diese Sorge kann ich gut nachvollziehen. Möchten Sie darüber sprechen?",    audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/Ich2mp3" },
+      { term: "Das ist eine ganz verständliche Reaktion. Sie sind nicht allein damit.",    audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/Ich1mp3" },
+      { term: "Die Genesung braucht Zeit. Wir unterstützen Sie Schritt für Schritt.",    audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/Ich4mp3" },
       { term: "XX",    audio: "https://raw.githubusercontent.com/LingodaStacy/Content/main/Sturzprophylaxe.mp3" }
     ];
 
@@ -236,9 +236,9 @@ Um nur die Audios und die angezeigten Begriffe anzupassen, musst du diesen Absch
 
 // 1) Daten: Begriff + Audio-URL
 const pairs = [
-  { term: "Es ist normal, sich nach so einer Operation erst neu zurechtzufinden. Ich bin da, wenn Sie reden möchten.",       audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/Ich fühle mich irgendwie ....mp3" },
-  { term: "Diese Sorge kann ich gut nachvollziehen. Möchten Sie darüber sprechen?",          audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/Ich habe Angst ....mp3" },
-  { term: "Das ist eine ganz verständliche Reaktion. Sie sind nicht allein damit.",   audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/Ich schäme mich so, meinen Körper anzusehen..mp3" },
-  { term: "Die Genesung braucht Zeit. Wir unterstützen Sie Schritt für Schritt.",      audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/Ich weiß nicht, ob ich je wieder glücklich sein kann..mp3" },
+  { term: "Es ist normal, sich nach so einer Operation erst neu zurechtzufinden. Ich bin da, wenn Sie reden möchten.",       audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/irgendwie3mp3" },
+  { term: "Diese Sorge kann ich gut nachvollziehen. Möchten Sie darüber sprechen?",          audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/Ich2mp3" },
+  { term: "Das ist eine ganz verständliche Reaktion. Sie sind nicht allein damit.",   audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/Ich1mp3" },
+  { term: "Die Genesung braucht Zeit. Wir unterstützen Sie Schritt für Schritt.",      audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/Ich4mp3" },
   { term: "Sturzprophylaxe",    audio: "https://…/Sturzprophylaxe.mp3" }
 ];
