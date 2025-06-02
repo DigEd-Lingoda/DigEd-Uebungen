@@ -1,0 +1,10 @@
+<iframe 
+  src="https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/refs/heads/main/B2B/ATA/SL/ATA_FM_0903" 
+  style="
+    width: 100%;       /* passt die Breite an */
+    height: 500px;     /* passe die Höhe an deine Bedürfnisse an */
+    overflow: hidden;  /* unterdrückt Scrollbars */
+    background-color: #fff; /* weißer Hintergrund */
+  "
+  scrolling="no">
+</iframe>
