@@ -100,10 +100,10 @@
 
     // 1) Daten: Begriff + Audio-URL
     const pairs = [
-      { term: "Es ist normal, sich nach so einer Operation erst neu zurechtzufinden. Ich bin da, wenn Sie reden möchten.",    audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/irgendwie3mp3" },
-      { term: "Diese Sorge kann ich gut nachvollziehen. Möchten Sie darüber sprechen?",    audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/Ich2mp3" },
-      { term: "Das ist eine ganz verständliche Reaktion. Sie sind nicht allein damit.",    audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/Ich1mp3" },
-      { term: "Die Genesung braucht Zeit. Wir unterstützen Sie Schritt für Schritt.",    audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/Ich4mp3" }
+      { term: "Es ist normal, sich nach so einer Operation erst neu zurechtzufinden. Ich bin da, wenn Sie reden möchten.",    audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/irgendwie3.mp3" },
+      { term: "Diese Sorge kann ich gut nachvollziehen. Möchten Sie darüber sprechen?",    audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/Ich2.mp3" },
+      { term: "Das ist eine ganz verständliche Reaktion. Sie sind nicht allein damit.",    audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/Ich1.mp3" },
+      { term: "Die Genesung braucht Zeit. Wir unterstützen Sie Schritt für Schritt.",    audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/Ich4.mp3" }
     ];
 
     // Shuffle-Helper
