@@ -242,31 +242,3 @@ const pairs = [
   { term: "Die Genesung braucht Zeit. Wir unterstützen Sie Schritt für Schritt.",      audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/ATA/SL/Ich weiß nicht, ob ich je wieder glücklich sein kann..mp3" },
   { term: "Sturzprophylaxe",    audio: "https://…/Sturzprophylaxe.mp3" }
 ];
-
-So passt du es an:
-Begriff (term) ändern:
-Ersetze den Text in den Anführungszeichen hinter "term:" durch deinen eigenen Begriff.
-
-// statt
-{ term: "akutes Delir", … }
-// z.B.
-{ term: "Herzinfarkt", … }
-
-
-Audio-URL (audio) anpassen:
-Trage hinter "audio:" die URL oder den Pfad zu deiner MP3-Datei ein.
-
-// statt
-audio: "https://…/akutes%20Delir.mp3"
-// z.B.
-audio: "https://…/Herzinfarkt.mp3"
-
-Als Pfad immer diesen nehmen (ergänzen mit dem (Rest-)Pfad, wo ihr die Datei abgelegt habt:
-https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/LINK_TO_AUDIO.mp3
-
-
-Anzahl der Paare
-– Möchtest du weniger oder mehr Einträge, lösche oder füge einfach Zeilen hinzu.
-– Achte darauf, dass jede Zeile mit einem Komma endet (außer die letzte).
-
-Das war‘s – alles Weitere im Skript (Shuffling, Drag & Drop, Matching-Logik) passt sich automatisch an deinen Paaren an.
