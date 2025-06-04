@@ -19,24 +19,24 @@
     /* Grid-Container */
     #word-search {
       display: grid;
-      grid-template-columns: repeat(11, 40px);
-      grid-template-rows: repeat(11, 40px);
-      gap: 2px;
+      grid-template-columns: repeat(11, 60px);
+      grid-template-rows: repeat(11, 60px);
+      gap: 4px;
       user-select: none; /* verhindert unerwünschtes Markieren von Text */
       margin: 0 auto;
       width: fit-content;
     }
     /* Einzelne Zellen */
     .cell {
-      width: 40px;
-      height: 40px;
-      border: 1px solid #153BFF;         /* Blaue Umrandung */
+      width: 60px;
+      height: 60px;
+      border: 2px solid #153BFF;         /* Blaue Umrandung */
       color: #153BFF;                     /* Blaue Buchstaben */
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 18px;
+      font-size: 24px;
       cursor: pointer;
       background-color: white;
       transition: background-color 0.2s;
@@ -381,7 +381,6 @@
 
     // === 5. Modal-/Popup-Logik für Multiple-Choice-Fragen ===
     const modalOverlay  = document.getElementById("modal-overlay");
-    const modalWord     = document.getElementById("modal-word");
     const modalQuestion = document.getElementById("modal-question");
     const modalChoices  = document.getElementById("modal-choices");
     const modalFeedback = document.getElementById("modal-feedback");
