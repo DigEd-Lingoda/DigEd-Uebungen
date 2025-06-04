@@ -19,8 +19,8 @@
     /* Grid-Container */
     #word-search {
       display: grid;
-      grid-template-columns: repeat(11, 60px);
-      grid-template-rows: repeat(11, 60px);
+      grid-template-columns: repeat(11, 50px);
+      grid-template-rows:    repeat(11, 50px);
       gap: 4px;
       user-select: none; /* verhindert unerwünschtes Markieren von Text */
       margin: 0 auto;
@@ -28,8 +28,8 @@
     }
     /* Einzelne Zellen */
     .cell {
-      width: 60px;
-      height: 60px;
+      width: 50px;
+      height: 50px;
       border: 2px solid #153BFF;         /* Blaue Umrandung */
       color: #153BFF;                     /* Blaue Buchstaben */
       display: flex;
@@ -104,7 +104,6 @@
   </style>
 </head>
 <body>
-
   <!-- Wortgitter-Container -->
   <div id="word-search"></div>
 
@@ -330,7 +329,6 @@
         }
       }
       if (matched) {
-        // Temporär speichern, um nach korrekter Antwort zu markieren
         currentMatchedWord = matched;
         currentMatchedCells = selectedCells.slice();
         showModalForWord(matched);
@@ -390,11 +388,11 @@
     }
 
     // === 5. Modal-/Popup-Logik für Multiple-Choice-Fragen ===
-    const modalOverlay  = document.getElementById("modal-overlay");
-    const modalQuestion = document.getElementById("modal-question");
-    const modalChoices  = document.getElementById("modal-choices");
-    const modalFeedback = document.getElementById("modal-feedback");
-    const modalSubmit   = document.getElementById("modal-submit");
+    const modalOverlay   = document.getElementById("modal-overlay");
+    const modalQuestion  = document.getElementById("modal-question");
+    const modalChoices   = document.getElementById("modal-choices");
+    const modalFeedback  = document.getElementById("modal-feedback");
+    const modalSubmit    = document.getElementById("modal-submit");
     let currentCorrectText = null;
 
     // Fisher-Yates Shuffle
