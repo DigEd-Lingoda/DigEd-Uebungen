@@ -79,7 +79,13 @@
       white-space: normal;
       word-wrap: break-word;
       hyphens: auto;
-      overflow: hidden;
+      -webkit-hyphens: auto;
+      -moz-hyphens: auto;
+
+      /* Hier geändert: statt "overflow: hidden;" erlauben wir Scrollen */
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+
       line-height: 1.2;
       font-size: 16px;
     }
@@ -124,7 +130,7 @@
     /* Neustart-Button linksbündig */
     #restart {
       display: block;
-      margin: 10px 0 0 0; /* Abstand oben, linksbündig */
+      margin: 10px 0 0 0;
       padding: 10px 20px;
       font-size: 16px;
       background: #0000ff;
