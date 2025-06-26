@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Memory-Quiz: Diagnostik</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      box-sizing: border-box;
+    }
+
+    .game-board {
+      display: grid;
+      gap: 10px;
+      width: 100%;
+      max-width: 800px;
+      justify-content: center;
+      align-content: center;
+    }
+
+    .card {
+      background: #153bff;
+      color: #ffffff;
+      padding: 15px;
+      cursor: pointer;
+      border-radius: 8px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      font-size: 16px;
+      text-align: center;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .card.revealed {
+      background: #F6F6F6;
+      color: #031638;
+      border: 1px solid #153bff;
+    }
+
+    .card.matched {
+      background: #2CBE55;
+      color: #031638;
+      pointer-events: none;
+    }
+
+    .quiz-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .quiz-box {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      max-width: 400px;
+      text-align: left;
+    }
+
+    .quiz-box button {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      width: 100%;
+      font-size: 16px;
+    }
+
+    @media (min-width: 768px) {
+      .game-board {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    @media (max-width: 767px) and (orientation: portrait) {
+      .game-board {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 767px) and (orientation: landscape) {
+      .game-board {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-board" id="game"></div>
+
+  <script>
+    const pairs = [
+      // Bildgebende Verfahren (bereinigt)
+      { id: "p1", term: "Meniskusschaden im Knie", def: "MRT", category: "nicht-invasive, bildgebendes Verfahren" },
+      { id: "p2", term: "Akutes Schädel-Hirn-Trauma", def: "CT", category: "nicht-invasive, bildgebendes Verfahren" },
+      { id: "p3", term: "Funktionelle Beurteilung eines Schilddrüsenknotens", def: "Szintigrafie", category: "nicht-invasive, bildgebendes Verfahren" },
+
+      // Pulmologische/Gastroentrologische Diagnostik
+      { id: "p7", term: "Grobe Beurteilung der Ventilation", def: "Spirometrie", category: "Pulmologische/Gastroentrologische Funktionsdiagnostik" },
+      { id: "p8", term: "Detaillierte Beurteilung der Ventilation", def: "Bodyplethysmographie", category: "Pulmologische/Gastroentrologische Funktionsdiagnostik" },
+      { id: "p9", term: "Analyse der PaO₂, PaCO₂ und der pH-Werte", def: "Arterielle Blutgasanalyse", category: "Pulmologische/Gastroentrologische Funktionsdiagnostik" }
+    ];
+
+    let flipped = [];
+    let matchedCount = 0;
+    const game = document.getElementById('game');
+
+    function createCard(content, id) {
+      const card = document.createElement('div');
+      card.classList.add('card');
+      card.textContent = '';
+      card.dataset.content = content;
+      card.dataset.id = id;
+
+      card.addEventListener('click', () => {
+        if (card.classList.contains('revealed') || flipped.length === 2) return;
+
+        card.textContent = content;
+        card.classList.add('revealed');
+        flipped.push(card);
+
+        if (flipped.length === 2) {
+          if (flipped[0].dataset.id === flipped[1].dataset.id) {
+            flipped[0].classList.add('matched');
+            flipped[1].classList.add('matched');
+            const pairData = pairs.find(p => p.id === flipped[0].dataset.id);
+            showQuiz(pairData);
+            matchedCount++;
+            if (matchedCount === pairs.length) {
+              setTimeout(() => alert("Gratulation! Du hast alle Paare und Quizfragen gelöst!"), 500);
+            }
+          } else {
+            setTimeout(() => {
+              flipped.forEach(c => {
+                c.textContent = '';
+                c.classList.remove('revealed');
+              });
+              flipped = [];
+            }, 1000);
+          }
+        }
+      });
+
+      return card;
+    }
+
+    function renderGame() {
+      const cards = [];
+      pairs.forEach(pair => {
+        cards.push(createCard(pair.term, pair.id));
+        cards.push(createCard(pair.def, pair.id));
+      });
+      shuffle(cards).forEach(card => game.appendChild(card));
+    }
+
+    function shuffle(arr) {
+      return arr.sort(() => Math.random() - 0.5);
+    }
+
+    function showQuiz(pair) {
+      const overlay = document.createElement('div');
+      overlay.className = 'quiz-overlay';
+
+      const box = document.createElement('div');
+      box.className = 'quiz-box';
+      box.innerHTML = `<p><strong>Welcher diagnostische Bereich passt zur gefundenen Kombination?</strong></p>`;
+
+      const options = [
+        "Pulmologische/Gastroentrologische Funktionsdiagnostik",
+        "nicht-invasive, bildgebendes Verfahren"
+      ];
+
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.addEventListener('click', () => {
+          if (opt === pair.category) {
+            document.body.removeChild(overlay);
+            flipped = [];
+          } else {
+            alert("Leider falsch – versuch's nochmal!");
+          }
+        });
+        box.appendChild(btn);
+      });
+
+      overlay.appendChild(box);
+      document.body.appendChild(overlay);
+    }
+
+    renderGame();
+  </script>
+</body>
+</html>
