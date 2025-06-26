@@ -22,10 +22,12 @@
       text-align: center;
       margin-bottom: 1em;
     }
+    /* Responsive Breite: bis max. 400px, sonst 90% des Viewports */
     #timeline {
       list-style: none;
       padding: 0;
-      width: 400px;
+      width: 90vw;
+      max-width: 400px;
     }
     #timeline li {
       position: relative;
@@ -44,6 +46,8 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       cursor: grab;
       transition: transform 150ms ease, box-shadow 150ms ease;
+      /* sicherstellen, dass lange Texte umbrechen */
+      word-wrap: break-word;
     }
     #timeline li.ghost {
       opacity: 0.4;
@@ -73,15 +77,16 @@
 </head>
 <body>
   <div>
+    <h2>Ordne die Ereignisse chronologisch</h2>
     <ul id="timeline">
-      <li data-pos="1">Symptombeginn: reduzierter Harndrang und Dysurie</li>
-      <li data-pos="2">Aufnahme in die Notaufnahme mit Fieber 39,2 °C</li>
-      <li data-pos="3">qSOFA-Score erhoben (AF, RR, Bewusstsein)</li>
-      <li data-pos="4">Blut- und Urinproben entnommen</li>
-      <li data-pos="5">Empirische Therapie mit Piperacillin/Tazobactam gestartet</li>
-      <li data-pos="6">Nach 12 h: Nachweis von E. coli in der Blutkultur</li>
-      <li data-pos="7">Nach 72 h: klinische Besserung und regrediente Entzündungswerte</li>
-      <li data-pos="8">Tag 5: Umstellung auf orale Antibiose</li>
+      <li data-pos="1">T – 48 h: Symptombeginn – reduzierte Urinmenge seit zwei Tagen</li>
+      <li data-pos="2">T 0: Aufnahme in die Notaufnahme mit Fieber 39,2 °C</li>
+      <li data-pos="3">T 0: qSOFA-Score erhoben (AF ≥ 22/min, RR ≤ 100 mmHg, kein Bewusstseins­verlust)</li>
+      <li data-pos="4">T 0: Blut- und Urinproben vor Antibiotikagabe entnommen</li>
+      <li data-pos="5">T 0+: Empirische Therapie mit Piperacillin/Tazobactam gestartet</li>
+      <li data-pos="6">T + 12 h: Nachweis von E. coli in der Blutkultur</li>
+      <li data-pos="7">T + 72 h: klinische Besserung, regrediente Entzündungswerte, normalisierte Diurese</li>
+      <li data-pos="8">T + 5 Tage: Umstellung auf orale Antibiose geplant</li>
     </ul>
     <div>
       <button id="check">Reihenfolge prüfen</button>
@@ -133,8 +138,8 @@
         const res = document.getElementById('result');
         res.style.color = ordered ? 'green' : 'red';
         res.textContent = ordered
-          ? '✅ Alles richtig!'
-          : '❌ Falsche Reihenfolge, bitte neu ordnen.';
+          ? '✔ Super, du hast den Verlauf wieferhergestellt!'
+          : '❌ Leider falsch, versuche es noch einmal!';
       };
 
       // Retry-Button: neu mischen und Ergebnis zurücksetzen
