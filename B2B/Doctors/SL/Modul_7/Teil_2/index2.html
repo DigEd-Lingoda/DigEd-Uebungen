@@ -4,53 +4,80 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Memory-Quiz: Diagnostik</title>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       padding: 20px;
-      background: #ffffff;
+      background: #FFFFFF;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      height: 100vh;
+      font-family: 'Open Sans', sans-serif;
       box-sizing: border-box;
+      min-height: 100vh;
+      justify-content: center;
     }
 
     .game-board {
       display: grid;
-      gap: 10px;
-      width: 100%;
-      max-width: 800px;
+      gap: 12px;
       justify-content: center;
       align-content: center;
+      margin-bottom: 20px;
     }
 
     .card {
-      background: #153bff;
-      color: #ffffff;
-      padding: 15px;
+      width: 120px;
+      height: 120px;
+      perspective: 1000px;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
       cursor: pointer;
+    }
+
+    .card.revealed .card-inner,
+    .card.matched .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
       border-radius: 8px;
-      height: 100px;
       display: flex;
       align-items: center;
       justify-content: center;
-      user-select: none;
+      padding: 8px;
       font-size: 16px;
-      text-align: center;
-      transition: background 0.3s, color 0.3s;
+      word-break: break-word;
+      hyphens: auto;
+      backface-visibility: hidden;
+      box-sizing: border-box;
     }
 
-    .card.revealed {
+    .card-front {
+      background: #153bff;
+      color: #ffffff;
+    }
+
+    .card-back {
       background: #F6F6F6;
       color: #031638;
-      border: 1px solid #153bff;
+      transform: rotateY(180deg);
     }
 
-    .card.matched {
-      background: #2CBE55;
-      color: #031638;
-      pointer-events: none;
+    .card.matched .card-back {
+      background: #9900CC;
+      color: #ffffff;
     }
 
     .quiz-overlay {
@@ -62,6 +89,7 @@
       align-items: center;
       justify-content: center;
       z-index: 10;
+      font-family: 'Open Sans', sans-serif;
     }
 
     .quiz-box {
@@ -78,6 +106,25 @@
       padding: 10px;
       width: 100%;
       font-size: 16px;
+      font-family: 'Open Sans', sans-serif;
+      cursor: pointer;
+    }
+
+    #restart {
+      padding: 12px 24px;
+      font-size: 16px;
+      font-family: 'Open Sans', sans-serif;
+      cursor: pointer;
+      background: #153bff;
+      color: #ffffff;
+      border: none;
+      border-radius: 999px;
+      margin-top: 20px;
+      transition: background 0.3s;
+    }
+
+    #restart:hover {
+      background: #0f2bbd;
     }
 
     @media (min-width: 768px) {
@@ -101,15 +148,13 @@
 </head>
 <body>
   <div class="game-board" id="game"></div>
+  <button id="restart">Nochmal spielen</button>
 
   <script>
     const pairs = [
-      // Bildgebende Verfahren (bereinigt)
       { id: "p1", term: "Meniskusschaden im Knie", def: "MRT", category: "nicht-invasive, bildgebendes Verfahren" },
       { id: "p2", term: "Akutes Schädel-Hirn-Trauma", def: "CT", category: "nicht-invasive, bildgebendes Verfahren" },
       { id: "p3", term: "Funktionelle Beurteilung eines Schilddrüsenknotens", def: "Szintigrafie", category: "nicht-invasive, bildgebendes Verfahren" },
-
-      // Pulmologische/Gastroentrologische Diagnostik
       { id: "p7", term: "Grobe Beurteilung der Ventilation", def: "Spirometrie", category: "Pulmologische/Gastroentrologische Funktionsdiagnostik" },
       { id: "p8", term: "Detaillierte Beurteilung der Ventilation", def: "Bodyplethysmographie", category: "Pulmologische/Gastroentrologische Funktionsdiagnostik" },
       { id: "p9", term: "Analyse der PaO₂, PaCO₂ und der pH-Werte", def: "Arterielle Blutgasanalyse", category: "Pulmologische/Gastroentrologische Funktionsdiagnostik" }
@@ -118,18 +163,32 @@
     let flipped = [];
     let matchedCount = 0;
     const game = document.getElementById('game');
+    const restartBtn = document.getElementById('restart');
 
     function createCard(content, id) {
       const card = document.createElement('div');
       card.classList.add('card');
-      card.textContent = '';
       card.dataset.content = content;
       card.dataset.id = id;
+
+      const inner = document.createElement('div');
+      inner.classList.add('card-inner');
+
+      const front = document.createElement('div');
+      front.classList.add('card-front');
+      front.textContent = '';
+
+      const back = document.createElement('div');
+      back.classList.add('card-back');
+      back.textContent = content;
+
+      inner.appendChild(front);
+      inner.appendChild(back);
+      card.appendChild(inner);
 
       card.addEventListener('click', () => {
         if (card.classList.contains('revealed') || flipped.length === 2) return;
 
-        card.textContent = content;
         card.classList.add('revealed');
         flipped.push(card);
 
@@ -145,10 +204,7 @@
             }
           } else {
             setTimeout(() => {
-              flipped.forEach(c => {
-                c.textContent = '';
-                c.classList.remove('revealed');
-              });
+              flipped.forEach(c => c.classList.remove('revealed'));
               flipped = [];
             }, 1000);
           }
@@ -159,6 +215,10 @@
     }
 
     function renderGame() {
+      game.innerHTML = '';
+      matchedCount = 0;
+      flipped = [];
+
       const cards = [];
       pairs.forEach(pair => {
         cards.push(createCard(pair.term, pair.id));
@@ -201,6 +261,8 @@
       overlay.appendChild(box);
       document.body.appendChild(overlay);
     }
+
+    restartBtn.addEventListener('click', renderGame);
 
     renderGame();
   </script>
