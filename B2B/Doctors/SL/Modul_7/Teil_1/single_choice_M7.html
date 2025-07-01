@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fremdanamnese-Szenario</title>
+  <title>Modul 7</title>
   <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Open Sans', sans-serif; }
@@ -11,6 +11,18 @@
     .active { display: block; }
     .container { max-width: 600px; margin: 50px auto; }
     h2 { color: #333; }
+    /* Fragen etwas größer */
+    .container p {
+      font-size: 1.2em;
+    }
+    /* Antwort-Labels auf Standardgröße festlegen */
+    form label {
+      display: block;
+      margin: 8px 0;
+      padding-left: 24px;
+      text-indent: -24px;
+      font-size: 1em;
+    }
     .btn {
       padding: 8px 16px;
       margin-top: 10px;
@@ -22,12 +34,6 @@
     }
     .message { margin-left: 10px; font-size: 0.9em; color: red; }
     .message.success { color: green; }
-    form label {
-      display: block;
-      margin: 8px 0;
-      padding-left: 24px;
-      text-indent: -24px;
-    }
   </style>
 </head>
 <body>
@@ -69,7 +75,7 @@
       </form>
     </div>
     <!-- Seite 4 -->
-	<div id="page4" class="page">
+    <div id="page4" class="page">
       <p>Welcher hämatologische Befund weist auf eine Entzündung hin?</p>
       <form id="form4">
         <label><input type="radio" name="q4" value="A"> CRP leicht erhöht</label>
@@ -107,7 +113,7 @@
     <!-- Abschluss -->
     <div id="success" class="page">
       <h2>Gut gemacht!</h2>
-      <p>Du hast alle Fragen zur Fremdanamnese richtig beantwortet.</p>
+      <p>Du hast alle Fragen richtig beantwortet.</p>
     </div>
   </div>
 
@@ -132,19 +138,35 @@
         shuffleForm('form' + num);
       }
     }
-    ['form1','form2','form3','form4','form5','form6','form7','form8'].forEach(shuffleForm);
+    // Shuffle nur die existierenden Formulare
+    ['form1','form2','form3','form4','form5','form6'].forEach(shuffleForm);
+
     function validate(page, correct) {
       const form = document.getElementById('form'+page);
-      const msg = document.getElementById('msg'+page);
-      const sel = form.querySelector('input[name="q'+page+'"]:checked');
+      const msg  = document.getElementById('msg'+page);
+      const sel  = form.querySelector('input[name="q'+page+'"]:checked');
       msg.textContent = '';
       msg.classList.remove('success');
-      if (!sel) { msg.textContent = 'Bitte wähle eine Antwort aus!'; return; }
+
+      if (!sel) {
+        msg.textContent = 'Bitte wähle eine Antwort aus!';
+        return;
+      }
+
       if (sel.value === correct) {
-        msg.textContent = 'Super, das war die richtige Antwort!'; msg.classList.add('success');
-        setTimeout(() => page<8 ? showPage('page'+(page+1)) : showPage('success'), 1000);
+        msg.textContent = 'Super, das war die richtige Antwort!';
+        msg.classList.add('success');
+        setTimeout(() => {
+          // Dynamisch prüfen, ob die nächste Seite existiert
+          const nextPage = document.getElementById('page' + (page + 1));
+          if (nextPage) {
+            showPage('page' + (page + 1));
+          } else {
+            showPage('success');
+          }
+        }, 1000);
       } else {
-        msg.textContent = 'Falsch – bitte erneut versuchen.';
+        msg.textContent = 'Leider falsch – versuche es noch einmal.';
       }
     }
   </script>
