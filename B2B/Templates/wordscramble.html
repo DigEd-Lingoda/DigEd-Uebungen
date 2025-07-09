@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vokabelübung: Wort-Scramble</title>
+  <!-- Open Sans einbinden -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Open Sans', sans-serif;
+      margin: 2em auto;
+      padding: 1em;
+    }
+    h1 {
+      text-align: center;
+    }
+    #exercise {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 1em;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    #scrambled-word {
+      font-size: 1.5em;
+      font-weight: bold;
+      margin: 1em 0;
+      text-align: center;
+      overflow-wrap: break-word;
+    }
+    input {
+      width: 100%;
+      max-width: 100%;
+      padding: 0.5em;
+      font-size: 1em;
+      margin-bottom: 0.5em;
+      font-family: 'Open Sans', sans-serif;
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5em;
+    }
+    .controls button {
+      padding: 0.5em 1em;
+      font-size: 1em;
+      font-family: 'Open Sans', sans-serif;
+      background-color: #153BFF;
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .controls button:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+    .controls span {
+      flex: 1 1 auto;
+      overflow-wrap: break-word;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div id="exercise">
+    <p id="scrambled-word">–</p>
+    <input id="answer" type="text" placeholder="Lösung eingeben">
+    <div class="controls">
+      <button id="check-btn">Überprüfen</button>
+      <span id="feedback"></span>
+    </div>
+  </div>
+
+  <script>
+    const words = ["Apfel", "Banane", "Schule", "Computer", "Tisch"];
+    let remaining = [], currentWord = "", attemptsLeft = 3, correctCount = 0;
+
+    function scramble(word) {
+      const letters = word.split("");
+      for (let i = letters.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [letters[i], letters[j]] = [letters[j], letters[i]];
+      }
+      return letters.join("");
+    }
+
+    function loadNext() {
+      const fb = document.getElementById("feedback");
+      const answerEl = document.getElementById("answer");
+      const checkBtn = document.getElementById("check-btn");
+
+      fb.textContent = "";
+      answerEl.value = "";
+      checkBtn.disabled = false;
+      answerEl.disabled = false;
+      attemptsLeft = 3;
+
+      if (remaining.length === 0) {
+        document.getElementById("scrambled-word").textContent = "Super, du hast alles beantwortet!";
+        fb.style.color = "black";
+        fb.textContent = `Du hattest ${correctCount} von ${words.length} richtig.`;
+        // Hier alles deaktivieren:
+        answerEl.disabled = true;
+        checkBtn.disabled = true;
+        return;
+      }
+
+      const idx = Math.floor(Math.random() * remaining.length);
+      currentWord = remaining.splice(idx, 1)[0];
+      let scrambled = scramble(currentWord);
+      while (scrambled.toLowerCase() === currentWord.toLowerCase()) {
+        scrambled = scramble(currentWord);
+      }
+      document.getElementById("scrambled-word").textContent = scrambled;
+    }
+
+    function checkAnswer() {
+      const answerEl = document.getElementById("answer");
+      const checkBtn = document.getElementById("check-btn");
+      const fb = document.getElementById("feedback");
+
+      const ans = answerEl.value.trim().toLowerCase();
+      checkBtn.disabled = true;
+      answerEl.disabled = true;
+
+      if (ans === currentWord.toLowerCase()) {
+        correctCount++;
+        fb.style.color = "green";
+        fb.textContent = "Richtig!";
+      } else {
+        attemptsLeft--;
+        if (attemptsLeft > 0) {
+          fb.style.color = "red";
+          fb.textContent = `Leider falsch. Du hast noch ${attemptsLeft} Versuch${attemptsLeft > 1 ? 'e' : ''}.`;
+          checkBtn.disabled = false;
+          answerEl.disabled = false;
+          return;
+        } else {
+          fb.style.color = "red";
+          fb.textContent = `Du hast leider keine Versuche mehr. Lösung: "${currentWord}".`;
+        }
+      }
+
+      setTimeout(loadNext, 2000);
+    }
+
+    document.getElementById("check-btn").addEventListener("click", checkAnswer);
+    document.getElementById("answer").addEventListener("keyup", e => {
+      if (e.key === "Enter" && !document.getElementById("check-btn").disabled) {
+        checkAnswer();
+      }
+    });
+
+    function init() {
+      remaining = [...words];
+      correctCount = 0;
+      loadNext();
+    }
+    init();
+  </script>
+</body>
+</html>
