@@ -1,62 +1,26 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <title>Textsegment-Auswahl</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      line-height: 1.6;
-      padding: 20px;
-    }
-
-    .segment {
-      cursor: pointer;
-      padding: 2px 4px;
-      border-radius: 4px;
-      transition: background-color 0.3s;
-    }
-
-    .segment:hover {
-      background-color: #eef;
-    }
-
-    .selected {
-      background-color: #cce5ff;
-      border: 1px solid #66afe9;
-    }
-
-    .correct {
-      background-color: #c6f7c3;
-      border: 1px solid #28a745;
-    }
-
-    .incorrect {
-      background-color: #f8d7da;
-      border: 1px solid #dc3545;
-    }
-
-    button {
-      margin-top: 20px;
-    }
-  </style>
-</head>
 <body>
 
-  <p>Diskussion zwischen Onkologie und interventioneller Radiologie: TACE bei kolorektalen Lebermetastasen
-Teilnehmer:
-Dr. Julia Wagner, Fachärztin für Onkologie
-Dr. Tom Neumann, interventioneller Radiologe
-Patient: Herr B., 61 Jahre, kolorektales Adenokarzinom, multiple bilobäre Lebermetastasen, keine extrahepatische Manifestation</p>
+  <h2>Diskussion zwischen Onkologie und interventioneller Radiologie:<br>
+  TACE bei kolorektalen Lebermetastasen</h2>
+
+  <p><em>
+    Patient: Herr B., 61 Jahre, kolorektales Adenokarzinom, multiple bilobäre Lebermetastasen, keine extrahepatische Manifestation
+  </em></p>
+
+  <p><strong>Teilnehmer:</strong><br>
+    Dr. Julia Wagner, Fachärztin für Onkologie<br>
+    Dr. Tom Neumann, interventioneller Radiologe
+  </p>
 
   <p>
-    Onkologin:
+    <strong>Onkologin:</strong><br>
     <span class="segment" data-correct="false">Hallo Tom, ich wollte Herrn B. mit dir besprechen.</span>
     <span class="segment" data-correct="false">Er hat ein metastasiertes kolorektales Karzinom mit hepatogener Metastasierung.</span>
     <span class="segment" data-correct="false">Die systemische Erstlinientherapie mit FOLFOX plus Bevacizumab lief gut, aber nach acht Zyklen ist nun eine partielle Progression in der Leber sichtbar.</span>
     <span class="segment" data-correct="false">Extrahepatisch ist er tumorfrei, Zustand gut, ECOG 1, Leberwerte leicht erhöht, aber noch im Rahmen.</span>
-    <span class="segment" data-correct="true">Wir überlegen, ob eine lokale Therapie ergänzend sinnvoll wäre.</span>
-    Radiologe:
+    <span class="segment" data-correct="true">Wir überlegen, ob eine lokale Therapie ergänzend sinnvoll wäre.</span><br><br>
+
+    <strong>Radiologe:</strong><br>
     <span class="segment" data-correct="false">Ja, ich habe die PET-CT und das letzte Leber-MRT gesehen.</span>
     <span class="segment" data-correct="true">Die Metastasen liegen vor allem in Segment VI und VIII, arterialisieren etwas, was für die TACE günstig ist.</span>
     <span class="segment" data-correct="false">Die Leberperfusion scheint erhalten, kein Hinweis auf portale Abflussstörung.</span>
@@ -94,4 +58,3 @@ Patient: Herr B., 61 Jahre, kolorektales Adenokarzinom, multiple bilobäre Leber
   </script>
 
 </body>
-</html>
