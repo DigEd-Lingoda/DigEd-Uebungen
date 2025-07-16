@@ -2,23 +2,22 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Textauswahl-Übung</title>
+  <title>Textsegment-Auswahl</title>
   <style>
     body {
       font-family: sans-serif;
+      line-height: 1.6;
       padding: 20px;
     }
 
-    .sentence {
-      display: inline-block;
-      margin: 5px 0;
-      padding: 5px;
+    .segment {
+      cursor: pointer;
+      padding: 2px 4px;
       border-radius: 4px;
       transition: background-color 0.3s;
-      cursor: pointer;
     }
 
-    .sentence:hover {
+    .segment:hover {
       background-color: #eef;
     }
 
@@ -44,42 +43,42 @@
 </head>
 <body>
 
-  <h2>Wähle alle Sätze mit Passivformen</h2>
-  <p>(Tipp: Klicke auf einen Satz, um ihn auszuwählen. Dann auf „Überprüfen“ klicken.)</p>
+  <h2>Wähle alle Segmente mit Passivformen</h2>
+  <p>(Klicke auf die passenden Textteile und überprüfe dann deine Auswahl.)</p>
 
-  <div id="text">
-    <span class="sentence" data-correct="false">Der Arzt untersucht den Patienten.</span><br>
-    <span class="sentence" data-correct="true">Der Patient wird untersucht.</span><br>
-    <span class="sentence" data-correct="false">Die Untersuchung dauert zehn Minuten.</span><br>
-    <span class="sentence" data-correct="true">Die Medikamente wurden verschrieben.</span><br>
-    <span class="sentence" data-correct="false">Er gibt dem Patienten ein Rezept.</span>
-  </div>
+  <p>
+    <span class="segment" data-correct="false">Am Morgen besucht der Arzt die Station.</span>
+    <span class="segment" data-correct="true">Dem Patienten wird Blut abgenommen.</span>
+    <span class="segment" data-correct="false">Anschließend erklärt er das weitere Vorgehen.</span>
+    <span class="segment" data-correct="true">Die Ergebnisse werden im Team besprochen.</span>
+    <span class="segment" data-correct="false">Danach ruft der Arzt die Angehörigen an.</span>
+  </p>
 
   <button onclick="checkAnswers()">Überprüfen</button>
 
   <script>
-    const sentences = document.querySelectorAll('.sentence');
+    const segments = document.querySelectorAll('.segment');
 
-    sentences.forEach(s => {
-      s.addEventListener('click', () => {
-        s.classList.toggle('selected');
-        s.classList.remove('correct', 'incorrect');
+    segments.forEach(segment => {
+      segment.addEventListener('click', () => {
+        segment.classList.toggle('selected');
+        segment.classList.remove('correct', 'incorrect');
       });
     });
 
     function checkAnswers() {
-      sentences.forEach(s => {
-        const isCorrect = s.getAttribute('data-correct') === "true";
-        const isSelected = s.classList.contains('selected');
+      segments.forEach(segment => {
+        const isCorrect = segment.getAttribute('data-correct') === "true";
+        const isSelected = segment.classList.contains('selected');
 
-        s.classList.remove('correct', 'incorrect');
+        segment.classList.remove('correct', 'incorrect');
 
         if (isSelected && isCorrect) {
-          s.classList.add('correct');
+          segment.classList.add('correct');
         } else if (isSelected && !isCorrect) {
-          s.classList.add('incorrect');
+          segment.classList.add('incorrect');
         } else if (!isSelected && isCorrect) {
-          s.classList.add('incorrect');
+          segment.classList.add('incorrect');
         }
       });
     }
@@ -87,4 +86,3 @@
 
 </body>
 </html>
-
