@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Textauswahl-Übung</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+
+    .sentence {
+      display: inline-block;
+      margin: 5px 0;
+      padding: 5px;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+      cursor: pointer;
+    }
+
+    .sentence:hover {
+      background-color: #eef;
+    }
+
+    .selected {
+      background-color: #cce5ff;
+      border: 1px solid #66afe9;
+    }
+
+    .correct {
+      background-color: #c6f7c3;
+      border: 1px solid #28a745;
+    }
+
+    .incorrect {
+      background-color: #f8d7da;
+      border: 1px solid #dc3545;
+    }
+
+    button {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Wähle alle Sätze mit Passivformen</h2>
+  <p>(Tipp: Klicke auf einen Satz, um ihn auszuwählen. Dann auf „Überprüfen“ klicken.)</p>
+
+  <div id="text">
+    <span class="sentence" data-correct="false">Der Arzt untersucht den Patienten.</span><br>
+    <span class="sentence" data-correct="true">Der Patient wird untersucht.</span><br>
+    <span class="sentence" data-correct="false">Die Untersuchung dauert zehn Minuten.</span><br>
+    <span class="sentence" data-correct="true">Die Medikamente wurden verschrieben.</span><br>
+    <span class="sentence" data-correct="false">Er gibt dem Patienten ein Rezept.</span>
+  </div>
+
+  <button onclick="checkAnswers()">Überprüfen</button>
+
+  <script>
+    const sentences = document.querySelectorAll('.sentence');
+
+    sentences.forEach(s => {
+      s.addEventListener('click', () => {
+        s.classList.toggle('selected');
+        s.classList.remove('correct', 'incorrect');
+      });
+    });
+
+    function checkAnswers() {
+      sentences.forEach(s => {
+        const isCorrect = s.getAttribute('data-correct') === "true";
+        const isSelected = s.classList.contains('selected');
+
+        s.classList.remove('correct', 'incorrect');
+
+        if (isSelected && isCorrect) {
+          s.classList.add('correct');
+        } else if (isSelected && !isCorrect) {
+          s.classList.add('incorrect');
+        } else if (!isSelected && isCorrect) {
+          s.classList.add('incorrect');
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>
+
