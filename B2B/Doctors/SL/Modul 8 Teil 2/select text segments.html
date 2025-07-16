@@ -29,39 +29,45 @@
     }
 
     .correct {
-      background-color: #e6f6ec;
+      font-weight: bold;
       color: #2CBE55;
       border: 1px solid #2CBE55;
     }
 
     .incorrect {
-      background-color: #ffe6e6;
+      font-weight: bold;
       color: #FF3333;
       border: 1px solid #FF3333;
     }
 
     button {
-      margin-top: 20px;
-      padding: 8px 16px;
-      background-color: #031638;
+      display: block;
+      margin: 40px auto;
+      padding: 14px 32px;
+      background-color: #0047FF;
       color: white;
+      font-size: 16px;
+      font-family: 'Open Sans', sans-serif;
+      font-weight: bold;
       border: none;
-      border-radius: 4px;
+      border-radius: 50px;
       cursor: pointer;
     }
 
     button:hover {
-      opacity: 0.9;
+      opacity: 0.95;
     }
   </style>
 </head>
 <body>
 
-  <p><em>Diskussion zwischen Onkologie und interventioneller Radiologie: TACE bei kolorektalen Lebermetastasen <br>
-Teilnehmer: <br>
-Dr. Julia Wagner, Fachärztin für Onkologie <br>
-Dr. Tom Neumann, interventioneller Radiologe <br>
-Patient: Herr B., 61 Jahre, kolorektales Adenokarzinom, multiple bilobäre Lebermetastasen, keine extrahepatische Manifestation</em></p>
+  <p><em>
+    Diskussion zwischen Onkologie und interventioneller Radiologie: TACE bei kolorektalen Lebermetastasen <br>
+    Teilnehmer: <br>
+    Dr. Julia Wagner, Fachärztin für Onkologie <br>
+    Dr. Tom Neumann, interventioneller Radiologe <br>
+    Patient: Herr B., 61 Jahre, kolorektales Adenokarzinom, multiple bilobäre Lebermetastasen, keine extrahepatische Manifestation
+  </em></p>
 
   <p>
     <strong>Onkologin:</strong>
@@ -69,12 +75,62 @@ Patient: Herr B., 61 Jahre, kolorektales Adenokarzinom, multiple bilobäre Leber
     <span class="segment" data-correct="false">Er hat ein metastasiertes kolorektales Karzinom mit hepatogener Metastasierung.</span>
     <span class="segment" data-correct="false">Die systemische Erstlinientherapie mit FOLFOX plus Bevacizumab lief gut, aber nach acht Zyklen ist nun eine partielle Progression in der Leber sichtbar.</span>
     <span class="segment" data-correct="false">Extrahepatisch ist er tumorfrei, Zustand gut, ECOG 1, Leberwerte leicht erhöht, aber noch im Rahmen.</span>
-    <span class="segment" data-correct="true">Wir überlegen, ob eine lokale Therapie ergänzend sinnvoll wäre.</span><br>
+    <span class="segment" data-correct="true">Wir überlegen, ob eine lokale Therapie ergänzend sinnvoll wäre.</span>
+  </p>
+
+  <p>
     <strong>Radiologe:</strong>
     <span class="segment" data-correct="false">Ja, ich habe die PET-CT und das letzte Leber-MRT gesehen.</span>
     <span class="segment" data-correct="true">Die Metastasen liegen vor allem in Segment VI und VIII, arterialisieren etwas, was für die TACE günstig ist.</span>
     <span class="segment" data-correct="false">Die Leberperfusion scheint erhalten, kein Hinweis auf portale Abflussstörung.</span>
-    <span class="segment" data-correct="false">Bisher keine Pfortaderthrombose, das ist essenziell.</span><br>
+    <span class="segment" data-correct="false">Bisher keine Pfortaderthrombose, das ist essenziell.</span>
+  </p>
+
+  <p>
+    <strong>Onkologin:</strong>
+    <span class="segment" data-correct="true">Genau. Uns ist wichtig, die Leberlast zu kontrollieren, bevor wir eine Zweitlinientherapie beginnen.</span>
+    <span class="segment" data-correct="true">Systemisch sind die Optionen limitiert, deshalb denken wir an eine arterielle Therapie – möglicherweise TACE mit Irinotecan-eluting beads?</span>
+  </p>
+
+  <p>
+    <strong>Radiologe:</strong>
+    <span class="segment" data-correct="true">Ja, das ist in dieser Konstellation durchaus vertretbar.</span>
+    <span class="segment" data-correct="true">Wir verwenden meist DC-Beads beladen mit Irinotecan, über die A. hepatica.</span>
+    <span class="segment" data-correct="true">Wir können segmental embolisieren, um das gesunde Lebergewebe möglichst zu schonen.</span>
+    <span class="segment" data-correct="true">Die Tumoren sind peripher gut zugänglich.</span>
+    <span class="segment" data-correct="true">Ich schlage vor, den Eingriff in zwei Sitzungen zu splitten – jeweils ein Leberlappen – um das Risiko der Lebertoxizität zu minimieren.</span>
+  </p>
+
+  <p>
+    <strong>Onkologin:</strong>
+    <span class="segment" data-correct="false">Das klingt gut. Was sind in diesem Fall die Hauptrisiken?</span>
+  </p>
+
+  <p>
+    <strong>Onkologin:</strong>
+    <span class="segment" data-correct="false">Neben dem postembolischen Syndrom ist bei vorgeschädigter Leber das Risiko für Transaminasenanstieg, biliäre Komplikationen und Leberversagen zu beachten.</span>
+    <span class="segment" data-correct="false">Aber bei gutem Allgemeinzustand und ohne relevante Komorbiditäten sehe ich das Risiko als kalkulierbar.</span>
+    <span class="segment" data-correct="false">Wir brauchen aktuelle Leberwerte, Bilirubin &lt;2 mg/dl wäre ideal.</span>
+  </p>
+
+  <p>
+    <strong>Onkologin:</strong>
+    <span class="segment" data-correct="false">Liegt derzeit bei 1,4 mg/dl.</span>
+    <span class="segment" data-correct="false">Ich lasse nochmal ein vollständiges Blutbild mit Gerinnung machen.</span>
+    <span class="segment" data-correct="false">Wenn das passt, können wir ihm zeitnah einen Termin geben.</span>
+    <span class="segment" data-correct="false">Wie wäre der Ablauf?</span>
+  </p>
+
+  <p>
+    <strong>Radiologe:</strong>
+    <span class="segment" data-correct="false">Ambulante Vorstellung zur Aufklärung, dann stationäre Aufnahme für 2 Tage.</span>
+    <span class="segment" data-correct="true">Intervention über die rechte A. femoralis, je nach Verlauf dann zweite Sitzung nach ca. vier Wochen.</span>
+  </p>
+
+  <p>
+    <strong>Onkologin:</strong>
+    <span class="segment" data-correct="true">Super, dann nehme ich das so mit in die Tumorkonferenz und plane ihn für die interventionelle Therapie ein.</span>
+    <span class="segment" data-correct="false">Danke dir!</span>
   </p>
 
   <button onclick="checkAnswers()">Überprüfen</button>
