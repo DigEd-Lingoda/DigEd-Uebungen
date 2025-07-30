@@ -156,22 +156,22 @@
       });
     });
 
-    function checkAnswers() {
-      segments.forEach(segment => {
-        const isCorrect = segment.getAttribute('data-correct') === "true";
-        const isSelected = segment.classList.contains('selected');
+ function checkAnswers() {
+  segments.forEach(segment => {
+    const isCorrect = segment.getAttribute('data-correct') === "true";
+    const isSelected = segment.classList.contains('selected');
 
-        segment.classList.remove('correct', 'incorrect');
+    segment.classList.remove('correct', 'incorrect', 'missed');
 
-        if (isSelected && isCorrect) {
-          segment.classList.add('correct');
-        } else if (isSelected && !isCorrect) {
-          segment.classList.add('incorrect');
-        } else if (!isSelected && isCorrect) {
-          segment.classList.add('incorrect');
-        }
-      });
+    if (isSelected && isCorrect) {
+      segment.classList.add('correct');
+    } else if (isSelected && !isCorrect) {
+      segment.classList.add('incorrect');
+    } else if (!isSelected && isCorrect) {
+      segment.classList.add('missed');
     }
+  });
+}
   </script>
 
 </body>
