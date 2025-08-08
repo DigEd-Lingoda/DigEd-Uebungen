@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Wortbildungsübung</title>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      padding: 20px;
+    }
+    table { 
+      border-collapse: collapse; 
+      width: 100%; /* volle Breite */
+      font-size: 0.85em; /* etwas kleinere Schrift für geringere Höhe */
+    }
+    th, td { 
+      border: 1px solid #ccc; 
+      padding: 4px; /* geringere Polsterung für kompaktere Zeilen */
+      text-align: left; 
+    }
+    th { 
+      background: #153BFF; 
+      color: #fff; 
+    }
+    input { 
+      width: 100%; 
+      box-sizing: border-box; 
+      padding: 2px; /* kompaktes Feld */
+      font-family: inherit;
+      font-size: 0.85em;
+    }
+    .correct { 
+      background-color: #c8e6c9; 
+    }
+    .wrong { 
+      background-color: #ffcdd2; 
+    }
+    button {
+      background: #153BFF;
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      font-size: 1em;
+      cursor: pointer;
+      margin-top: 10px;
+      font-family: 'Open Sans', sans-serif;
+      border-radius: 30px; /* noch abgerundeter */
+    }
+  </style>
+</head>
+<body>
+  <table>
+    <thead>
+      <tr>
+        <th>Verb</th>
+        <th>Nomen</th>
+        <th>Beispielsatz (Nom.)</th>
+        <th>Adjektiv (unflektierte Form)</th>
+        <th>Beispielsatz (Adj.)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr data-verb="aufklären">
+        <td>aufklären</td>
+        <td><input id="noun-aufklären" type="text"></td>
+        <td>Die <input id="nounSent-aufklären" type="text"> über Risiken erfolgt gemäß § 630e BGB.</td>
+        <td><input id="adj-aufklären" type="text"></td>
+        <td>Ein <input id="adjSent-aufklären" type="text"> Gespräch stärkt das Vertrauen.</td>
+      </tr>
+      <tr data-verb="dokumentieren">
+        <td>dokumentieren</td>
+        <td><input id="noun-dokumentieren" type="text"></td>
+        <td>Die <input id="nounSent-dokumentieren" type="text"> von Komplikationen ist vorgeschrieben.</td>
+        <td><input id="adj-dokumentieren" type="text"></td>
+        <td>Eine <input id="adjSent-dokumentieren" type="text"> Lücke kann Folgen haben.</td>
+      </tr>
+      <tr data-verb="verhandeln">
+        <td>verhandeln</td>
+        <td><input id="noun-verhandeln" type="text"></td>
+        <td>Die <input id="nounSent-verhandeln" type="text"> dauerte mehrere Wochen.</td>
+        <td><input id="adj-verhandeln" type="text"></td>
+        <td>Manche Termine sind <input id="adjSent-verhandeln" type="text">.</td>
+      </tr>
+      <tr data-verb="sichern">
+        <td>sichern</td>
+        <td><input id="noun-sichern" type="text"></td>
+        <td>Die <input id="nounSent-sichern" type="text"> muss unabhängig sein.</td>
+        <td><input id="adj-sichern" type="text"></td>
+        <td>Eine <input id="adjSent-sichern" type="text"> Dokumentation schützt.</td>
+      </tr>
+      <tr data-verb="verpflichten">
+        <td>verpflichten</td>
+        <td><input id="noun-verpflichten" type="text"></td>
+        <td>Die <input id="nounSent-verpflichten" type="text"> ist Teil des Vertrags.</td>
+        <td><input id="adj-verpflichten" type="text"></td>
+        <td>Die Schweigepflicht ist <input id="adjSent-verpflichten" type="text">.</td>
+      </tr>
+      <tr data-verb="informieren">
+        <td>informieren</td>
+        <td><input id="noun-informieren" type="text"></td>
+        <td>Die <input id="nounSent-informieren" type="text"> über Diagnose ist unumgänglich.</td>
+        <td><input id="adj-informieren" type="text"></td>
+        <td>Der Hinweistext ist <input id="adjSent-informieren" type="text"> Natur.</td>
+      </tr>
+      <tr data-verb="einsehen">
+        <td>einsehen</td>
+        <td><input id="noun-einsehen" type="text"></td>
+        <td>Die <input id="nounSent-einsehen" type="text"> kann jederzeit verlangt werden.</td>
+        <td><input id="adj-einsehen" type="text"></td>
+        <td>Die Akte ist <input id="adjSent-einsehen" type="text"> für Patient:innen.</td>
+      </tr>
+      <tr data-verb="wählen">
+        <td>wählen</td>
+        <td><input id="noun-wählen" type="text"></td>
+        <td>Die <input id="nounSent-wählen" type="text"> des Arztes ist gesetzlich garantiert.</td>
+        <td><input id="adj-wählen" type="text"></td>
+        <td>Eine Zweitmeinung ist <input id="adjSent-wählen" type="text"> bei planbaren Eingriffen.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <button onclick="checkAnswers()">Antworten prüfen</button>
+
+  <script>
+    const solutions = {
+      aufklären: { noun: 'Aufklärung', nounSent: 'Aufklärung', adj: 'aufklärend', adjSent: 'aufklärendes' },
+      dokumentieren: { noun: 'Dokumentation', nounSent: 'Dokumentation', adj: 'dokumentarisch', adjSent: 'dokumentarische' },
+      verhandeln: { noun: 'Verhandlung', nounSent: 'Verhandlung', adj: 'verhandelbar', adjSent: 'verhandelbar' },
+      sichern: { noun: 'Sicherheit', nounSent: 'Sicherheit', adj: 'sicher', adjSent: 'sichere' },
+      verpflichten: { noun: 'Verpflichtung', nounSent: 'Verpflichtung', adj: 'verpflichtend', adjSent: 'verpflichtend' },
+      informieren: { noun: 'Information', nounSent: 'Information', adj: 'informativ', adjSent: 'informativer' },
+      einsehen: { noun: 'Einsicht', nounSent: 'Einsicht', adj: 'einsehbar', adjSent: 'einsehbar' },
+      wählen: { noun: 'Wahl', nounSent: 'Wahl', adj: 'wählbar', adjSent: 'wählbar' }
+    };
+
+    function checkAnswers() {
+      Object.keys(solutions).forEach(key => {
+        const sol = solutions[key];
+        ['noun', 'nounSent', 'adj', 'adjSent'].forEach(field => {
+          const input = document.getElementById(`${field}-${key}`);
+          if (input.value.trim().toLowerCase() === sol[field].toLowerCase()) {
+            input.classList.add('correct');
+            input.classList.remove('wrong');
+          } else {
+            input.classList.add('wrong');
+            input.classList.remove('correct');
+          }
+        });
+      });
+    }
+  </script>
+</body>
+</html>
