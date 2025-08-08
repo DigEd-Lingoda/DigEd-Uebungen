@@ -2,8 +2,6 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <!-- Viewport für mobile Geräte -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wortbildungsübung</title>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
   <style>
@@ -11,17 +9,14 @@
       font-family: 'Open Sans', sans-serif;
       padding: 20px;
     }
-    /* Tabelle block-level und overflow für horizontales Scrollen */
-    table {
-      display: block;
-      overflow-x: auto;
-      border-collapse: collapse;
-      width: 100%;
-      font-size: 0.85em;
+    table { 
+      border-collapse: collapse; 
+      width: 100%; /* volle Breite */
+      font-size: 0.85em; /* etwas kleinere Schrift für geringere Höhe */
     }
     th, td { 
       border: 1px solid #ccc; 
-      padding: 4px;
+      padding: 4px; /* geringere Polsterung für kompaktere Zeilen */
       text-align: left; 
     }
     th { 
@@ -31,7 +26,7 @@
     input { 
       width: 100%; 
       box-sizing: border-box; 
-      padding: 2px;
+      padding: 2px; /* kompaktes Feld */
       font-family: inherit;
       font-size: 0.85em;
     }
@@ -50,23 +45,7 @@
       cursor: pointer;
       margin-top: 10px;
       font-family: 'Open Sans', sans-serif;
-      border-radius: 30px;
-    }
-
-    /* Feinjustierung auf sehr schmalen Bildschirmen */
-    @media (max-width: 480px) {
-      table {
-        font-size: 0.75em;
-      }
-      input {
-        padding: 4px;
-        font-size: 0.75em;
-      }
-      button {
-        width: 100%;
-        padding: 8px 12px;
-        font-size: 0.9em;
-      }
+      border-radius: 30px; /* noch abgerundeter */
     }
   </style>
 </head>
@@ -75,67 +54,49 @@
     <thead>
       <tr>
         <th>Verb</th>
-        <th>Nomen</th>
-        <th>Beispielsatz (Nom.)</th>
-        <th>Adjektiv (unflektierte Form)</th>
-        <th>Beispielsatz (Adj.)</th>
+        <th>Beispielsatz (Nomen)</th>
+        <th>Beispielsatz (Adjektiv)</th>
       </tr>
     </thead>
     <tbody>
       <tr data-verb="aufklären">
         <td>aufklären</td>
-        <td><input id="noun-aufklären" type="text"></td>
         <td>Die <input id="nounSent-aufklären" type="text"> über Risiken erfolgt gemäß § 630e BGB.</td>
-        <td><input id="adj-aufklären" type="text"></td>
         <td>Ein <input id="adjSent-aufklären" type="text"> Gespräch stärkt das Vertrauen.</td>
       </tr>
       <tr data-verb="dokumentieren">
         <td>dokumentieren</td>
-        <td><input id="noun-dokumentieren" type="text"></td>
         <td>Die <input id="nounSent-dokumentieren" type="text"> von Komplikationen ist vorgeschrieben.</td>
-        <td><input id="adj-dokumentieren" type="text"></td>
         <td>Eine <input id="adjSent-dokumentieren" type="text"> Lücke kann Folgen haben.</td>
       </tr>
       <tr data-verb="verhandeln">
         <td>verhandeln</td>
-        <td><input id="noun-verhandeln" type="text"></td>
         <td>Die <input id="nounSent-verhandeln" type="text"> dauerte mehrere Wochen.</td>
-        <td><input id="adj-verhandeln" type="text"></td>
         <td>Manche Termine sind <input id="adjSent-verhandeln" type="text">.</td>
       </tr>
       <tr data-verb="sichern">
         <td>sichern</td>
-        <td><input id="noun-sichern" type="text"></td>
         <td>Die <input id="nounSent-sichern" type="text"> muss unabhängig sein.</td>
-        <td><input id="adj-sichern" type="text"></td>
         <td>Eine <input id="adjSent-sichern" type="text"> Dokumentation schützt.</td>
       </tr>
       <tr data-verb="verpflichten">
         <td>verpflichten</td>
-        <td><input id="noun-verpflichten" type="text"></td>
         <td>Die <input id="nounSent-verpflichten" type="text"> ist Teil des Vertrags.</td>
-        <td><input id="adj-verpflichten" type="text"></td>
         <td>Die Schweigepflicht ist <input id="adjSent-verpflichten" type="text">.</td>
       </tr>
       <tr data-verb="informieren">
         <td>informieren</td>
-        <td><input id="noun-informieren" type="text"></td>
         <td>Die <input id="nounSent-informieren" type="text"> über Diagnose ist unumgänglich.</td>
-        <td><input id="adj-informieren" type="text"></td>
         <td>Der Hinweistext ist <input id="adjSent-informieren" type="text"> Natur.</td>
       </tr>
       <tr data-verb="einsehen">
         <td>einsehen</td>
-        <td><input id="noun-einsehen" type="text"></td>
         <td>Die <input id="nounSent-einsehen" type="text"> kann jederzeit verlangt werden.</td>
-        <td><input id="adj-einsehen" type="text"></td>
         <td>Die Akte ist <input id="adjSent-einsehen" type="text"> für Patient:innen.</td>
       </tr>
       <tr data-verb="wählen">
         <td>wählen</td>
-        <td><input id="noun-wählen" type="text"></td>
         <td>Die <input id="nounSent-wählen" type="text"> des Arztes ist gesetzlich garantiert.</td>
-        <td><input id="adj-wählen" type="text"></td>
         <td>Eine Zweitmeinung ist <input id="adjSent-wählen" type="text"> bei planbaren Eingriffen.</td>
       </tr>
     </tbody>
@@ -145,20 +106,20 @@
 
   <script>
     const solutions = {
-      aufklären: { noun: 'Aufklärung', nounSent: 'Aufklärung', adj: 'aufklärend', adjSent: 'aufklärendes' },
-      dokumentieren: { noun: 'Dokumentation', nounSent: 'Dokumentation', adj: 'dokumentarisch', adjSent: 'dokumentarische' },
-      verhandeln: { noun: 'Verhandlung', nounSent: 'Verhandlung', adj: 'verhandelbar', adjSent: 'verhandelbar' },
-      sichern: { noun: 'Sicherheit', nounSent: 'Sicherheit', adj: 'sicher', adjSent: 'sichere' },
-      verpflichten: { noun: 'Verpflichtung', nounSent: 'Verpflichtung', adj: 'verpflichtend', adjSent: 'verpflichtend' },
-      informieren: { noun: 'Information', nounSent: 'Information', adj: 'informativ', adjSent: 'informativer' },
-      einsehen: { noun: 'Einsicht', nounSent: 'Einsicht', adj: 'einsehbar', adjSent: 'einsehbar' },
-      wählen: { noun: 'Wahl', nounSent: 'Wahl', adj: 'wählbar', adjSent: 'wählbar' }
+      aufklären: { nounSent: 'Aufklärung', adjSent: 'aufklärendes' },
+      dokumentieren: { nounSent: 'Dokumentation', adjSent: 'dokumentarische' },
+      verhandeln: { nounSent: 'Verhandlung', adjSent: 'verhandelbar' },
+      sichern: { nounSent: 'Sicherheit', adjSent: 'sichere' },
+      verpflichten: { nounSent: 'Verpflichtung', adjSent: 'verpflichtend' },
+      informieren: { nounSent: 'Information', adjSent: 'informativer' },
+      einsehen: { nounSent: 'Einsicht', adjSent: 'einsehbar' },
+      wählen: { nounSent: 'Wahl', adjSent: 'wählbar' }
     };
 
     function checkAnswers() {
       Object.keys(solutions).forEach(key => {
         const sol = solutions[key];
-        ['noun', 'nounSent', 'adj', 'adjSent'].forEach(field => {
+        ['nounSent', 'adjSent'].forEach(field => {
           const input = document.getElementById(`${field}-${key}`);
           if (input.value.trim().toLowerCase() === sol[field].toLowerCase()) {
             input.classList.add('correct');
