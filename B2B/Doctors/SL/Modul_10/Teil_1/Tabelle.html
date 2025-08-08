@@ -2,6 +2,8 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
+  <!-- Viewport für mobile Geräte -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wortbildungsübung</title>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
   <style>
@@ -9,14 +11,17 @@
       font-family: 'Open Sans', sans-serif;
       padding: 20px;
     }
-    table { 
-      border-collapse: collapse; 
-      width: 100%; /* volle Breite */
-      font-size: 0.85em; /* etwas kleinere Schrift für geringere Höhe */
+    /* Tabelle block-level und overflow für horizontales Scrollen */
+    table {
+      display: block;
+      overflow-x: auto;
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 0.85em;
     }
     th, td { 
       border: 1px solid #ccc; 
-      padding: 4px; /* geringere Polsterung für kompaktere Zeilen */
+      padding: 4px;
       text-align: left; 
     }
     th { 
@@ -26,7 +31,7 @@
     input { 
       width: 100%; 
       box-sizing: border-box; 
-      padding: 2px; /* kompaktes Feld */
+      padding: 2px;
       font-family: inherit;
       font-size: 0.85em;
     }
@@ -45,7 +50,23 @@
       cursor: pointer;
       margin-top: 10px;
       font-family: 'Open Sans', sans-serif;
-      border-radius: 30px; /* noch abgerundeter */
+      border-radius: 30px;
+    }
+
+    /* Feinjustierung auf sehr schmalen Bildschirmen */
+    @media (max-width: 480px) {
+      table {
+        font-size: 0.75em;
+      }
+      input {
+        padding: 4px;
+        font-size: 0.75em;
+      }
+      button {
+        width: 100%;
+        padding: 8px 12px;
+        font-size: 0.9em;
+      }
     }
   </style>
 </head>
