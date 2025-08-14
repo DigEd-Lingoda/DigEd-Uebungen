@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Präpositionen + Kasus – Drag & Drop</title>
+
+  <!-- Open Sans einbinden -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#fafafa; --ink:#1f2937; --muted:#6b7280;
+      --accent:#2563eb; --ok:#16a34a; --err:#dc2626; --ring:#93c5fd;
+      --card:#ffffff; --shadow:0 6px 20px rgba(0,0,0,.08);
+      --radius:12px;
+    }
+    html,body{
+      background:var(--bg);
+      color:var(--ink);
+      font-family:"Open Sans", Arial, Helvetica, sans-serif;
+      font-size:16px; line-height:1.5; margin:0;
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    }
+    main{max-width:900px; margin:32px auto; padding:0 16px 48px}
+    h1{font-size:1.5rem; margin:0 0 12px}
+    p.lead{color:var(--muted); margin-top:0}
+    .wrap{
+      background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow);
+      padding:20px;
+    }
+    .bank{
+      display:flex; flex-wrap:wrap; gap:10px; margin:8px 0 18px;
+      padding:10px; border:1px dashed #cbd5e1; border-radius:10px; background:#f8fafc;
+    }
+    .token{
+      border:none; background:#eef2ff; color:#111827; padding:8px 10px;
+      border-radius:999px; cursor:grab; user-select:none;
+      box-shadow:0 1px 0 rgba(0,0,0,.05);
+      display:inline-flex; align-items:center; gap:6px; font-weight:600;
+    }
+    .token:active{cursor:grabbing}
+    .token[aria-disabled="true"]{opacity:.45; cursor:not-allowed}
+    .token .hint{color:var(--muted); font-weight:500; font-size:.85em}
+    .exercise{counter-reset:q; display:flex; flex-direction:column; gap:14px; padding-left:1rem}
+    .exercise li{list-style:none; background:#fff; padding:10px 12px; border-radius:10px; box-shadow:0 1px 0 rgba(0,0,0,.04)}
+    .exercise li::before{counter-increment:q; content: counter(q) ") "; color:#000000; font-weight:700; margin-right:2px}
+    .drop{
+      display:inline-flex; align-items:center; gap:8px;
+      min-width:10ch; min-height:2.25rem;
+      padding:0 10px; margin:0 4px; border-radius:999px;
+      background:#f1f5f9; border:2px dashed #cbd5e1; vertical-align:baseline;
+    }
+    .drop[data-filled="true"]{border-style:solid; background:#eef2ff; border-color:#c7d2fe}
+    .drop:focus{outline:none; box-shadow:0 0 0 4px var(--ring)}
+    .drop .token{background:transparent; box-shadow:none; padding:0; cursor:grab}
+    .drop .token .hint{display:none} /* keine Hints im Satz */
+
+    .remove{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:24px; height:24px; border-radius:50%;
+      background:#e2e8f0; color:#111827; font-weight:700; cursor:pointer;
+      border:none;
+    }
+    .remove:hover{filter:brightness(0.95)}
+    .remove:focus{outline:none; box-shadow:0 0 0 3px var(--ring)}
+
+    .controls{display:flex; flex-wrap:wrap; gap:10px; margin-top:18px}
+    .controls button{
+      background:var(--accent); color:#fff; border:none; border-radius:10px;
+      padding:10px 14px; font-weight:700; cursor:pointer;
+    }
+    .controls button:hover{filter:brightness(0.95)}
+    .controls button:disabled{opacity:.6; cursor:not-allowed}
+    .feedback{margin-top:12px; font-weight:700}
+    .correct{background:#ecfdf5; outline:2px solid var(--ok)}
+    .wrong{background:#fef2f2; outline:2px solid var(--err)}
+    .legend{color:var(--muted); font-size:.92rem}
+    @media (prefers-reduced-motion:no-preference){
+      .token,.drop{transition:background .15s ease, outline-color .15s ease, filter .15s ease}
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="wrap" aria-label="Übung Präpositionen">
+      <div id="bank" class="bank" role="list" aria-label="Wortbank">
+        <!-- Tokens (werden beim Laden gemischt) -->
+        <button class="token" draggable="true" role="listitem" data-word="auf Grundlage" aria-label="auf Grundlage, Genitiv">
+          auf Grundlage <span class="hint"></span>
+        </button>
+        <button class="token" draggable="true" role="listitem" data-word="aufgrund" aria-label="aufgrund, Genitiv">
+          aufgrund <span class="hint"></span>
+        </button>
+        <button class="token" draggable="true" role="listitem" data-word="bei" aria-label="bei, Dativ">
+          bei <span class="hint"></span>
+        </button>
+        <button class="token" draggable="true" role="listitem" data-word="im Falle" aria-label="im Falle, Genitiv">
+          im Falle <span class="hint"></span>
+        </button>
+        <button class="token" draggable="true" role="listitem" data-word="gegenüber" aria-label="gegenüber, Dativ">
+          gegenüber <span class="hint"></span>
+        </button>
+        <button class="token" draggable="true" role="listitem" data-word="zur Wahrung" aria-label="zur Wahrung, Genitiv">
+          zur Wahrung <span class="hint"></span>
+        </button>
+      </div>
+
+      <ol class="exercise">
+        <li>
+          Ärzt:innen haften zivilrechtlich
+          <span class="drop" tabindex="0" role="button" aria-label="Lücke 1" data-answer="auf Grundlage" data-filled="false">_____</span>
+          des Behandlungsvertrags (§§ 630a ff. BGB).
+        </li>
+        <li>
+          Vertrauliche Informationen dürfen nur mit Einwilligung oder
+          <span class="drop" tabindex="0" role="button" aria-label="Lücke 2" data-answer="bei" data-filled="false">_____</span>
+          gesetzlicher Pflicht weitergegeben werden.
+        </li>
+        <li>
+          <span class="drop" tabindex="0" role="button" aria-label="Lücke 3" data-answer="aufgrund" data-filled="false">_____</span>
+          grober Fahrlässigkeit kann zusätzlich eine strafrechtliche Verantwortung greifen.
+        </li>
+        <li>
+          Die Berufsordnungen regeln das Verhalten
+          <span class="drop" tabindex="0" role="button" aria-label="Lücke 4" data-answer="gegenüber" data-filled="false">_____</span>
+          Patient:innen und Kolleg:innen.
+        </li>
+        <li>
+          Eine Berufshaftpflicht ist vorgeschrieben,
+          <span class="drop" tabindex="0" role="button" aria-label="Lücke 5" data-answer="zur Wahrung" data-filled="false">_____</span>
+          eines professionellen Berufsbildes.
+        </li>
+        <li>
+          <span class="drop" tabindex="0" role="button" aria-label="Lücke 6" data-answer="im Falle" data-filled="false">_____</span>
+          eines Behandlungsfehlers haften Ärzt:innen zivilrechtlich.
+        </li>
+      </ol>
+
+      <div class="controls">
+        <button id="check">Prüfen</button>
+        <button id="reset">Zurücksetzen</button>
+      </div>
+      <div id="score" class="feedback" aria-live="polite"></div>
+    </div>
+  </main>
+
+  <script>
+    // Utility: shuffle children in the bank
+    function shuffle(container){
+      const nodes = Array.from(container.children);
+      for(let i = nodes.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [nodes[i], nodes[j]] = [nodes[j], nodes[i]];
+      }
+      nodes.forEach(n => container.appendChild(n));
+    }
+
+    const bank = document.getElementById('bank');
+    const tokens = Array.from(document.querySelectorAll('.token'));
+    const drops = Array.from(document.querySelectorAll('.drop'));
+    let selectedToken = null; // for keyboard/click placement
+    let draggedToken = null;
+
+    shuffle(bank);
+
+    // ---- Drag & Drop handlers ----
+    tokens.forEach(t => {
+      t.addEventListener('dragstart', e => {
+        draggedToken = t;
+        t.classList.add('dragging');
+        e.dataTransfer.setData('text/plain', t.dataset.word);
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      t.addEventListener('dragend', () => {
+        draggedToken = null;
+        t.classList.remove('dragging');
+      });
+
+      // Keyboard selection
+      t.addEventListener('click', () => toggleSelect(t));
+      t.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter' || e.key === ' '){
+          e.preventDefault();
+          toggleSelect(t);
+        }
+      });
+    });
+
+    function toggleSelect(t){
+      if (t.getAttribute('aria-disabled') === 'true') return;
+      if(selectedToken === t){
+        t.classList.remove('selected');
+        selectedToken = null;
+        return;
+      }
+      if(selectedToken) selectedToken.classList.remove('selected');
+      selectedToken = t;
+      t.classList.add('selected');
+    }
+
+    drops.forEach(d => {
+      d.addEventListener('dragover', e => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+      });
+      d.addEventListener('drop', e => {
+        e.preventDefault();
+        if(!draggedToken) return;
+        placeToken(draggedToken, d);
+      });
+
+      // Keyboard placement
+      d.addEventListener('click', () => {
+        if(selectedToken) placeToken(selectedToken, d);
+      });
+      d.addEventListener('keydown', (e) => {
+        // Enter/Space: platzieren; Backspace/Delete: leeren
+        if((e.key === 'Enter' || e.key === ' ') && selectedToken){
+          e.preventDefault();
+          placeToken(selectedToken, d);
+        } else if(e.key === 'Backspace' || e.key === 'Delete'){
+          e.preventDefault();
+          clearDrop(d);
+        }
+      });
+
+      // Doppelklick leert die Lücke
+      d.addEventListener('dblclick', () => clearDrop(d));
+    });
+
+    function addRemoveControl(drop){
+      // schon vorhanden?
+      if (drop.querySelector('.remove')) return;
+      const btn = document.createElement('button');
+      btn.className = 'remove';
+      btn.type = 'button';
+      btn.setAttribute('aria-label','Lücke leeren');
+      btn.textContent = '×';
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        clearDrop(drop);
+      });
+      btn.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter' || e.key === ' '){
+          e.preventDefault();
+          clearDrop(drop);
+        }
+      });
+      drop.appendChild(btn);
+    }
+
+    function placeToken(token, drop){
+      // Quelle (vor dem Verschieben) merken:
+      const prevParent = token.parentElement;
+
+      // Falls Ziel schon belegt: vorhandenes Token zurück in die Bank
+      const existing = drop.querySelector('.token');
+      if(existing){
+        bank.appendChild(existing);
+        existing.removeAttribute('aria-disabled');
+      }
+
+      // Ziel leeren, Token einsetzen, Entfernen-Button hinzufügen
+      drop.innerHTML = '';
+      drop.appendChild(token);
+      addRemoveControl(drop);
+      drop.dataset.filled = 'true';
+      token.classList.remove('selected');
+      selectedToken = null;
+      token.draggable = true;
+
+      // WICHTIG: Ursprungs-Lücke bereinigen (damit das "×" verschwindet)
+      if (prevParent && prevParent.classList.contains('drop') && prevParent !== drop && !prevParent.querySelector('.token')) {
+        clearDrop(prevParent);
+      }
+    }
+
+    // Token zurück in die Bank ziehen
+    bank.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    });
+    bank.addEventListener('drop', e => {
+      e.preventDefault();
+      if(!draggedToken) return;
+      bank.appendChild(draggedToken);
+      draggedToken.removeAttribute('aria-disabled');
+      clearEmptyDrops();
+    });
+
+    function clearDrop(drop){
+      const tok = drop.querySelector('.token');
+      if(tok){ bank.appendChild(tok); }
+      drop.dataset.filled = 'false';
+      drop.classList.remove('correct','wrong');
+      drop.innerHTML = '_____';
+    }
+
+    function clearEmptyDrops(){
+      drops.forEach(d => {
+        if(!d.querySelector('.token')){
+          d.dataset.filled = 'false';
+          d.classList.remove('correct','wrong');
+          d.innerHTML = '_____';
+        }
+      });
+    }
+
+    // ---- Controls ----
+    document.getElementById('check').addEventListener('click', () => {
+      let correct = 0;
+      drops.forEach(d => {
+        d.classList.remove('correct','wrong');
+        const tok = d.querySelector('.token');
+        if(!tok){ d.classList.add('wrong'); return; }
+        const chosen = tok.dataset.word;
+        if(chosen === d.dataset.answer){
+          d.classList.add('correct');
+          correct++;
+        }else{
+          d.classList.add('wrong');
+        }
+      });
+      const score = document.getElementById('score');
+      score.textContent = `Richtig: ${correct} / ${drops.length}`;
+    });
+
+    document.getElementById('reset').addEventListener('click', () => {
+      // move all tokens back
+      document.querySelectorAll('.token').forEach(t => bank.appendChild(t));
+      drops.forEach(d => {
+        d.dataset.filled = 'false';
+        d.classList.remove('correct','wrong');
+        d.innerHTML = '_____';
+      });
+      shuffle(bank);
+      document.getElementById('score').textContent = '';
+      selectedToken = null;
+    });
+
+    // Accessibility labels für Tokens
+    tokens.forEach(t => t.setAttribute('aria-grabbed','false'));
+    document.addEventListener('dragstart', e => {
+      const t = e.target.closest('.token');
+      if(t) t.setAttribute('aria-grabbed','true');
+    });
+    document.addEventListener('dragend', e => {
+      const t = e.target.closest('.token');
+      if(t) t.setAttribute('aria-grabbed','false');
+    });
+  </script>
+</body>
+</html>
