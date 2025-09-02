@@ -27,20 +27,24 @@
       margin: 0 auto;
     }
 
+    /* ---------- FIX 2: feste Pixelbreiten, keine Bruchteile ---------- */
     .memory-game {
       display: grid;
-      grid-template-columns: repeat(4, 1fr); /* immer 4 Karten pro Reihe */
-      gap: 10px;
-      width: 90%;
-      margin-bottom: 20px; /* Platz unter dem Grid */
+      grid-template-columns: repeat(4, 194px); /* 4 Spalten à 194px */
+      gap: 10px;                                /* 3 Gaps → 30px */
+      justify-content: center;                   /* Grid in der Mitte ausrichten */
+      width: 100%;
+      max-width: none;
+      margin-bottom: 20px;
     }
 
     .card {
-      width: 100%;            /* füllt die gesamte Spaltenbreite */
-      aspect-ratio: 1 / 1;     /* Breite = Höhe → quadratisch */
+      width: 194px;          /* feste Breite passend zur Spaltengröße */
+      aspect-ratio: 1 / 1;   /* quadratisch */
       perspective: 1000px;
       cursor: pointer;
     }
+
     .card-inner {
       position: relative;
       width: 100%;
@@ -140,8 +144,13 @@
     }
     #restart:hover { opacity: 0.9; }
 
+    /* Mobil: auf 2 Spalten mit kleineren Karten wechseln */
     @media (max-width: 600px) {
-      .memory-game { grid-template-columns: repeat(2, 1fr); }
+      .memory-game {
+        grid-template-columns: repeat(2, 160px);
+        gap: 10px;
+      }
+      .card { width: 160px; }
     }
   </style>
 </head>
