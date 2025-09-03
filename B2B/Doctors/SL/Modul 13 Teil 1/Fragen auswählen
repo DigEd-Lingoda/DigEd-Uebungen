@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>Textsegment-Auswahl – Behandlungskonferenz Psychiatrie</title>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      line-height: 1.6;
+      padding: 20px;
+      color: #031638;
+      background-color: #fff;
+    }
+
+    .segment {
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+
+    .segment:hover {
+      background-color: #F6F6F6;
+    }
+
+    .selected {
+      background-color: #D7E4FC;
+    }
+
+    .correct {
+      font-weight: bold;
+      background-color: #FFFFFF;
+      color: #2CBE55;
+      border: 1px solid #2CBE55;
+    }
+
+    .incorrect {
+      font-weight: bold;
+      background-color: #FFFFFF;
+      color: #FF3333;
+      border: 1px solid #FF3333;
+    }
+
+    .missed {
+      font-weight: bold;
+      color: #ff9900;
+      border: 1px dashed #ff9900;
+      background-color: transparent;
+    }
+
+    button {
+      display: block;
+      margin: 40px auto;
+      padding: 14px 32px;
+      background-color: #0047FF;
+      color: white;
+      font-size: 16px;
+      font-family: 'Open Sans', sans-serif;
+      font-weight: bold;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.95;
+    }
+  </style>
+</head>
+<body>
+
+  <p><em>
+    Behandlungskonferenz auf der allgemeinpsychiatrischen Station (Universitätsklinik) <br>
+    Beteiligte Berufsgruppen: Stationsarzt, Pflege, Psychologin, Kunsttherapie, Patient
+  </em></p>
+
+  <p>
+    <strong>Dr. Ghanem (Stationsarzt):</strong>
+    <span class="segment" data-correct="false">Guten Morgen, Herr Schneider.</span>
+    <span class="segment" data-correct="false">Danke, dass Sie heute zur Behandlungskonferenz gekommen sind.</span>
+    <span class="segment" data-correct="false">Wir sind hier heute in großer Runde – also verschiedene Berufsgruppen, die Sie im Alltag begleiten, sprechen mit Ihnen über Ihren aktuellen Gesundheitszustand und Ihre weitere Behandlung.</span>
+    <span class="segment" data-correct="false">Ist das in Ordnung für Sie?</span>
+  </p>
+
+  <p>
+    <strong>Herr Schneider:</strong>
+    <span class="segment" data-correct="false">Ja, ist gut.</span>
+  </p>
+
+  <p>
+    <strong>Dr. Ghanem (an das Team):</strong>
+    <span class="segment" data-correct="false">Zur Einleitung kurz zum somatischen und psychiatrischen Status:</span>
+    <span class="segment" data-correct="false">Herr Schneider wurde vor zwei Wochen mit einer mittelgradigen depressiven Episode aufgenommen,</span>
+    <span class="segment" data-correct="false">Initialsymptomatik: gedrückte Stimmung, psychomotorische Verlangsamung, insomnische Beschwerden.</span>
+    <span class="segment" data-correct="false">Wir haben eine antidepressive Therapie mit Sertralin begonnen und sind derzeit bei 75 mg.</span>
+  </p>
+
+  <p>
+    <strong>Dr. Ghanem (an Herrn Schneider):</strong>
+    <span class="segment" data-correct="false">Herr Schneider … Sie sind jetzt seit ungefähr zwei Wochen bei uns, weil es Ihnen psychisch sehr schlecht ging.</span>
+    <span class="segment" data-correct="false">Wir haben ja ein Medikament begonnen, das stimmungsaufhellend wirken soll.</span>
+    <span class="segment" data-correct="false">Wie geht es Ihnen aktuell damit?</span>
+  </p>
+
+  <p>
+    <strong>Herr Schneider:</strong>
+    <span class="segment" data-correct="false">Also, ich glaube, es wirkt ein bisschen.</span>
+    <span class="segment" data-correct="false">Ich bin nicht mehr ganz so leer.</span>
+    <span class="segment" data-correct="false">Aber ich bin oft noch sehr müde.</span>
+  </p>
+
+  <p>
+    <strong>Dr. Ghanem:</strong>
+    <span class="segment" data-correct="false">Hmm, hmm, verstehe.</span>
+    <span class="segment" data-correct="false">Solche Medikamente brauchen oft zwei bis drei Wochen, bis man eine deutliche Besserung spürt.</span>
+    <span class="segment" data-correct="false">Die Müdigkeit kann eine Nebenwirkung sein, die sich oft wieder legt.</span>
+    <span class="segment" data-correct="false">Wir behalten das im Blick.</span>
+    <span class="segment" data-correct="true">(An Frau Zotova) Frau Zotova, was haben Sie für einen Eindruck von Herrn Schneider?</span>
+  </p>
+
+  <p>
+    <strong>Frau Zotova (Pflege):</strong>
+    <span class="segment" data-correct="false">Aus pflegerischer Sicht ist ebenfalls eine gewisse Stabilisierung zu erkennen.</span>
+    <span class="segment" data-correct="false">Herr Schneider steht morgens meist selbstständig auf und frühstückt etwas zurückgezogen im Gemeinschaftsraum.</span>
+    <span class="segment" data-correct="false">In Gruppensituationen ist er noch zurückhaltend.</span>
+  </p>
+
+  <p>
+    <strong>Dr. Ghanem (an Herrn Schneider):</strong>
+    <span class="segment" data-correct="false">Können Sie Ihre Zurückhaltung in größeren Gruppen so bestätigen, Herr Schneider?</span>
+  </p>
+
+  <p>
+    <strong>Herr Schneider:</strong>
+    <span class="segment" data-correct="false">Ja … ich tue mir schwer mit anderen Menschen gerade.</span>
+    <span class="segment" data-correct="false">Ich zieh’ mich lieber zurück.</span>
+  </p>
+
+  <p>
+    <strong>Dr. Ghanem (an Psychologin):</strong>
+    <span class="segment" data-correct="true">Wie schätzen Sie die bisherige Entwicklung ein, Frau Marino?</span>
+  </p>
+
+  <p>
+    <strong>Frau Marino (Psychologin):</strong>
+    <span class="segment" data-correct="false">In den Einzelgesprächen äußerte Herr Schneider ausgeprägte Grübelgedanken, v. a. in Bezug auf Versagensgefühle.</span>
+    <span class="segment" data-correct="false">Wenn Herr Schneider einverstanden ist, würden wir uns gemeinsam auf die Alltagsstrukturierung und Techniken zum Grübelstopp konzentrieren.</span>
+    <span class="segment" data-correct="false">Was wünschen Sie sich, was besser werden soll, Herr Schneider?</span>
+  </p>
+
+  <p>
+    <strong>Herr Schneider:</strong>
+    <span class="segment" data-correct="false">Ja, einmal was Sie gesagt haben, dass das Grübeln aufhört.</span>
+    <span class="segment" data-correct="false">Und ich gehe gerne zur Kunsttherapie, da vergesse ich zumindest für ein paar Minuten meine Sorgen und dieses schwere Gefühl ...</span>
+  </p>
+
+  <p>
+    <strong>Frau Junker (Kunsttherapie):</strong>
+    <span class="segment" data-correct="false">Das möchte ich gerne unterstützen!</span>
+    <span class="segment" data-correct="false">Herr Schneider hat diese Woche an zwei Therapiestunden teilgenommen.</span>
+    <span class="segment" data-correct="false">Zunächst zögerlich, beim letzten Mal aber sehr ausdrucksstark.</span>
+    <span class="segment" data-correct="false">Besonders die Verwendung von dunklen Farben und harten Kontrasten fiel auf.</span>
+    <span class="segment" data-correct="false">Ich sehe hier ein Potenzial zur Bearbeitung innerer Spannungen.</span>
+    <span class="segment" data-correct="false">(An Herrn Schneider) Ich denke, die Kunsttherapie kann ein anderer, sinnvoller Weg sein, sich mit den eigenen Gefühlen auseinanderzusetzen.</span>
+  </p>
+
+  <p>
+    <strong>Herr Schneider:</strong>
+    <span class="segment" data-correct="false">Ja, das war irgendwie … befreiend.</span>
+  </p>
+
+  <p>
+    <strong>Dr. Ghanem:</strong>
+    <span class="segment" data-correct="false">Sehr gut.</span>
+    <span class="segment" data-correct="false">Herr Schneider - Gibt es etwas, das wir noch nicht angesprochen haben?</span>
+  </p>
+
+  <p>
+    <strong>Herr Schneider:</strong>
+    <span class="segment" data-correct="false">Ich wollte wissen … wie lange ich hier noch bleiben muss.</span>
+  </p>
+
+  <p>
+    <strong>Dr. Ghanem:</strong>
+    <span class="segment" data-correct="false">Das ist eine berechtigte Frage.</span>
+    <span class="segment" data-correct="false">In der Regel dauert eine erste Phase der Stabilisierung drei bis vier Wochen.</span>
+    <span class="segment" data-correct="false">Wir befinden uns also mittendrin.</span>
+    <span class="segment" data-correct="false">Wir schauen gemeinsam, wie Sie in der kommenden Woche weiter vorankommen – dann können wir auch eine mögliche tagesklinische Weiterbehandlung ins Auge fassen, also eine Form der Therapie, bei der Sie tagsüber hier sind, aber abends zu Hause schlafen würden.</span>
+    <span class="segment" data-correct="false">Wäre das eine Option für Sie?</span>
+  </p>
+
+  <p>
+    <strong>Herr Schneider:</strong>
+    <span class="segment" data-correct="false">Ja, das klingt gut.</span>
+  </p>
+
+  <p>
+    <strong>Dr. Ghanem:</strong>
+    <span class="segment" data-correct="false">Dann danken wir Ihnen, Herr Schneider, für Ihre Offenheit.</span>
+    <span class="segment" data-correct="false">Die nächste BK ist kommenden Mittwoch, bis dahin begleiten wir Sie natürlich weiter wie gewohnt.</span>
+    <span class="segment" data-correct="false">Und: Wenn Ihnen vorher etwas auf dem Herzen liegt – bitte kommen Sie jederzeit auf uns zu.</span>
+  </p>
+
+  <button onclick="checkAnswers()">Überprüfen</button>
+
+  <script>
+    const segments = document.querySelectorAll('.segment');
+
+    segments.forEach(segment => {
+      segment.addEventListener('click', () => {
+        segment.classList.toggle('selected');
+        segment.classList.remove('correct', 'incorrect');
+      });
+    });
+
+    function checkAnswers() {
+      segments.forEach(segment => {
+        const isCorrect = segment.getAttribute('data-correct') === "true";
+        const isSelected = segment.classList.contains('selected');
+
+        segment.classList.remove('correct', 'incorrect', 'missed');
+
+        if (isSelected && isCorrect) {
+          segment.classList.add('correct');
+        } else if (isSelected && !isCorrect) {
+          segment.classList.add('incorrect');
+        } else if (!isSelected && isCorrect) {
+          segment.classList.add('missed');
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>
