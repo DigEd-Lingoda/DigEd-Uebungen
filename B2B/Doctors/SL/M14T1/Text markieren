@@ -68,12 +68,12 @@
   <!-- Einleitender Absatz aufgeteilt in klickbare Einheiten -->
   <p>
     <span class="segment block" data-correct="false">
-      Der Patient Herr Lydrichson, 43 Jahre alt, befindet sich auf der pulmologischen Station eines städtischen Krankenhauses
+      Der Patient Herr Lydrichson, 43 Jahre alt, befindet sich auf der pulmologischen Station eines städtischen Krankenhauses und soll heute um 11:00 Uhr eine invasive Diagnostik der Lunge (Bronchoskopie mit Biopsien) zur weiteren Abklärung unklarer Hämoptysen erhalten.
     </span>
 
     <!-- ✔ CORRECT UNIT (zweisätziger Block) -->
     <span class="segment block" data-correct="true">
-      und soll heute um 11:00 Uhr eine invasive Diagnostik der Lunge (Bronchoskopie mit Biopsien) zur weiteren Abklärung unklarer Hämoptysen erhalten. Es ist 08:45 Uhr, als der Assistenzarzt Dr. Steven mit einer Patientenbroschüre in der Hand Herrn Lydrichson auf dem Stationsflur trifft und ihn über den bevorstehenden Eingriff aufklären will.
+      Es ist 08:45 Uhr, als der Assistenzarzt Dr. Steven mit einer Patientenbroschüre in der Hand Herrn Lydrichson auf dem Stationsflur trifft und ihn über den bevorstehenden Eingriff aufklären will.
     </span>
 
     <span class="segment block" data-correct="false">
@@ -101,9 +101,14 @@
   <!-- ✔ CORRECT UNIT (mehrsätziger Dialogblock) -->
   <p>
     <span class="segment block" data-correct="true">
-      Dr. Steven: Sie müssen aber nüchtern bleiben, ja? Gefrühstückt haben Sie doch jetzt nicht schon, oder? (guckt erschrocken auf) Herr Lydrichson: Ähhh, nein, es steht noch im Zimmer, weil ich jetzt nicht wusste, ob ich essen darf oder nicht… Dr. Steven: Sehr gut! (lacht erleichtert) Sonst hätten wir die Untersuchung jetzt absagen müssen!
-    </span>
-  </p>
+         <strong>Dr. Steven: </strong> Sie müssen aber nüchtern bleiben, ja? Gefrühstückt haben Sie doch jetzt nicht schon, oder? (guckt erschrocken auf) 
+
+  <p>
+         <strong>Herr Lydrichson: </strong> Ähhh, nein, es steht noch im Zimmer, weil ich jetzt nicht wusste, ob ich essen darf oder nicht… 
+
+<p>
+<strong> Dr. Steven:</strong> Sehr gut! (lacht erleichtert) Sonst hätten wir die Untersuchung jetzt absagen müssen!
+</span>
 
   <p>
     <strong>Herr Lydrichson:</strong>
