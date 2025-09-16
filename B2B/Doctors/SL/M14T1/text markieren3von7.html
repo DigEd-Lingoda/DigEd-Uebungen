@@ -1,1 +1,184 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>Textsegment-Auswahl – Bronchoskopie-Aufklärung</title>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      line-height: 1.6;
+      padding: 20px;
+      color: #031638;
+      background-color: #fff;
+    }
 
+    .segment {
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+    .segment:hover { background-color: #F6F6F6; }
+    .selected { background-color: #D7E4FC; }
+
+    .correct {
+      font-weight: bold;
+      background-color: #FFFFFF;
+      color: #2CBE55;
+      border: 1px solid #2CBE55;
+    }
+    .incorrect {
+      font-weight: bold;
+      background-color: #FFFFFF;
+      color: #FF3333;
+      border: 1px solid #FF3333;
+    }
+    .missed {
+      font-weight: bold;
+      color: #ff9900;
+      border: 1px dashed #ff9900;
+      background-color: transparent;
+    }
+
+    button {
+      display: block;
+      margin: 40px auto;
+      padding: 14px 32px;
+      background-color: #0047FF;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: 'Open Sans', sans-serif;
+    }
+    button:hover { opacity: 0.95; }
+
+    /* helper for readability of multi-sentence units */
+    .block { display: block; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+
+  <p><em>Szene: Aufklärungsgespräch auf der pulmologischen Station (Bronchoskopie mit Biopsien)</em></p>
+
+  <!-- Einleitender Absatz aufgeteilt in klickbare Einheiten -->
+  <p>
+    <span class="segment block" data-correct="false">
+      Der Patient Herr Lydrichson, 43 Jahre alt, befindet sich auf der pulmologischen Station eines städtischen Krankenhauses und soll heute um 11:00 Uhr eine invasive Diagnostik der Lunge (Bronchoskopie mit Biopsien) zur weiteren Abklärung unklarer Hämoptysen erhalten.
+    </span>
+
+    <!-- ✔ CORRECT UNIT (zweisätziger Block) -->
+    <span class="segment block" data-correct="false">
+      Es ist 08:45 Uhr, als der Assistenzarzt Dr. Steven mit einer Patientenbroschüre in der Hand Herrn Lydrichson auf dem Stationsflur trifft und ihn über den bevorstehenden Eingriff aufklären will.
+    </span>
+
+    <span class="segment block" data-correct="true">
+      Die Pflegefachkräfte sammeln im Hintergrund die Frühstückstabletts der Patient:innen ein. Weitere Patienten passieren immer wieder das Gespräch.
+    </span>
+  </p>
+
+  <p>
+    <strong>Dr. Steven (blickt auf den Klemmbrettstapel):</strong>
+    <span class="segment block" data-correct="false">Herr Lydrichson? Ja? Hallo! Hier ist eine Informationsbroschüre für die Bronchoskopie. Bitte lesen Sie die einmal durch und unterschreiben ganz unten.</span>
+    <!-- ✔ CORRECT single sentence -->
+    <span class="segment block" data-correct="false">Die Untersuchung ist ja schon in zwei Stunden.</span>
+  </p>
+
+  <p>
+    <strong>Herr Lydrichson (verunsichert, nimmt den Bogen):</strong>
+    <span class="segment block" data-correct="false">Ähm... das ist jetzt für diesen Schlauch in die Lunge, oder?</span>
+  </p>
+
+  <p>
+    <strong>Dr. Steven (nickt, während er schon weiterblättert):</strong>
+    <span class="segment block" data-correct="false">Genau, kleine Kamera über die Luftröhre. Standard. Plus ein paar Biopsien, also PROBENENTNAHMEN (sagt es betont langsam, dass Patient es auch versteht). Dauert nicht lang.</span>
+  </p>
+
+  <!-- ✔ CORRECT UNIT (mehrsätziger Dialogblock) -->
+  <p>
+    <span class="segment block" data-correct="false">
+         <strong>Dr. Steven: </strong> Sie müssen aber nüchtern bleiben, ja? Gefrühstückt haben Sie doch jetzt nicht schon, oder? (guckt erschrocken auf) 
+
+  <p>
+         <strong>Herr Lydrichson: </strong> Ähhh, nein, es steht noch im Zimmer, weil ich jetzt nicht wusste, ob ich essen darf oder nicht… 
+
+<p>
+<strong> Dr. Steven:</strong> Sehr gut! (lacht erleichtert) Sonst hätten wir die Untersuchung jetzt absagen müssen!
+</span>
+
+  <p>
+    <strong>Herr Lydrichson:</strong>
+    <span class="segment block" data-correct="false">Gibt’s denn da irgendwelche Gefahren bei dieser Untersuchung?</span>
+  </p>
+
+  <p>
+    <strong>Dr. Steven:</strong>
+    <span class="segment block" data-correct="false">Nichts Dramatisches. Nur das Allgemeine eben, also Blutungen, Verletzungen, usw. steht auch alles nochmal hier drin. (deutet auf die Broschüre)</span>
+  </p>
+
+  <p>
+    <strong>Schwester Steffi (kommt vorbei und unterbricht das Gespräch):</strong>
+    <span class="segment block" data-correct="false">Na Herr Lydrichson, das Frühstück kann dann mit, oder? Keinen Hunger gehabt?</span>
+  </p>
+
+  <p>
+    <strong>Herr Lydrichson:</strong>
+    <span class="segment block" data-correct="false">Ähhhh…..doch, aber ich darf nichts essen! Gut, dass ich gewartet habe.</span>
+  </p>
+
+  <p>
+    <strong>Dr. Steven (schaut auf die Uhr):</strong>
+    <span class="segment block" data-correct="false">Noch Fragen, Herr Lydrichson? Ich muss jetzt leider weiter, die Visite wartet. Einfach ganz unten unterschreiben, wir holen Sie dann später ab.</span>
+  </p>
+
+  <p>
+    <strong>Herr Lydrichson (unsicher, schaut sich um – andere Patient:innen hören zu):</strong>
+    <span class="segment block" data-correct="false">Ich….äh… nein, keine Fragen.</span>
+  </p>
+
+  <p>
+    <strong>Dr. Steven (geht rückwärts Richtung nächstem Patientenzimmer):</strong>
+    <span class="segment block" data-correct="false">Super, dann bis später! Ach ja: Schwester Steffi! (ruft) das Apixaban von Herrn Lydrichson ist ja eh schon abgesetzt, oder?</span>
+  </p>
+
+  <p>
+    <strong>Schwester Steffi:</strong>
+    <span class="segment block" data-correct="false">Das müssen Sie doch wissen. Ich bin heute zum ersten Mal seit meinem Urlaub wieder im Dienst.</span>
+  </p>
+
+  <button onclick="checkAnswers()">Überprüfen</button>
+
+  <script>
+    const segments = document.querySelectorAll('.segment');
+
+    segments.forEach(segment => {
+      segment.addEventListener('click', () => {
+        segment.classList.toggle('selected');
+        segment.classList.remove('correct', 'incorrect');
+      });
+    });
+
+    function checkAnswers() {
+      segments.forEach(segment => {
+        const isCorrect = segment.getAttribute('data-correct') === "true";
+        const isSelected = segment.classList.contains('selected');
+
+        segment.classList.remove('correct', 'incorrect', 'missed');
+
+        if (isSelected && isCorrect) {
+          segment.classList.add('correct');
+        } else if (isSelected && !isCorrect) {
+          segment.classList.add('incorrect');
+        } else if (!isSelected && isCorrect) {
+          segment.classList.add('missed');
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>
