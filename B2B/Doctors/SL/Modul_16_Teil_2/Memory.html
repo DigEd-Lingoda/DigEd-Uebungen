@@ -27,20 +27,20 @@
       margin: 0 auto;
     }
 
-    /* ---------- FIX 2: feste Pixelbreiten, keine Bruchteile ---------- */
+    /* Responsive Grid: flexible Spalten statt fester Pixelbreiten */
     .memory-game {
       display: grid;
-      grid-template-columns: repeat(4, 194px); /* 4 Spalten à 194px */
-      gap: 10px;                                /* 3 Gaps → 30px */
-      justify-content: center;                   /* Grid in der Mitte ausrichten */
+      grid-template-columns: repeat(4, 1fr); /* 4 flexible Spalten */
+      gap: 10px;
+      justify-content: center;
       width: 100%;
       max-width: none;
       margin-bottom: 20px;
     }
 
     .card {
-      width: 194px;          /* feste Breite passend zur Spaltengröße */
-      aspect-ratio: 1 / 1;   /* quadratisch */
+      width: 100%;          /* füllt die Grid-Spalte */
+      aspect-ratio: 1 / 1;  /* quadratisch */
       perspective: 1000px;
       cursor: pointer;
     }
@@ -130,7 +130,7 @@
       min-height: 24px;
     }
 
-    /* Neustart-Button */
+    /* Neustart-Button (seitlich abgerundet) */
     #restart {
       display: block;
       margin: 0;
@@ -144,13 +144,18 @@
     }
     #restart:hover { opacity: 0.9; }
 
-    /* Mobil: auf 2 Spalten mit kleineren Karten wechseln */
+    /* Mobil: 2 Spalten, flexible Karten */
     @media (max-width: 600px) {
       .memory-game {
-        grid-template-columns: repeat(2, 160px);
+        grid-template-columns: repeat(2, 1fr);
         gap: 10px;
       }
-      .card { width: 160px; }
+      .card { width: 100%; }
+    }
+
+    /* Sehr schmal: 1 Spalte */
+    @media (max-width: 360px) {
+      .memory-game { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -163,9 +168,9 @@
 
   <script>
     const pairs = [
-      ["unterteilen",      "in"],
+      ["unterteilen", "in"],
       ["binden", "an"],
-      ["führen",      "zu"],
+      ["führen", "zu"],
       ["ansprechen", "auf"],
       ["abhängig sein", "von"],
       ["gerichtet sein", "gegen"]
