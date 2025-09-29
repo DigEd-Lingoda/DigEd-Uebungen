@@ -1,0 +1,171 @@
+<!doctype html>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --blue:#153BFF; --ok:#14a44d; --bad:#e53935; }
+  body { font:16px/1.7 "Open Sans", system-ui, -apple-system, sans-serif; max-width:920px; margin:2rem auto; padding:0 1rem; }
+  h1 { font-size:1.25rem; margin:0 0 .75rem; }
+  #instr { color:#555; margin:.25rem 0 1rem; }
+  #text { text-align: justify; }
+  .chip { cursor:pointer; padding:0 .05rem; border-radius:.15rem; transition:all .12s ease; }
+  .chip.selected { background:transparent; border-bottom:2px solid var(--blue); }
+  .chip.ok { border-bottom:2px solid var(--ok); }
+  .chip.bad { border-bottom:2px solid var(--bad); }
+  .punct { cursor:default; }
+  .btn {
+    display:inline-block; margin-top:1rem; padding:.6rem 1rem;
+    background:#153BFF; color:#fff; border:none; border-radius:9999px;
+    font-weight:600; letter-spacing:.2px; cursor:pointer;
+  }
+  .btn:focus { outline:2px solid #dfe6ff; outline-offset:2px; }
+  .report { margin:.75rem 0 0; color:#333; }
+  .missed { margin:.25rem 0 0; color:#444; }
+  .hint { color:#666; font-size:.9em; }
+</style>
+
+<p id="text">
+  In der Morgenbesprechung bittet das ärztliche Team um eine kurze Übersicht zur Nachtdokumentation.
+  Die Pflegekräfte berichten, dass mehrere Patient:innen über Schmerzen klagten.
+  Eine Pflegefachperson ergänzt, dass die Kommunikation mit Angehörigen teilweise erschwert war.
+  Aus ärztlicher Sicht erscheint eine Anpassung der Medikation sinnvoll; das Leitungsteam schlägt eine gemeinsame Rückmelderunde vor.
+  Die Ärzt:innen betonen, dass Hinweise des Pflegeteams künftig strukturiert gesammelt werden sollen,
+  damit Mitarbeitende aus allen Bereichen beteiligt sind. Gleichzeitig wird vereinbart,
+  bei unklaren Zuständigkeiten die betroffene Person aktiv einzubeziehen.
+  Zum Vergleich fallen im Gespräch auch ältere Begriffe: der Arzt, die Schwester und der Patient.
+  Abschließend halten Ärzteschaft und Pflege fest, dass eine Speak-up-Kultur zur Patientensicherheit beiträgt.
+</p>
+
+<button class="btn" id="check">Prüfen</button>
+<p class="report" id="out"></p>
+<p class="missed" id="missed"></p>
+<p class="hint">Hinweis: Blau unterstrichene Wörter sind deine Auswahl. Grün = korrekt inklusiv, Rot = fälschlich markiert.</p>
+
+<script>
+  // ===== Konfiguration =====
+  // Einzelwörter (kleinschreibung)
+  const inclusiveWordSet = new Set([
+    "pflegekräfte","patient:innen","pflegefachperson","angehörigen","leitungsteam",
+    "ärzt:innen","pflegeteam","pflegeteams","mitarbeitende","ärzteschaft", "pflege"
+  ]);
+  // Zweiwort-Phrasen (kleinschreibung, in dieser Reihenfolge)
+  const inclusivePhrases = [
+    ["ärztliche","team"],
+    ["betroffene","person"]
+  ];
+
+  const container = document.getElementById("text");
+  const raw = container.textContent;
+  container.textContent = ""; // leeren, wir bauen neu auf
+
+  // Tokenisierung: Wörter (inkl. Doppelpunkte/Bindestriche), Whitespaces, einzelne Zeichen
+  const tokens = raw.match(/(\s+|[\p{L}\-:]+|[^\s\p{L}\-:])/gu) || [];
+  const meta = tokens.map(t => {
+    const isWS   = /^\s+$/.test(t);
+    const isWord = !isWS && /[\p{L}:]/u.test(t);
+    return { text: t, type: isWS ? "ws" : (isWord ? "word" : "punct"), inc: 0 };
+  });
+
+  // Indizes nur der Wort-Tokens sammeln
+  const wordIdx = meta.reduce((acc, m, i) => { if (m.type === "word") acc.push(i); return acc; }, []);
+  const wordsLower = wordIdx.map(i => meta[i].text.toLowerCase());
+
+  // Einzelwörter vorkennzeichnen
+  wordIdx.forEach(i => {
+    const w = meta[i].text.toLowerCase();
+    if (inclusiveWordSet.has(w)) meta[i].inc = 1;
+  });
+
+  // Phrasen zusammenfassen: Wir erstellen später eigene "chip"-Spans, die beide Wörter + Zwischen-WS enthalten,
+  // und überspringen die betroffenen Token beim Rendern.
+  const mergeRanges = []; // [{startToken, endToken, text, label}]
+  inclusivePhrases.forEach(phrase => {
+    const len = phrase.length; // hier 2
+    for (let wi = 0; wi <= wordsLower.length - len; wi++) {
+      let match = true;
+      for (let k = 0; k < len; k++) {
+        if (wordsLower[wi + k] !== phrase[k]) { match = false; break; }
+      }
+      if (!match) continue;
+      // Token-Range bestimmen: vom ersten Worttoken bis zum letzten Worttoken, inkl. Zwischen-WS/Punktuation
+      const firstWordTok = wordIdx[wi];
+      const lastWordTok  = wordIdx[wi + len - 1];
+
+      // Baue den sichtbaren Text der Phrase, inklusive Original-Zwischenräume/Zeitzeichen zwischen den Wörtern
+      let phraseText = meta[firstWordTok].text;
+      for (let t = firstWordTok + 1; t <= lastWordTok; t++) phraseText += meta[t].text;
+
+      mergeRanges.push({ startToken: firstWordTok, endToken: lastWordTok, text: phraseText.trim(), label: phrase.join(" ") });
+
+      // Markiere die einzeln enthaltenen Wörter NICHT mehr als inklusiv, da wir eine eigene Phrase-Spanne erzeugen
+      for (let t = firstWordTok; t <= lastWordTok; t++) meta[t].inc = 0;
+
+      // WorteLower überspringen verhindern (damit sich Phrasen nicht überlappen):
+      // wir setzen die nächsten (len-1) Wörter als bereits "verbraucht", indem wir sie auf Sonderwert setzen
+      for (let k = 1; k < len; k++) wordsLower[wi + k] = "__USED__";
+    }
+  });
+
+  // Hilfsfunktion: Prüfen, ob aktueller Index den Start einer Merge-Range darstellt
+  function findMergeAtToken(tokenIndex) {
+    return mergeRanges.find(r => r.startToken === tokenIndex);
+  }
+
+  // DOM aufbauen
+  for (let i = 0; i < meta.length; i++) {
+    // Wenn dieser Token der Start einer Phrase ist, rendere EIN zusammenhängendes <span class="chip">
+    const merge = findMergeAtToken(i);
+    if (merge) {
+      const span = document.createElement("span");
+      span.textContent = merge.text;               // inkl. Zwischen-WS
+      span.className = "chip";
+      span.dataset.inc = "1";                      // gesamte Phrase ist inklusiv
+      span.dataset.phrase = "1";                   // Kennzeichnung als Phrase
+      span.addEventListener("click", () => span.classList.toggle("selected"));
+      container.appendChild(span);
+
+      // Danach alle Token bis zum Ende der Phrase überspringen (sie wurden im Phrase-Span bereits dargestellt)
+      i = merge.endToken;
+      continue;
+    }
+
+    const m = meta[i];
+    if (m.type === "ws") { container.appendChild(document.createTextNode(m.text)); continue; }
+    if (m.type === "punct") {
+      const sp = document.createElement("span"); sp.textContent = m.text; sp.className = "punct"; container.appendChild(sp); continue;
+    }
+
+    // Normales Wort als eigenes klickbares Element
+    const wspan = document.createElement("span");
+    wspan.textContent = m.text;
+    wspan.className = "chip";
+    wspan.dataset.inc = String(m.inc); // "1" inklusiv, "0" nicht inklusiv
+    wspan.addEventListener("click", () => wspan.classList.toggle("selected"));
+    container.appendChild(wspan);
+  }
+
+  // Prüfen
+  document.getElementById("check").addEventListener("click", () => {
+    const chips = [...document.querySelectorAll(".chip")];
+
+    chips.forEach(c => c.classList.remove("ok","bad"));
+
+    const totalInclusive = chips.filter(c => c.dataset.inc === "1").length;
+    const userCorrectArr = chips.filter(c => c.dataset.inc === "1" && c.classList.contains("selected"));
+    const falsePosArr    = chips.filter(c => c.dataset.inc === "0" && c.classList.contains("selected"));
+    const missedArr      = chips.filter(c => c.dataset.inc === "1" && !c.classList.contains("selected"));
+
+    userCorrectArr.forEach(c => c.classList.add("ok"));
+    falsePosArr.forEach(c => c.classList.add("bad"));
+
+    const msg = `Korrekt markiert: ${userCorrectArr.length}/${totalInclusive}. `
+              + `Falsch markiert: ${falsePosArr.length}. `
+              + `Nicht markiert (inklusiv): ${missedArr.length}.`;
+    document.getElementById("out").textContent = msg;
+
+    // Verpasste Einträge: Phrasen und Wörter jeweils EINMAL listen (Originaltext)
+    const missedSet = new Set(missedArr.map(el => el.textContent.trim()));
+    const missedList = [...missedSet].join(", ");
+    document.getElementById("missed").textContent =
+      missedSet.size ? `Nicht markiert (korrekt gewesen): ${missedList}` : `Alles markiert – top!`;
+  });
+</script>
