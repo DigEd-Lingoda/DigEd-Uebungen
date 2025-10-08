@@ -27,24 +27,24 @@
 
     .game-wrapper {
       width: 100%;
-      max-width: 900px;             /* weiches Maximum */
+      max-width: 1200px;            /* weiches Maximum für die gesamte Fläche */
       margin: 0 auto;
     }
 
-    /* Responsive Grid: keine festen Pixelbreiten */
+    /* Gleichmäßiges, zoom-stabiles Grid */
     .memory-game {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       gap: 12px;
-      justify-items: center;        /* Karten zentrieren */
+      justify-items: stretch;       /* Karten füllen die Spalten */
+      align-items: stretch;
       width: 100%;
       margin-bottom: 20px;
     }
 
     .card {
-      width: 100%;
+      width: 100%;                  /* füllt die Spalte */
       aspect-ratio: 1 / 1;          /* quadratisch */
-      max-width: 200px;             /* verhindert Riesen-Karten bei viel Platz */
       perspective: 1000px;
       cursor: pointer;
     }
@@ -73,7 +73,7 @@
     .card-front {
       background: #0000ff;
       color: white;
-      font-size: clamp(14px, 2.2vw, 20px); /* skaliert etwas mit Breite */
+      font-size: clamp(14px, 2.2vw, 20px);
     }
     .card-back {
       background: white;
@@ -136,13 +136,12 @@
     }
     #restart:hover { opacity: 0.9; }
 
-    /* Sehr schmale Viewports */
+    /* Optional: auf sehr schmalen Screens etwas kleinere Mindestbreite */
     @media (max-width: 600px) {
       .memory-game {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
         gap: 10px;
       }
-      .card { max-width: 180px; }
     }
   </style>
 </head>
