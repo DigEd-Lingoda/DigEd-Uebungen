@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>Textsegment-Auswahl – Arztbericht</title>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      line-height: 1.6;
+      padding: 20px;
+      color: #031638;
+      background-color: #fff;
+    }
+
+    .segment {
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+
+    .segment:hover { background-color: #F6F6F6; }
+    .selected { background-color: #D7E4FC; }
+
+    .correct {
+      font-weight: bold;
+      background-color: #FFFFFF;
+      color: #2CBE55;
+      border: 1px solid #2CBE55;
+    }
+    .incorrect {
+      font-weight: bold;
+      background-color: #FFFFFF;
+      color: #FF3333;
+      border: 1px solid #FF3333;
+    }
+    .missed {
+      font-weight: bold;
+      color: #ff9900;
+      border: 1px dashed #ff9900;
+      background-color: transparent;
+    }
+
+    button {
+      display: block;
+      margin: 40px auto;
+      padding: 14px 32px;
+      background-color: #0047FF;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: 'Open Sans', sans-serif;
+    }
+
+    button:hover { opacity: 0.95; }
+
+    /* Sätze inline anzeigen, nicht blockweise */
+    .block {
+      display: inline;
+      margin-right: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Begrüßung in eigener Zeile -->
+  <p>
+    <span class="segment" data-correct="false">Sehr geehrte Frau Kollegin,</span>
+  </p>
+
+  <!-- Fließtext als ein Block -->
+  <p>
+    <span class="segment block" data-correct="true">wir berichten über Frau Brandt,</span>
+    <span class="segment block" data-correct="false">die sich mit Halsschmerzen, Fieber und ausgeprägter Abgeschlagenheit vorstellte.</span>
+    <span class="segment block" data-correct="true">Sie sagt, dass sie Schmerzen im rechten Oberbauch hat und keinen Appetit hat sowie gelegentlich Nausea und fremdanamnestisch Gelbsucht.</span>
+    <span class="segment block" data-correct="false">Der Bruder war vor Kurzem ebenfalls erkrankt.</span>
+    <span class="segment block" data-correct="false">Der Hausarzt hat auf die Überweisung EBV geschrieben.</span>
+    <span class="segment block" data-correct="false">Keine Allergien, keine Noxen.</span>
+    <span class="segment block" data-correct="true">Familien- und Sozialanamnese: Vater hatte einen Aploplex, Mutter leidet unter DM Typ 2.</span>
+    <span class="segment block" data-correct="true">Impfstatus vollständig, kürzlich erfolgte Reise nach Italien.</span>
+  </p>
+
+  <button onclick="checkAnswers()">Überprüfen</button>
+
+  <script>
+    const segments = document.querySelectorAll('.segment');
+
+    segments.forEach(segment => {
+      segment.addEventListener('click', () => {
+        segment.classList.toggle('selected');
+        segment.classList.remove('correct', 'incorrect');
+      });
+    });
+
+    function checkAnswers() {
+      segments.forEach(segment => {
+        const isCorrect = segment.getAttribute('data-correct') === "true";
+        const isSelected = segment.classList.contains('selected');
+
+        segment.classList.remove('correct', 'incorrect', 'missed');
+
+        if (isSelected && isCorrect) {
+          segment.classList.add('correct');
+        } else if (isSelected && !isCorrect) {
+          segment.classList.add('incorrect');
+        } else if (!isSelected && isCorrect) {
+          segment.classList.add('missed');
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>
