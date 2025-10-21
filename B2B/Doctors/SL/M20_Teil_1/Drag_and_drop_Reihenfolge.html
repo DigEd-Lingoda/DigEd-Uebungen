@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Audio-Reihenfolge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --brand:#153BFF;
+      --accent:#FF33CC;
+      --text:#222;
+      --bg:#f8f9fb;
+      --ok:#1a7f37;
+      --err:#b3261e;
+    }
+    html,body{font-family:'Open Sans',sans-serif;margin:0;padding:20px;background:var(--bg);color:var(--text)}
+    .container{max-width:600px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+    #list{display:flex;flex-direction:column;gap:10px}
+    .item{display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid #e4e7fb;border-radius:12px;padding:16px;cursor:grab;transition:border .2s, transform .1s}
+    .item:active{cursor:grabbing}
+    .item.over{border-color:var(--accent)}
+    .btn-play{border:none;border-radius:50%;width:60px;height:60px;font-size:1.5rem;font-weight:700;color:#fff;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+    .btn1{background:#153BFF;}
+    .btn2{background:#FF33CC;}
+    .btn3{background:#FF8C00;}
+    .btn4{background:#00B894;}
+    .controls{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+    .control-btn{background:var(--brand);color:#fff;border:none;border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer;box-shadow:0 4px 10px rgba(21,59,255,.2)}
+    #feedback{text-align:center;min-height:1.4em}
+    .ok{color:var(--ok)}
+    .err{color:var(--err)}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="list"></div>
+
+    <div class="controls">
+      <button class="control-btn" id="checkBtn">Reihenfolge prüfen</button>
+    </div>
+    <div id="feedback" role="status" aria-live="polite"></div>
+  </div>
+
+  <script>
+    const audioClips = [
+      { id: 1, src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/M20_Teil_1/Abschnitt_1_Vorstellung.mp3' },
+      { id: 2, src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/M20_Teil_1/Abschnitt_2_Anamnese.mp3' },
+      { id: 3, src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/M20_Teil_1/Abschnitt_3_Befunde.mp3' },
+      { id: 4, src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/M20_Teil_1/Abschnitt_4_Therapie.mp3' }
+    ];
+
+    const colors = ['btn1','btn2','btn3','btn4'];
+    let currentAudio = null;
+
+    const list = document.getElementById('list');
+    const feedback = document.getElementById('feedback');
+    const checkBtn = document.getElementById('checkBtn');
+
+    function createItem(clip,index){
+      const el = document.createElement('div');
+      el.className = 'item';
+      el.draggable = true;
+      el.dataset.id = clip.id;
+
+      const btn = document.createElement('button');
+      btn.className = 'btn-play ' + colors[index % colors.length];
+      btn.textContent = '▶';
+      btn.addEventListener('click', ()=>{
+        if (currentAudio) {
+          currentAudio.pause();
+          currentAudio.currentTime = 0;
+        }
+        const audio = new Audio(clip.src);
+        currentAudio = audio;
+        audio.play();
+        audio.addEventListener('ended', () => { currentAudio = null; });
+      });
+
+      el.appendChild(btn);
+      return el;
+    }
+
+    function renderList(arr){
+      list.innerHTML = '';
+      arr.forEach((clip,i)=> list.appendChild(createItem(clip,i)));
+      bindDnD();
+    }
+
+    function bindDnD(){
+      let dragEl = null;
+      list.querySelectorAll('.item').forEach(el => {
+        el.addEventListener('dragstart', e => {
+          dragEl = el;
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', el.dataset.id);
+          el.style.opacity = '0.5';
+        });
+        el.addEventListener('dragend', ()=>{
+          el.style.opacity = '1';
+          list.querySelectorAll('.item').forEach(i=>i.classList.remove('over'));
+          dragEl = null;
+        });
+        el.addEventListener('dragover', e => {
+          e.preventDefault();
+          const target = e.currentTarget;
+          if(target===dragEl) return;
+          target.classList.add('over');
+        });
+        el.addEventListener('dragleave', e=> e.currentTarget.classList.remove('over'));
+        el.addEventListener('drop', e=>{
+          e.preventDefault();
+          const target = e.currentTarget;
+          target.classList.remove('over');
+          if(target===dragEl) return;
+          const rect = target.getBoundingClientRect();
+          const before = (e.clientY - rect.top) < rect.height/2;
+          if(before) list.insertBefore(dragEl,target); else list.insertBefore(dragEl,target.nextSibling);
+        });
+      });
+    }
+
+    function checkOrder(){
+      const correct = audioClips.map(c=>c.id);
+      const current = Array.from(list.children).map(el=>Number(el.dataset.id));
+      const wrong = current.filter((id,i)=>id!==correct[i]).length;
+      if(wrong===0){feedback.className='ok';feedback.textContent='✔ Perfekt!';}
+      else{feedback.className='err';feedback.textContent=`❌ ${wrong} an falscher Position.`;}
+    }
+
+    checkBtn.addEventListener('click', checkOrder);
+
+    function shuffle(arr){
+      const a=[...arr];
+      for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+      return a;
+    }
+
+    renderList(shuffle(audioClips));
+  </script>
+</body>
+</html>
