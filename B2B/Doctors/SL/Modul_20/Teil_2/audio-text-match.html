@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Audio-Wortpaar-Matching (umziehen ohne Austausch)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --blue:#0000ff;
+      --green:#2CBE55;
+      --red:#E74C3C;
+    }
+    body {
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 400;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .game-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      max-width: 760px;
+      width: 100%;
+    }
+
+    .audio-list, .term-list {
+      display: grid;
+      grid-auto-rows: 60px;
+      gap: 10px;
+    }
+
+    /* Audio-Boxen (blau) */
+    .audio-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--blue);
+      border: 2px solid var(--blue);
+      color: #fff;
+      border-radius: 8px;
+      cursor: grab;
+      user-select: none;
+      font-size: 24px;
+      transition: transform .06s ease;
+    }
+
+    /* Term-Boxen (weiß, Label mittig, Chips rechts) */
+    .term-item {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr; /* links Platz, Label Mitte, Chips rechts */
+      align-items: center;
+      background: #f9f9f9;
+      border: 2px solid var(--blue);
+      border-radius: 8px;
+      height: 60px;
+      user-select: none;
+      padding: 0 10px;
+      text-align: center;
+      position: relative;
+    }
+    .term-item .label {
+      grid-column: 2;
+      font-weight: 400;
+      line-height: 1.2;
+      justify-self: center;
+    }
+    .term-item .chips {
+      grid-column: 3;
+      justify-self: end;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--blue);
+      border-radius: 999px;
+      padding: 2px 8px;
+      height: 24px;
+      font-size: 14px;
+      background: #EAF0FF;
+      color: #000;
+      cursor: pointer; /* optional: Klick entfernt Chip */
+    }
+    .chip.correct {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+    .chip.incorrect {
+      background: var(--red);
+      border-color: var(--red);
+      color: #fff;
+    }
+
+    /* Drag-Over */
+    .term-item.over {
+      background: #ff00ff22;
+      outline: 2px dashed #ff00ff;
+      outline-offset: -4px;
+    }
+
+    /* Ungültiger Drop (Shake) */
+    .audio-item.wrong { animation: shake 0.3s; }
+    @keyframes shake {
+      0%,100%   { transform: translateX(0) }
+      20%,60%   { transform: translateX(-5px) }
+      40%,80%   { transform: translateX(5px) }
+    }
+
+    /* Button & Ergebnis */
+    .actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .btn {
+      appearance: none;
+      border: none;
+      padding: 10px 18px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #checkBtn {
+      background: var(--blue);
+      color: #fff;
+      border: 2px solid var(--blue);
+      border-radius: 9999px;   /* pill */
+      padding: 10px 22px;
+    }
+
+    #resultMessage {
+      font-size: 16px;
+      color: #333;
+      min-height: 22px;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-wrapper">
+    <div class="audio-list" id="audioList"></div>
+    <div class="term-list" id="termList"></div>
+  </div>
+
+  <div class="actions">
+    <button id="checkBtn" class="btn">Prüfen</button>
+    <div id="resultMessage"></div>
+  </div>
+
+  <script>
+    let isPlaying = false;
+
+    // ===== 1) DATEN =====
+    // Many-to-one: Mehrfach vorkommender 'term' in pairs => Term akzeptiert mehrere Audios.
+    // Hier ohne Duplikate => 6 Audios, je 1 Ziel.
+    const pairs = [
+      { term: "S – Subjektiv", audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Modul_20/Teil_2/subjektiv1.mp3" },
+      { term: "O – Objektiv", audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Modul_20/Teil_2/objektiv1.mp3" },
+      { term: "A – Assessment", audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Modul_20/Teil_2/assessment1.mp3" },
+      { term: "P – Plan",  audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Modul_20/Teil_2/plan1.mp3" },
+      { term: "A – Assessment",         audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Modul_20/Teil_2/assessment2.mp3" },
+      { term: "S – Subjektiv",        audio: "https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Modul_20/Teil_2/subjektiv1.mp3" }
+    ];
+
+    // ===== Shuffle-Helper =====
+    function shuffle(a) {
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    // ===== 2) DOM-Refs =====
+    const audioList = document.getElementById('audioList');
+    const termList  = document.getElementById('termList');
+    const resultMsg = document.getElementById('resultMessage');
+    const checkBtn  = document.getElementById('checkBtn');
+
+    // ===== 3) Kapazität je Term (wie oft term in pairs vorkommt) =====
+    const requiredPerTerm = pairs.reduce((acc, p) => {
+      acc[p.term] = (acc[p.term] || 0) + 1;
+      return acc;
+    }, {});
+    const uniqueTerms = Object.keys(requiredPerTerm);
+
+    // Kopien mischen
+    const audioItems = shuffle(pairs.map((p, idx) => ({ id: 'a' + idx, ...p })));
+    const termItems  = shuffle(uniqueTerms.map(term => ({ term })));
+
+    // ===== 4) Audio-Boxen erstellen =====
+    audioItems.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'audio-item';
+      el.draggable = true;
+      el.dataset.term = item.term;    // richtige Lösung (Soll)
+      el.dataset.id = item.id;        // eindeutige Audio-ID
+      el.dataset.assignedTerm = '';   // aktuelle Zuordnung (leer = unzugeordnet)
+      el.innerHTML = '🔊';
+
+      // Klick zum Abspielen (immer erlaubt)
+      el.addEventListener('click', () => {
+        if (isPlaying) return;
+        const audioclip = new Audio(item.audio);
+
+        isPlaying = true;
+        document.querySelectorAll('.audio-item').forEach(box => {
+          box.style.pointerEvents = 'none';
+        });
+
+        audioclip.addEventListener('ended', () => {
+          isPlaying = false;
+          document.querySelectorAll('.audio-item').forEach(box => {
+            box.style.pointerEvents = '';
+          });
+        });
+
+        audioclip.play();
+      });
+
+      // Drag-Start (wir übertragen nur die Audio-ID)
+      el.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', JSON.stringify({ audioId: item.id }));
+      });
+
+      audioList.appendChild(el);
+    });
+
+    // ===== 5) Term-Boxen erstellen =====
+    termItems.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'term-item';
+      el.dataset.term = item.term;
+      el.dataset.required = String(requiredPerTerm[item.term]); // Kapazität
+
+      // label (Mitte) + chips (rechts)
+      el.appendChild(document.createElement('div')); // linker Platzhalter
+      const label = document.createElement('div');
+      label.className = 'label';
+      label.textContent = item.term;
+      el.appendChild(label);
+      const chips = document.createElement('div');
+      chips.className = 'chips';
+      el.appendChild(chips);
+
+      // Drag-Over: nur optisch highlighten
+      el.addEventListener('dragover', e => {
+        e.preventDefault();
+        el.classList.add('over');
+      });
+      el.addEventListener('dragleave', () => {
+        el.classList.remove('over');
+      });
+
+      // Drop-Event: nur eigenes Audio umziehen; nie andere löschen/ersetzen
+      el.addEventListener('drop', e => {
+        e.preventDefault();
+        el.classList.remove('over');
+
+        const payloadText = e.dataTransfer.getData('text/plain');
+        if (!payloadText) return;
+        const { audioId } = JSON.parse(payloadText);
+
+        const audioEl = document.querySelector(`.audio-item[data-id="${audioId}"]`);
+        if (!audioEl) return;
+
+        const targetTerm = el.dataset.term;
+        const required = Number(el.dataset.required);
+        const chipsContainer = el.querySelector('.chips');
+        const currentCount = chipsContainer.querySelectorAll('.chip').length;
+
+        // Wenn Ziel voll: abbrechen (Shake) – alte Zuordnung bleibt erhalten
+        if (currentCount >= required) {
+          audioEl.classList.add('wrong');
+          setTimeout(() => audioEl.classList.remove('wrong'), 300);
+          return;
+        }
+
+        // Ziel hat Platz: ggf. alten Chip dieses Audios entfernen, dann neuen setzen
+        removeChipForAudio(audioId); // entfernt nur den Chip dieses Audios (niemand sonst)
+        addChip(chipsContainer, audioId);
+        audioEl.dataset.assignedTerm = targetTerm;
+
+        // Feedback zurücksetzen
+        clearFeedbackColors();
+        resultMsg.textContent = '';
+      });
+
+      termList.appendChild(el);
+    });
+
+    function addChip(container, audioId){
+      const chip = document.createElement('span');
+      chip.className = 'chip';
+      chip.textContent = '🔊';
+      chip.dataset.audioId = audioId;
+
+      // Optional: Klick entfernt nur diesen Chip (macht Audio unzugeordnet)
+      chip.addEventListener('click', () => {
+        removeChipForAudio(audioId);
+        clearFeedbackColors();
+        resultMsg.textContent = '';
+      });
+
+      container.appendChild(chip);
+    }
+
+    /** Entfernt (falls vorhanden) den Chip EINES Audios aus ALLEN Termen (keine anderen!) */
+    function removeChipForAudio(audioId) {
+      const oldChip = document.querySelector(`.chip[data-audio-id="${audioId}"]`);
+      if (oldChip && oldChip.parentElement) {
+        oldChip.parentElement.removeChild(oldChip);
+      }
+      const audioEl = document.querySelector(`.audio-item[data-id="${audioId}"]`);
+      if (audioEl) audioEl.dataset.assignedTerm = '';
+    }
+
+    /** Entfernt nur die Farb-Feedback-Klassen von Chips */
+    function clearFeedbackColors() {
+      document.querySelectorAll('.chip').forEach(chip => {
+        chip.classList.remove('correct', 'incorrect');
+      });
+    }
+
+    /** Prüfen: Chips passend zu ihrer Audio-Sollzuordnung einfärben */
+    checkBtn.addEventListener('click', () => {
+      clearFeedbackColors();
+
+      let correct = 0;
+      const total = audioItems.length;
+
+      audioItems.forEach(item => {
+        const audioEl = document.querySelector(`.audio-item[data-id="${item.id}"]`);
+        const assigned = audioEl?.dataset.assignedTerm || '';
+        const isCorrect = assigned && (assigned === item.term);
+
+        const chip = document.querySelector(`.chip[data-audio-id="${item.id}"]`);
+        if (chip) chip.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+        if (isCorrect) correct++;
+      });
+
+      resultMsg.textContent = (correct === total)
+        ? `Super, alles richtig! (${correct}/${total})`
+        : `Ergebnis: ${correct} von ${total} korrekt.`;
+    });
+  </script>
+</body>
+</html>
