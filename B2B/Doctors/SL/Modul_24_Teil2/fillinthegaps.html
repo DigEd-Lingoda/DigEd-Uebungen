@@ -18,7 +18,7 @@
       }
 
       .gap-input {
-        width: 15px;
+        width: 25px;         /* etwas breiter für 2 Buchstaben */
         height: 20px;
         text-align: center;
         font-size: 16px;
@@ -55,98 +55,75 @@
         background-color: #153bff;
         color: #fff;
       }
+
+      .solution {
+        margin-left: 10px;
+        font-size: 16px;
+        font-style: italic;
+        color: #4b5563;
+      }
     </style>
   </head>
   <body>
     <div id="container">
       <p>
-        1. b<input id="l1" class="gap-input" maxlength="1" />ttl<input
-          id="l2"
-          class="gap-input"
-          maxlength="1"
-        />g<input id="l3" class="gap-input" maxlength="1" />r<input
-          id="l4"
-          class="gap-input"
-          maxlength="1"
-        />g
+        1. b<input id="l1" class="gap-input" maxlength="2" />ttl
+        <input id="l2" class="gap-input" maxlength="2" />g
+        <input id="l3" class="gap-input" maxlength="2" />r
+        <input id="l4" class="gap-input" maxlength="2" />g
+        <span id="solution1" class="solution"></span>
       </p>
 
       <p>
-        2. P<input id="l5" class="gap-input" maxlength="1" />t<input
-          id="l6"
-          class="gap-input"
-          maxlength="1"
-        /><input id="l7" class="gap-input" maxlength="1" />nt<input
-          id="l8"
-          class="gap-input"
-          maxlength="1"
-        />nv<input id="l9" class="gap-input" maxlength="1" />rf<input
-          id="l10"
-          class="gap-input"
-          maxlength="1"
-        />g<input id="l11" class="gap-input" maxlength="1" />ng
+        2. P<input id="l5" class="gap-input" maxlength="2" />t
+        <input id="l6" class="gap-input" maxlength="2" />
+        <input id="l7" class="gap-input" maxlength="2" />nt
+        <input id="l8" class="gap-input" maxlength="2" />nv
+        <input id="l9" class="gap-input" maxlength="2" />rf
+        <input id="l10" class="gap-input" maxlength="2" />g
+        <input id="l11" class="gap-input" maxlength="2" />ng
+        <span id="solution2" class="solution"></span>
       </p>
 
       <p>
-        3. Br<input id="l12" class="gap-input" maxlength="1" />nch<input
-          id="l13"
-          class="gap-input"
-          maxlength="1"
-        /><input id="l14" class="gap-input" maxlength="1" />lk<input
-          id="l15"
-          class="gap-input"
-          maxlength="1"
-        />rz<input id="l16" class="gap-input" maxlength="1" />n<input
-          id="l17"
-          class="gap-input"
-          maxlength="1"
-        />m
+        3. Br<input id="l12" class="gap-input" maxlength="2" />nch
+        <input id="l13" class="gap-input" maxlength="2" />
+        <input id="l14" class="gap-input" maxlength="2" />lk
+        <input id="l15" class="gap-input" maxlength="2" />rz
+        <input id="l16" class="gap-input" maxlength="2" />
+        <input id="l17" class="gap-input" maxlength="2" />m
+        <span id="solution3" class="solution"></span>
       </p>
 
       <p>
-        4. <input id="l18" class="gap-input" maxlength="1" />nv<input
-          id="l19"
-          class="gap-input"
-          maxlength="1"
-        />s<input id="l20" class="gap-input" maxlength="1" />v<input
-          id="l21"
-          class="gap-input"
-          maxlength="1"
-        />
-        B<input id="l22" class="gap-input" maxlength="1" /><input
-          id="l23"
-          class="gap-input"
-          maxlength="1"
-        />tm<input id="l24" class="gap-input" maxlength="1" />ng
+        4. <input id="l18" class="gap-input" maxlength="2" />nv
+        <input id="l19" class="gap-input" maxlength="2" />s
+        <input id="l20" class="gap-input" maxlength="2" />v
+        <input id="l21" class="gap-input" maxlength="2" />
+        B<input id="l22" class="gap-input" maxlength="2" />
+        <input id="l23" class="gap-input" maxlength="2" />tm
+        <input id="l24" class="gap-input" maxlength="2" />ng
+        <span id="solution4" class="solution"></span>
       </p>
 
       <p>
-        5. <input id="l25" class="gap-input" maxlength="1" />p<input
-          id="l26"
-          class="gap-input"
-          maxlength="1"
-        /><input id="l27" class="gap-input" maxlength="1" /><input
-          id="l28"
-          class="gap-input"
-          maxlength="1"
-        />dd<input id="l29" class="gap-input" maxlength="1" />s<input
-          id="l30"
-          class="gap-input"
-          maxlength="1"
-        />s
+        5. <input id="l25" class="gap-input" maxlength="2" />p
+        <input id="l26" class="gap-input" maxlength="2" />
+        <input id="l27" class="gap-input" maxlength="2" />
+        <input id="l28" class="gap-input" maxlength="2" />dd
+        <input id="l29" class="gap-input" maxlength="2" />s
+        <input id="l30" class="gap-input" maxlength="2" />s
+        <span id="solution5" class="solution"></span>
       </p>
 
       <p>
-        6. <input id="l31" class="gap-input" maxlength="1" />bg<input
-          id="l32"
-          class="gap-input"
-          maxlength="1"
-        />m<input id="l33" class="gap-input" maxlength="1" />g<input
-          id="l34"
-          class="gap-input"
-          maxlength="1"
-        />rt
+        6. <input id="l31" class="gap-input" maxlength="2" />bg
+        <input id="l32" class="gap-input" maxlength="2" />m
+        <input id="l33" class="gap-input" maxlength="2" />g
+        <input id="l34" class="gap-input" maxlength="2" />rt
+        <span id="solution6" class="solution"></span>
       </p>
+
       <div id="feedback"></div>
       <button onclick="checkAnswers()">Überprüfen</button>
     </div>
@@ -194,12 +171,43 @@
         l34: "e",
       };
 
+      // Zuordnung Eingabefeld -> Zeilennummer
+      const idToLine = {
+        l1: 1, l2: 1, l3: 1, l4: 1,
+        l5: 2, l6: 2, l7: 2, l8: 2, l9: 2, l10: 2, l11: 2,
+        l12: 3, l13: 3, l14: 3, l15: 3, l16: 3, l17: 3,
+        l18: 4, l19: 4, l20: 4, l21: 4, l22: 4, l23: 4, l24: 4,
+        l25: 5, l26: 5, l27: 5, l28: 5, l29: 5, l30: 5,
+        l31: 6, l32: 6, l33: 6, l34: 6,
+      };
+
+      // Korrekt geschriebene Wörter, die hinten angezeigt werden
+      const lineSolutions = {
+        1: "bettlägerig",
+        2: "Patientenverfügung",
+        3: "Bronchialkarzinom",
+        4: "invasive Beatmung",
+        5: "Opioiddosis",
+        6: "abgemagert",
+      };
+
+      // ae / oe / ue (auch groß/klein) -> ä / ö / ü
+      function normalizeUmlautInput(str) {
+        return str
+          .replace(/ae/gi, "ä")
+          .replace(/oe/gi, "ö")
+          .replace(/ue/gi, "ü");
+      }
+
       function checkAnswers() {
         let allCorrect = true;
+        const lineHasError = { 1: false, 2: false, 3: false, 4: false, 5: false, 6: false };
 
         Object.keys(keys).forEach((id) => {
           const field = document.getElementById(id);
-          const value = field.value.trim();
+
+          // Eingabe normalisieren (ae, oe, ue -> ä, ö, ü)
+          const value = normalizeUmlautInput(field.value.trim());
           const expected = keys[id];
 
           field.classList.remove("correct", "wrong");
@@ -213,11 +221,26 @@
             correct = value.toLowerCase() === expected.toLowerCase();
           }
 
+          const line = idToLine[id];
+
           if (correct) {
             field.classList.add("correct");
           } else {
             field.classList.add("wrong");
             allCorrect = false;
+            if (line) {
+              lineHasError[line] = true;
+            }
+          }
+        });
+
+        // Lösungswörter für Zeilen mit Fehlern anzeigen
+        Object.keys(lineSolutions).forEach((line) => {
+          const span = document.getElementById("solution" + line);
+          if (lineHasError[line]) {
+            span.textContent = "Lösung: " + lineSolutions[line];
+          } else {
+            span.textContent = ""; // ggf. leeren, wenn alles richtig war
           }
         });
 
@@ -227,7 +250,7 @@
           feedback.textContent = "Super!";
           feedback.style.color = "#15803d";
         } else {
-          feedback.textContent = "Bitte versuche es noch einmal!";
+          feedback.textContent = "Schau dir die Lösungen hinter den Zeilen an.";
           feedback.style.color = "#b91c1c";
         }
       }
