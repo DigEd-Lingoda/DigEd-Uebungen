@@ -35,11 +35,19 @@
         font-size: 0.85em;
       }
       .correct {
-        background-color: #c8e6c9;
-      }
-      .wrong {
-        background-color: #ffcdd2;
-      }
+		  background-color: #c8e6c9;
+		  text-decoration: none;
+		}
+
+		.wrong {
+		  background-color: #ffcdd2;
+		  text-decoration: line-through;
+		}
+
+		.solution-text {
+		  margin-left: 6px;
+		  font-weight: bold;
+		}
       button {
         background: #153bff;
         color: #fff;
@@ -130,33 +138,50 @@
     <button onclick="checkAnswers()">Antworten prüfen</button>
 
     <script>
-      const solutions = {
-        transplantieren: { adjSent: "transplantierbar" },
-        inkompatibel: { nounSent: "Inkompatibilität" },
-        fortschreiten: { adjSent: "fortschreitende" },
-        stabilisieren: { adjSent: "stabil" },
-        abstoßen: { nounSent: "Abstoßung" },
-        immunologie: { adjSent: "immunologischer" },
-        kontrollieren: { nounSent: "Kontrolle" },
-        entwickeln: { nounSent: "Entwicklung" },
-      };
+	  const solutions = {
+		transplantieren: { adjSent: "transplantierbar" },
+		inkompatibel: { nounSent: "Inkompatibilität" },
+		fortschreiten: { adjSent: "fortschreitende" },
+		stabilisieren: { adjSent: "stabil" },
+		abstoßen: { nounSent: "Abstoßung" },
+		immunologie: { adjSent: "immunologischer" },
+		kontrollieren: { nounSent: "Kontrolle" },
+		entwickeln: { nounSent: "Entwicklung" },
+	  };
 
-      function checkAnswers() {
-        Object.keys(solutions).forEach((key) => {
-          const sol = solutions[key];
-          ["nounSent", "adjSent"].forEach((field) => {
-            const input = document.getElementById(`${field}-${key}`);
-            if (!input) return;
-            if (input.value.trim().toLowerCase() === sol[field].toLowerCase()) {
-              input.classList.add("correct");
-              input.classList.remove("wrong");
-            } else {
-              input.classList.add("wrong");
-              input.classList.remove("correct");
-            }
-          });
-        });
-      }
-    </script>
+	  function checkAnswers() {
+		Object.keys(solutions).forEach((key) => {
+		  const sol = solutions[key];
+		  ["nounSent", "adjSent"].forEach((field) => {
+			const input = document.getElementById(`${field}-${key}`);
+			if (!input || !sol[field]) return;
+
+			const correct = sol[field];
+			const userValue = input.value.trim();
+
+			// Falls vorher schon eine Lösung angezeigt wurde: entfernen
+			let solutionSpan = input.nextElementSibling;
+			if (solutionSpan && solutionSpan.classList.contains("solution-text")) {
+			  solutionSpan.remove();
+			}
+
+			if (userValue.toLowerCase() === correct.toLowerCase()) {
+			  // richtige Antwort
+			  input.classList.add("correct");
+			  input.classList.remove("wrong");
+			} else {
+			  // falsche Antwort: durchstreichen + richtige Lösung dahinter anzeigen
+			  input.classList.add("wrong");
+			  input.classList.remove("correct");
+
+			  solutionSpan = document.createElement("span");
+			  solutionSpan.className = "solution-text";
+			  solutionSpan.textContent = "→ " + correct;
+			  input.insertAdjacentElement("afterend", solutionSpan);
+			}
+		  });
+		});
+	  }
+	</script>
   </body>
 </html>
