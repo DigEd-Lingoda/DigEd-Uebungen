@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.4;
+            color: #333;
+            background-color: #f4f7f6;
+            padding: 20px;
+        }
+        .report-container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 40px;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            border-bottom: 2px solid #0000ff;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 14px;
+            color: #0000ff;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 8px;
+        }
+        .field-group {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 10px;
+        }
+        .field {
+            flex: 1;
+        }
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: bold;
+            color: #666;
+        }
+        .input-box {
+            border: 1px solid #ddd;
+            padding: 8px;
+            min-height: 20px;
+            background: #fafafa;
+            border-radius: 3px;
+        }
+        .large-box {
+            min-height: 80px;
+        }
+        .placeholder {
+            color: #999;
+            font-style: italic;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="report-container">
+    <div class="header">
+        <div><strong>Ärztekammer / Prüfungszentrum</strong><br>Fachsprachenprüfung (FSP)</div>
+        <div style="text-align: right;"><strong>DATUM:</strong> 12.01.2026</div>
+    </div>
+
+    <div class="section">
+        <div class="field-group">
+            <div class="field">
+                <label>PATIENTENNAME, VORNAME</label>
+                <div class="input-box">Mustermann, Max</div>
+            </div>
+            <div class="field" style="flex: 0 0 150px;">
+                <label>GEBURTSDATUM</label>
+                <div class="input-box">01.01.1960</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Diagnosen</div>
+        <div class="field">
+            <label>VERDACHTSDIAGNOSE</label>
+            <div class="input-box"><span class="placeholder">z.B. V. a. akute Cholezystitis</span></div>
+        </div>
+        <div style="margin-top:10px;">
+            <label>DIFFERENTIALDIAGNOSEN (DD)</label>
+            <div class="input-box"><span class="placeholder">z.B. Myokardinfarkt, Nephrolithiasis</span></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Anamnese (Aktuelle Beschwerden / Vorgeschichte)</div>
+        <div class="input-box large-box">
+            <span class="placeholder">Nutzen Sie hier den Konjunktiv I: "Der Patient berichtet, er leide unter..."</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Vegetative Anamnese / Noxen</div>
+        <div class="field-group">
+            <div class="field">
+                <label>FIEBER / GEWICHT / SCHLAF</label>
+                <div class="input-box"></div>
+            </div>
+            <div class="field">
+                <label>NOXEN (RAUCHEN, ALKOHOL)</label>
+                <div class="input-box"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Körperliche Untersuchung (Befund)</div>
+        <div class="input-box large-box">
+            <span class="placeholder">AZ/EZ, Herz/Lunge, Abdomen (z.B. Druckschmerz im rechten Oberbauch)</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Prozedere / Weiteres Vorgehen</div>
+        <div class="input-box">
+            <span class="placeholder">z.B. Labor (Entzündungswerte), Sonografie Abdomen, EKG</span>
+        </div>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 1px solid #ccc; padding-top: 10px; font-size: 12px; text-align: center; color: #888;">
+        Dokumentation erstellt von: Dr. [Ihr Name]
+    </div>
+</div>
+
+</body>
+</html>
