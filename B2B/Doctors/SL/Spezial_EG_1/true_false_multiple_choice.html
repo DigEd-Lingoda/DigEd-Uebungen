@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="de" style="background: transparent !important; border: none !important;">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FSP Organisatorik Quiz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    html, body { background: transparent !important; margin: 0; padding: 0; }
+    body { font-family: 'Open Sans', sans-serif; padding: 20px; color: #333; }
+    
+    .game-wrapper { width: 100%; max-width: 800px; margin: 0 auto; }
+    
+    .memory-game { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 15px; 
+      margin-bottom: 20px; 
+    }
+
+    .card { 
+      width: 100%; 
+      background: #0000ff; 
+      border-radius: 8px; 
+      overflow: hidden; 
+      cursor: pointer; 
+      transition: all 0.4s ease-in-out; 
+      border: 2px solid #0000ff;
+    }
+
+    .card-header {
+      padding: 15px 20px;
+      color: #fff;
+      font-weight: 600;
+      font-size: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-content {
+      max-height: 0;
+      opacity: 0;
+      background: #fff;
+      transition: all 0.4s ease-in-out;
+      padding: 0 20px;
+      overflow: hidden;
+    }
+
+    .card.active .card-content {
+      max-height: 1000px;
+      opacity: 1;
+      padding: 20px;
+    }
+
+    .card.matched { border-color: #ff00ff; }
+    .card.matched .card-header { background: #ff00ff; }
+    
+    .card.mismatch { animation: shake 0.4s; border-color: #ff0000; }
+    .card.mismatch .card-header { background: #ff0000; }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .question { font-weight: 600; margin-bottom: 1rem; font-size: 16px; }
+    .options label { 
+      display: flex; 
+      align-items: center; 
+      margin: 0.5rem 0; 
+      cursor: pointer; 
+      padding: 8px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+    .options label:hover { background: #f0f0f0; }
+    .option-letter { font-weight: 600; margin-right: 0.8em; color: #0000ff; }
+    
+    #restart { 
+      display: block; margin: 20px auto; padding: 10px 20px; 
+      background: #0000ff; color: #fff; border: none; 
+      border-radius: 6px; cursor: pointer; font-size: 16px; 
+    }
+
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 100; }
+    .modal-content { background: #fff; padding: 25px; border-radius: 12px; max-width: 500px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+  </style>
+</head>
+<body>
+
+<div class="game-wrapper">
+  <div class="memory-game" id="game"></div>
+  <button id="restart">Alle Fragen zurücksetzen</button>
+</div>
+
+<div class="modal" id="popup">
+  <div class="modal-content" id="popup-content"></div>
+</div>
+
+<script>
+  const cardsData = [
+    { 
+      q: 'q1', title: 'Frage 1: Zuständigkeit', 
+      text: 'Welche Institution ist in der Regel für die Abnahme der Fachsprachenprüfung (FSP) verantwortlich?', 
+      opts: ['Das Gesundheitsministerium des Bundes', 'Die jeweilige Landesärztekammer (LÄK)', 'Die Volkshochschulen (VHS)', 'Das Goethe-Institut'], 
+      correct: 'Die jeweilige Landesärztekammer (LÄK)', 
+      extra: { 
+        question: 'In welchem Bundesland ist nicht die Ärztekammer, sondern der Zweckverband NiZzA für die Zuweisung zur Prüfung zuständig?', 
+        opts: ['Bayern', 'Niedersachsen', 'Sachsen-Anhalt', 'Berlin'], 
+        correct: 'Niedersachsen' 
+      } 
+    },
+    { 
+      q: 'q2', title: 'Frage 2: Dauer', 
+      text: 'Wie viel Zeit ist rein für die drei Kernphasen der Prüfung (3x20 Min.) vorgesehen?', 
+      opts: ['45 Minuten', '60 Minuten', '90 Minuten', '120 Minuten'], 
+      correct: '60 Minuten', 
+      extra: { 
+        question: 'Warum verbringen Bewerber oft dennoch 3-5 Stunden in der Kammer?', 
+        opts: ['Wegen administrativer Prozesse (Check-in, Beratung)', 'Weil man vor Ort noch Grammatik lernt', 'Weil die Teile an verschiedenen Tagen stattfinden', 'Weil die Bibliothek besucht werden muss'], 
+        correct: 'Wegen administrativer Prozesse (Check-in, Beratung)' 
+      } 
+    },
+    { 
+      q: 'q3', title: 'Frage 3: Anmeldung', 
+      text: 'Was ist meist Voraussetzung, um einen Termin für die FSP zu erhalten?', 
+      opts: ['Ein Arbeitsvertrag', '10 Jahre Berufserfahrung', 'Der Antrag auf Approbation bei der Behörde', 'Deutsche Staatsbürgerschaft'], 
+      correct: 'Der Antrag auf Approbation bei der Behörde', 
+      extra: { 
+        question: 'Wer ist in Nordrhein-Westfalen für diesen Antrag zuständig?', 
+        opts: ['Das Rathaus', 'Die zuständige Bezirksregierung', 'Das Krankenhaus direkt', 'Die Bundesärztekammer'], 
+        correct: 'Die zuständige Bezirksregierung' 
+      } 
+    },
+    { 
+      q: 'q4', title: 'Frage 4: Berlin', 
+      text: 'Welches Element wird in Berlin oft am Ende verlangt?', 
+      opts: ['Blutabnahme', 'Übersetzen von Fachbegriffen/Abkürzungen', 'Rechtschreibtest', 'Psychologisches Gutachten'], 
+      correct: 'Übersetzen von Fachbegriffen/Abkürzungen', 
+      extra: { 
+        question: 'Wie lautet der patientennahe Begriff für "Ödem"?', 
+        opts: ['Entzündung', 'Wassereinlagerung / Schwellung', 'Knochenbruch', 'Bluthochdruck'], 
+        correct: 'Wassereinlagerung / Schwellung' 
+      } 
+    },
+    { 
+      q: 'q5', title: 'Frage 5: FaMed', 
+      text: 'In welchem Bundesland wird die FaMed aktuell flächendeckend anerkannt?', 
+      opts: ['NRW', 'Bayern', 'Berlin', 'Sachsen'], 
+      correct: 'Bayern', 
+      extra: { 
+        question: 'Warum wird FaMed in Ländern wie NRW oft abgelehnt?', 
+        opts: ['Zu teuer', 'Zu einfach', 'Es wird nur die Prüfung der eigenen Landesärztekammer akzeptiert', 'Zu lange Dauer'], 
+        correct: 'Es wird nur die Prüfung der eigenen Landesärztekammer akzeptiert' 
+      } 
+    },
+    { 
+      q: 'q6', title: 'Frage 6: Phasen', 
+      text: 'Welcher Teil findet üblicherweise als zweiter Schritt (Phase 2) statt?', 
+      opts: ['Oberarztgespräch', 'Körperliche Untersuchung', 'Schriftliche Dokumentation', 'Labor-Analyse'], 
+      correct: 'Schriftliche Dokumentation', 
+      extra: { 
+        question: 'Welche Notizen dürfen Sie in dieser 20-minütigen Phase nutzen?', 
+        opts: ['Keine', 'Eigene Notizen aus dem Patientengespräch', 'Fachwörterbücher', 'Muster-Arztbriefe'], 
+        correct: 'Eigene Notizen aus dem Patientengespräch' 
+      } 
+    },
+    { 
+      q: 'q7', title: 'Frage 7: Hilfsmittel', 
+      text: 'Welche Hilfsmittel sind während der 60-minütigen FSP in der Regel erlaubt?', 
+      opts: ['Wörterbuch', 'Smartphone', 'Fachbücher', 'Keine externen Hilfsmittel'], 
+      correct: 'Keine externen Hilfsmittel', 
+      extra: { 
+        question: 'Wie reagieren Sie, wenn Ihnen ein Fachwort (z.B. Cholezystektomie) nicht einfällt?', 
+        opts: ['Lücke lassen', 'Muttersprache nutzen', 'Präzise umschreiben (z.B. operative Entfernung der Gallenblase)', 'Prüfer fragen'], 
+        correct: 'Präzise umschreiben (z.B. operative Entfernung der Gallenblase)' 
+      } 
+    },
+    { 
+      q: 'q8', title: 'Frage 8: Bewertung', 
+      text: 'Was ist das primäre Ziel der FSP?', 
+      opts: ['Fachwissen auf Facharztniveau', 'Kommunikative Fähigkeiten in der Berufsausübung', 'Grammatiktest auf A2-Niveau', 'Chirurgische Fertigkeiten'], 
+      correct: 'Kommunikative Fähigkeiten in der Berufsausübung', 
+      extra: { 
+        question: 'Wie reagieren Sie professionell auf eine medizinische Wissenslücke?', 
+        opts: ['Nichts sagen', 'Wissen verweigern', 'Sprachlich versiert (z.B. "werde ich im Konsil abklären")', 'Antwort erfinden'], 
+        correct: 'Sprachlich versiert (z.B. "werde ich im Konsil abklären")' 
+      } 
+    },
+    { 
+      q: 'q9', title: 'Frage 9: Hessen', 
+      text: 'Wie wird der schriftliche Teil in Hessen oft durchgeführt?', 
+      opts: ['Diktat', 'Handschriftlich auf Tafel', 'Computerbasiert am PC', 'Gar nicht'], 
+      correct: 'Computerbasiert am PC', 
+      extra: { 
+        question: 'Welches Problem tritt bei QWERTZ-Tastaturen für internationale Nutzer oft auf?', 
+        opts: ['Vertauschung von Y und Z / Umlaute', 'Keine Leertaste', 'Keine Zahlen', 'Keine Shifttaste'], 
+        correct: 'Vertauschung von Y und Z / Umlaute' 
+      } 
+    },
+    { 
+      q: 'q10', title: 'Frage 10: Wiederholung', 
+      text: 'Was passiert, wenn man die FSP nicht besteht?', 
+      opts: ['Lebenslange Sperre', 'Unbegrenzt oft wiederholbar (gegen Gebühr)', 'Ein Jahr Zwangspause', 'Studium wiederholen'], 
+      correct: 'Unbegrenzt oft wiederholbar (gegen Gebühr)', 
+      extra: { 
+        question: 'In welchem Bereich liegen die Gebühren üblicherweise?', 
+        opts: ['50 € - 100 €', '350 € - 600 €', '1.500 € - 2.000 €', 'Kostenlos'], 
+        correct: '350 € - 600 €' 
+      } 
+    }
+  ];
+
+  const game = document.getElementById('game');
+  const popup = document.getElementById('popup');
+  const content = document.getElementById('popup-content');
+  let busy = false;
+
+  function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
+  }
+
+  function createCards() {
+    game.innerHTML = '';
+    cardsData.forEach((data, index) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.q = data.q;
+      card.innerHTML = `
+        <div class="card-header">
+          <span>${data.title}</span>
+          <span class="icon">▼</span>
+        </div>
+        <div class="card-content">
+          <div class="question">${data.text}</div>
+          <div class="options">
+            ${shuffle([...data.opts]).map((o, i) => `
+              <label data-text="${o}">
+                <span class="option-letter">${String.fromCharCode(65 + i)})</span>
+                <span class="option-text">${o}</span>
+              </label>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      card.addEventListener('click', (e) => {
+        if (busy || card.classList.contains('matched') || card.classList.contains('active')) return;
+        if (e.target.closest('.options')) return;
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+      });
+
+      card.querySelectorAll('label').forEach(label => {
+        label.addEventListener('click', () => {
+          if (!card.classList.contains('active') || busy) return;
+          checkAnswer(card, data, label.querySelector('.option-text').textContent);
+        });
+      });
+
+      game.appendChild(card);
+    });
+  }
+
+  function checkAnswer(card, data, selected) {
+    busy = true;
+    if (selected === data.correct) {
+      showPopup(card, data.extra);
+    } else {
+      card.classList.add('mismatch');
+      setTimeout(() => {
+        card.classList.remove('mismatch', 'active');
+        busy = false;
+      }, 1000);
+    }
+  }
+
+  function showPopup(card, extra) {
+    content.innerHTML = `<div class="question" style="color:#0000ff">RICHTIG! Follow-up Frage:</div><div class="question">${extra.question}</div><div class="options"></div>`;
+    const optsContainer = content.querySelector('.options');
+    
+    shuffle([...extra.opts]).forEach((o, i) => {
+      const lbl = document.createElement('label');
+      lbl.innerHTML = `
+        <span class="option-letter">${String.fromCharCode(65+i)})</span>
+        <span class="option-text">${o}</span>
+      `;
+      lbl.onclick = () => {
+        if (o === extra.correct) {
+          lbl.style.background = '#d4edda';
+          setTimeout(() => {
+            popup.style.display = 'none';
+            card.classList.add('matched');
+            card.classList.remove('active');
+            card.querySelector('.icon').textContent = '✓';
+            busy = false;
+          }, 600);
+        } else {
+          lbl.style.background = '#f8d7da';
+          setTimeout(() => {
+            popup.style.display = 'none';
+            card.classList.remove('active');
+            busy = false;
+          }, 800);
+        }
+      };
+      optsContainer.appendChild(lbl);
+    });
+    popup.style.display = 'flex';
+  }
+
+  document.getElementById('restart').addEventListener('click', () => { createCards(); });
+  createCards();
+</script>
+</body>
+</html>
