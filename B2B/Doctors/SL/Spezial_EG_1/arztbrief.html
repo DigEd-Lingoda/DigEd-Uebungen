@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f9; padding: 20px; color: #333; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        h2 { color: #2c3e50; text-align: center; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .instruction { font-style: italic; margin-bottom: 25px; text-align: center; color: #7f8c8d; }
+        
+        .game-area { display: flex; gap: 30px; align-items: flex-start; }
+        .items { flex: 1; display: flex; flex-direction: column; gap: 8px; max-height: 700px; overflow-y: auto; padding-right: 10px; }
+        .slots { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+        
+        .draggable { padding: 10px; background: #ffffff; border: 1px solid #d1d8dd; cursor: grab; border-radius: 6px; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s; }
+        .draggable:hover { background: #f8f9fa; border-color: #3498db; }
+        
+        .slot { border: 2px dashed #bdc3c7; padding: 12px; border-radius: 8px; min-height: 60px; background: #fafafa; transition: all 0.3s; }
+        .slot-title { font-weight: bold; font-size: 11px; color: #34495e; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
+        
+        .correct { background-color: #d4edda !important; border-color: #28a745 !important; color: #155724; }
+        .wrong { background-color: #f8d7da !important; border-color: #dc3545 !important; color: #721c24; }
+        
+        button { display: block; width: 100%; padding: 15px; margin-top: 25px; background: #3498db; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 18px; font-weight: bold; }
+        button:hover { background: #2980b9; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="game-area">
+        <div class="items" id="items">
+            <div class="draggable" draggable="true" id="i1" data-target="diag">Verdacht auf akutes Koronarsyndrom (ACS)</div>
+            <div class="draggable" draggable="true" id="i2" data-target="diag">Ausschluss einer Lungenarterienembolie (LAE)</div>
+            <div class="draggable" draggable="true" id="i3" data-target="anam">Stechender Schmerz im Epigastrium seit 2h</div>
+            <div class="draggable" draggable="true" id="i4" data-target="anam">Begleitende Übelkeit und kalter Schweiß</div>
+            <div class="draggable" draggable="true" id="i5" data-target="vege">Ungewollter Gewichtsverlust von 5 kg</div>
+            <div class="draggable" draggable="true" id="i6" data-target="vege">Nikotinabusus (30 Packungsjahre)</div>
+            <div class="draggable" draggable="true" id="i7" data-target="vor">Bekannter Diabetes mellitus Typ 2 seit 2015</div>
+            <div class="draggable" draggable="true" id="i8" data-target="vor">Zustand nach Cholezystektomie (2018)</div>
+            <div class="draggable" draggable="true" id="i9" data-target="medi">Einnahme von Metformin 500 mg (1-0-1)</div>
+            <div class="draggable" draggable="true" id="i10" data-target="medi">Allergie gegen Penicillin (Urtikaria)</div>
+            <div class="draggable" draggable="true" id="i11" data-target="soz">Lebt allein im 4. Stock ohne Aufzug</div>
+            <div class="draggable" draggable="true" id="i12" data-target="soz">Früher tätig als gelernter Schlosser</div>
+            <div class="draggable" draggable="true" id="i13" data-target="befund">Herztöne rein und rhythmisch</div>
+            <div class="draggable" draggable="true" id="i14" data-target="befund">Abdomen weich, kein Druckschmerz</div>
+            <div class="draggable" draggable="true" id="i15" data-target="proz">Durchführung einer Koronarangiographie</div>
+            <div class="draggable" draggable="true" id="i16" data-target="proz">Engmaschige Überwachung der Vitalparameter</div>
+        </div>
+
+        <div class="slots">
+            <div class="slot" id="diag" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="slot-title">1. Diagnosen</div></div>
+            <div class="slot" id="anam" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="slot-title">2. Aktuelle Anamnese</div></div>
+            <div class="slot" id="vege" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="slot-title">3. Vegetativum & Noxen</div></div>
+            <div class="slot" id="vor" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="slot-title">4. Vorerkrankungen / OP</div></div>
+            <div class="slot" id="medi" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="slot-title">5. Medikamente & Allergien</div></div>
+            <div class="slot" id="soz" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="slot-title">6. Sozialanamnese</div></div>
+            <div class="slot" id="befund" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="slot-title">7. Körperlicher Befund</div></div>
+            <div class="slot" id="proz" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="slot-title">8. Prozedere</div></div>
+        </div>
+    </div>
+
+    <button onclick="checkResults()">Ergebnis prüfen</button>
+</div>
+
+<script>
+    function allowDrop(ev) { ev.preventDefault(); }
+    function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+    
+    document.querySelectorAll('.draggable').forEach(item => {
+        item.addEventListener('dragstart', drag);
+    });
+
+    function drop(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        var draggedElement = document.getElementById(data);
+        var dropzone = ev.target.closest('.slot');
+        if (dropzone) dropzone.appendChild(draggedElement);
+    }
+
+    function checkResults() {
+        document.querySelectorAll('.draggable').forEach(item => {
+            const parentId = item.parentElement.id;
+            const targetId = item.getAttribute('data-target');
+            if (parentId === targetId) {
+                item.classList.add('correct');
+                item.classList.remove('wrong');
+            } else {
+                item.classList.add('wrong');
+                item.classList.remove('correct');
+            }
+        });
+    }
+</script>
+</body>
+</html>
