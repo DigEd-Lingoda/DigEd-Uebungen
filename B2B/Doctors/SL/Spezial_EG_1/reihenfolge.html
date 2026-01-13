@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Timeline-Reihenfolge Urosepsis</title>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+  <style>
+    /* Open Sans für alles */
+    * {
+      font-family: 'Open Sans', sans-serif;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: #ffffff;
+      padding: 2em;
+      display: flex;
+      justify-content: center;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1em;
+    }
+    /* Responsive Breite: bis max. 400px, sonst 90% des Viewports */
+    #timeline {
+      list-style: none;
+      padding: 0;
+      width: 90vw;
+      max-width: 400px;
+    }
+    #timeline li {
+      position: relative;
+      margin: 0.5em 0;
+      padding: 1em;
+      background: #f0ece3; /* beige-grauer Papierfetzen */
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      /* zackige Kanten simulieren */
+      clip-path: polygon(
+        0 5%, 5% 0, 10% 5%, 15% 0, 20% 5%,
+        25% 0, 100% 5%, 100% 95%, 95% 100%,
+        90% 95%, 85% 100%, 80% 95%, 75% 100%,
+        0 95%
+      );
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      cursor: grab;
+      transition: transform 150ms ease, box-shadow 150ms ease;
+      /* sicherstellen, dass lange Texte umbrechen */
+      word-wrap: break-word;
+    }
+    #timeline li.ghost {
+      opacity: 0.4;
+    }
+    #timeline li.chosen {
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transform: scale(1.02);
+    }
+    button {
+      margin-top: 1em;
+      padding: 0.5em 1em;
+      border: none;
+      background: #153BFF;
+      color: white;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 1em;
+      display: inline-block;
+      margin-right: 0.5em;
+    }
+    #result {
+      margin-top: 1em;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h2>Ordne die Ereignisse chronologisch</h2>
+    <ul id="timeline">
+      <li data-pos="1">Einreichen der Unterlagen (Diplom, Sprachzertifikat B2 etc.) bei der Approbationsbehörde (z. B. Bezirksregierung oder Landesamt)</li>
+      <li data-pos="2">Erhalt der Eingangsbestätigung und Zuweisung zur Fachsprachenprüfung (FSP) durch die Behörde</li>
+      <li data-pos="3">Anmeldung und Zahlung der Prüfungsgebühr bei der zuständigen Landesärztekammer (LÄK)</li>
+      <li data-pos="4">Ablegen der 60-minütigen Fachsprachenprüfung</li>
+      <li data-pos="5">Erteilung der Berufserlaubnis (§10 BÄO) oder Approbation</li>
+    </ul>
+    <div>
+      <button id="check">Reihenfolge prüfen</button>
+      <button id="retry" type="button">Noch einmal</button>
+    </div>
+    <div id="result"></div>
+  </div>
+
+  <!-- SortableJS für animiertes Drag & Drop -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+  <script>
+    // Shuffle-Funktion für ein Array
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const list = document.getElementById('timeline');
+      let items = Array.from(list.children);
+
+      // Beim Laden: Liste umsortieren
+      shuffle(items);
+      items.forEach(li => list.appendChild(li));
+
+      // SortableJS initialisieren
+      Sortable.create(list, {
+        animation: 150,
+        ghostClass: 'ghost',
+        chosenClass: 'chosen',
+        onStart: () => {
+          document.querySelectorAll('#timeline li:not(.chosen)').forEach(li => {
+            li.style.transition = 'margin 150ms ease';
+            li.style.margin = '1.5em 0';
+          });
+        },
+        onEnd: () => {
+          document.querySelectorAll('#timeline li').forEach(li => {
+            li.style.margin = '0.5em 0';
+          });
+        }
+      });
+
+      // Prüf-Button-Logik
+      document.getElementById('check').onclick = () => {
+        const ordered = Array.from(list.children).every((li, i) => +li.dataset.pos === i + 1);
+        const res = document.getElementById('result');
+        res.style.color = ordered ? 'green' : 'red';
+        res.textContent = ordered
+          ? '✔ Super, du hast alles richtig zugeordnet!'
+          : '❌ Leider falsch, versuche es noch einmal!';
+      };
+
+      // Retry-Button: neu mischen und Ergebnis zurücksetzen
+      document.getElementById('retry').onclick = () => {
+        items = Array.from(list.children);
+        shuffle(items);
+        items.forEach(li => list.appendChild(li));
+        document.getElementById('result').textContent = '';
+      };
+    });
+  </script>
+</body>
+</html>
