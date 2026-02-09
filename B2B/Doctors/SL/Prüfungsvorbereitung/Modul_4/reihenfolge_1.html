@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Timeline-Reihenfolge Urosepsis</title>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+  <style>
+    /* Open Sans für alles */
+    * {
+      font-family: 'Open Sans', sans-serif;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: #ffffff;
+      padding: 2em;
+      display: flex;
+      justify-content: center;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1em;
+    }
+    /* Responsive Breite: bis max. 400px, sonst 90% des Viewports */
+    #timeline {
+      list-style: none;
+      padding: 0;
+      width: 90vw;
+      max-width: 400px;
+    }
+    #timeline li {
+      position: relative;
+      margin: 0.5em 0;
+      padding: 1em;
+      background: #f0ece3; /* beige-grauer Papierfetzen */
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      /* zackige Kanten simulieren */
+      clip-path: polygon(
+        0 5%, 5% 0, 10% 5%, 15% 0, 20% 5%,
+        25% 0, 100% 5%, 100% 95%, 95% 100%,
+        90% 95%, 85% 100%, 80% 95%, 75% 100%,
+        0 95%
+      );
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      cursor: default; /* nicht interaktiv */
+      transition: transform 150ms ease, box-shadow 150ms ease;
+      /* sicherstellen, dass lange Texte umbrechen */
+      word-wrap: break-word;
+    }
+    /* Klassen bleiben drin (Optik), werden aber nicht genutzt */
+    #timeline li.ghost { opacity: 0.4; }
+    #timeline li.chosen {
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transform: scale(1.02);
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <ul id="timeline">
+      <li>Notiz 1: 6 Wochen Schmerz Oberbauch, drückend, schlimmer nach Essen. Oft Sodbrennen + saures Aufstoßen</li>
+      <li>Notiz 2: Kein Blut erbrochen. Stuhl normal farben (kein schwarz). Kein Gewicht verloren</li>
+      <li>Notiz 3: Nimmt Ramipril gegen Bluthochdruck. Keine Schmerzmittel (Ibu/Ass). Manchmal Tabletten gegen Sodbrennen selbst gekauft</li>
+      <li>Notiz 4: Muss Magenspiegelung machen. Gewebe entnehmen (Antrum/Korpus). Test auf Bakterien (Urease)</li>
+      <li>Notiz 5: Helicobacter-Therapie starten. Aber: Allergie gegen Penicillin (Ausschlag). Deshalb: Bismut-Kombi-Therapie 10 Tage</li>
+    </ul>
+  </div>
+</body>
+</html>
