@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Interaktives Wortgitter mit Quiz-Popups</title>
+
+  <!-- Open Sans einbinden -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      margin: 20px;
+    }
+    h2 {
+      text-align: center;
+    }
+    /* Grid-Container */
+    #word-search {
+      display: grid;
+      grid-template-columns: repeat(11, 50px);
+      grid-template-rows:    repeat(11, 50px);
+      gap: 4px;
+      user-select: none; /* verhindert unerwünschtes Markieren von Text */
+      margin: 0 auto;
+      width: fit-content;
+    }
+    /* Einzelne Zellen */
+    .cell {
+      width: 50px;
+      height: 50px;
+      border: 2px solid #153BFF;         /* Blaue Umrandung */
+      color: #153BFF;                     /* Blaue Buchstaben */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 24px;
+      cursor: pointer;
+      background-color: white;
+      transition: background-color 0.2s;
+    }
+    .cell.selected {
+      background-color: rgba(255, 51, 204, 0.4); /* leichte Vorab-Färbung beim Auswahl-Drag */
+    }
+    .cell.found {
+      background-color: #FF33CC;           /* gefundenes Wort in FF33CC (Pink) */
+      color: white;                        /* Buchstaben in Weiß auf Pink */
+    }
+    /* Modal-Overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      width: 320px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    .modal h3 {
+      margin-top: 0;
+      font-size: 20px;
+    }
+    .modal .choices {
+      margin-top: 10px;
+    }
+    .modal .feedback {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .modal button {
+      margin-top: 15px;
+      padding: 8px 16px;
+      border: none;
+      background-color: #007BFF;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .modal button:hover {
+      background-color: #0056b3;
+    }
+    /* Abschlussmeldung */
+    #completion-message {
+      display: none;
+      color: green;
+      text-align: center;
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Wortgitter-Container -->
+  <div id="word-search"></div>
+
+  <!-- Abschlussmeldung -->
+  <div id="completion-message">
+    Super, du hast alle Begriffe gefunden und richtig erklärt!
+  </div>
+
+  <!-- Modal für Multiple-Choice-Fragen -->
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal">
+      <form id="modal-form">
+        <div id="modal-question"></div>
+        <div class="choices" id="modal-choices"></div>
+        <div class="feedback" id="modal-feedback"></div>
+        <button type="button" id="modal-submit">Antwort prüfen</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // === 1. Definition der Wörter und ihrer Quiz-Fragen + Antworten ===
+    const wordData = {
+      "KONSERVATIV": {
+        question: "Was bedeutet <strong>KONSERVATIV</strong> im medizinischen Kontext?",
+        options: [
+          "eine Behandlung ohne Operation",
+          "eine Behandlung mit Operation",
+          "ein chirurgisches Verfahren",
+          "eine Notfallmaßnahme"
+        ],
+        correctText: "eine Behandlung ohne Operation"
+      },
+      "INFRARENAL": {
+        question: "Was bedeutet <strong>INFRARENAL</strong>?",
+        options: [
+          "oberhalb der Nierenarterien",
+          "unterhalb der Nierenarterien",
+          "innerhalb der Niere",
+          "neben der Niere"
+        ],
+        correctText: "unterhalb der Nierenarterien"
+      },
+      "RUPTUR": {
+        question: "Was beschreibt eine <strong>RUPTUR</strong>?",
+        options: [
+          "einen Riss der Gefäßwand",
+          "eine Verengung der Gefäßwand",
+          "eine Verstopfung der Gefäßwand",
+          "eine Entzündung der Gefäßwand"
+        ],
+        correctText: "einen Riss der Gefäßwand"
+      },
+      "ENTWÖHNUNG": {
+        question: "Was versteht man unter <strong>ENTWÖHNUNG</strong>?",
+        options: [
+          "eine gezielte medizinische Maßnahme zur Umstellung der Ernährung",
+          "den Prozess des schrittweisen oder vollständigen Abgewöhnens einer Sucht",
+          "eine operative Therapie zur Entfernung von Tumoren",
+          "eine physiotherapeutische Übung zur Muskelentspannung"
+        ],
+        correctText: "den Prozess des schrittweisen oder vollständigen Abgewöhnens einer Sucht"
+      },
+      "EVAR": {
+        question: "Wofür steht die Abkürzung <strong>EVAR</strong>?",
+        options: [
+          "Endovaskuläre Aortenprothese",
+          "Offene Operation der Aorta",
+          "Medikamentöse Therapie",
+          "Ultraschalluntersuchung"
+        ],
+        correctText: "Endovaskuläre Aortenprothese"
+      },
+      "ANEURYSMA": {
+        question: "Was ist ein <strong>ANEURYSMA</strong>?",
+        options: [
+          "eine Entzündung der inneren Herzschicht (Endokard)",
+          "eine Verhärtung (Sklerose) eines Blutgefäßes durch Kalkablagerungen",
+          "eine Erweiterung (Aussackung) einer Arterie aufgrund einer Schwächung der Gefäßwand",
+          "eine Verstopfung einer Vene durch ein Blutgerinnsel"
+        ],
+        correctText: "eine Erweiterung (Aussackung) einer Arterie aufgrund einer Schwächung der Gefäßwand"
+      }
+    };
+
+    // === 2. Dynamische Erzeugung des 11×11-Grids mit Zufallsplatzierung der Wörter ===
+    const GRID_SIZE = 11;
+    const words = Object.keys(wordData);
+
+    // Leeres GRID initialisieren (null = freies Feld)
+    function createEmptyGrid(size) {
+      const grid = [];
+      for (let r = 0; r < size; r++) {
+        grid[r] = [];
+        for (let c = 0; c < size; c++) {
+          grid[r][c] = null;
+        }
+      }
+      return grid;
+    }
+
+    // Versucht, ein Wort zufällig ins Grid zu platzieren (horizontal oder vertikal)
+    function placeWord(grid, word) {
+      const len = word.length;
+      const maxAttempts = 100;
+      let placed = false;
+
+      for (let attempt = 0; attempt < maxAttempts && !placed; attempt++) {
+        const direction = Math.random() < 0.5 ? "H" : "V"; // H = horizontal, V = vertikal
+        if (direction === "H") {
+          const row = Math.floor(Math.random() * GRID_SIZE);
+          const colStart = Math.floor(Math.random() * (GRID_SIZE - len + 1));
+          let canPlace = true;
+          for (let k = 0; k < len; k++) {
+            const existing = grid[row][colStart + k];
+            if (existing !== null && existing !== word[k]) {
+              canPlace = false;
+              break;
+            }
+          }
+          if (canPlace) {
+            for (let k = 0; k < len; k++) {
+              grid[row][colStart + k] = word[k];
+            }
+            placed = true;
+          }
+        } else { // vertikal
+          const col = Math.floor(Math.random() * GRID_SIZE);
+          const rowStart = Math.floor(Math.random() * (GRID_SIZE - len + 1));
+          let canPlace = true;
+          for (let k = 0; k < len; k++) {
+            const existing = grid[rowStart + k][col];
+            if (existing !== null && existing !== word[k]) {
+              canPlace = false;
+              break;
+            }
+          }
+          if (canPlace) {
+            for (let k = 0; k < len; k++) {
+              grid[rowStart + k][col] = word[k];
+            }
+            placed = true;
+          }
+        }
+      }
+      return placed;
+    }
+
+    // Fülle alle leeren Felder mit zufälligen Großbuchstaben A–Z
+    function fillEmptyCells(grid) {
+      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZÖÄÜ";
+      for (let r = 0; r < GRID_SIZE; r++) {
+        for (let c = 0; c < GRID_SIZE; c++) {
+          if (grid[r][c] === null) {
+            const randIndex = Math.floor(Math.random() * letters.length);
+            grid[r][c] = letters[randIndex];
+          }
+        }
+      }
+    }
+
+    // Komplettes Grid erzeugen: Wörter platzieren, danach auffüllen
+    function generateGrid() {
+      const grid = createEmptyGrid(GRID_SIZE);
+      // Jedes Wort platzieren (bei Platzierungsfehlschlag überspringen)
+      words.forEach(word => placeWord(grid, word));
+      fillEmptyCells(grid);
+      return grid;
+    }
+
+    // === 3. Raster im DOM aufbauen ===
+    const gridContainer = document.getElementById("word-search");
+    let letterGrid = generateGrid(); // generiertes, zufälliges Grid
+
+    function renderGrid(grid) {
+      gridContainer.innerHTML = "";
+      for (let r = 0; r < GRID_SIZE; r++) {
+        for (let c = 0; c < GRID_SIZE; c++) {
+          const cell = document.createElement("div");
+          cell.classList.add("cell");
+          cell.dataset.row = r;
+          cell.dataset.col = c;
+          cell.dataset.letter = grid[r][c];
+          cell.textContent = grid[r][c];
+          gridContainer.appendChild(cell);
+        }
+      }
+    }
+
+    // Erstmaliges Rendern
+    renderGrid(letterGrid);
+
+    // === 4. Auswahl-Logik (Mouse/Touch) mit Quiz-Integration ===
+    let selecting = false;
+    let selectedCells = [];
+    let foundWords = new Set();
+    let currentMatchedWord = null;
+    let currentMatchedCells = [];
+
+    function addCellToSelection(cell) {
+      cell.classList.add("selected");
+      selectedCells.push(cell);
+    }
+    function clearCurrentSelection() {
+      selectedCells.forEach(cell => cell.classList.remove("selected"));
+      selectedCells = [];
+    }
+    function pathToWord(pathCells) {
+      return pathCells.map(cell => cell.dataset.letter).join("");
+    }
+    function reverseString(str) {
+      return str.split("").reverse().join("");
+    }
+
+    function checkSelection() {
+      const word = pathToWord(selectedCells);
+      const rev  = reverseString(word);
+      let matched = null;
+      for (const target of words) {
+        if ((word === target || rev === target) && !foundWords.has(target)) {
+          matched = target;
+          break;
+        }
+      }
+      if (matched) {
+        currentMatchedWord = matched;
+        currentMatchedCells = selectedCells.slice();
+        showModalForWord(matched);
+      } else {
+        clearCurrentSelection();
+      }
+    }
+
+    function handleMouseDown(e) {
+      if (e.target.classList.contains("cell")) {
+        selecting = true;
+        clearCurrentSelection();
+        addCellToSelection(e.target);
+      }
+    }
+    function handleMouseEnter(e) {
+      if (selecting && e.target.classList.contains("cell")) {
+        const last = selectedCells[selectedCells.length - 1];
+        if (!selectedCells.includes(e.target) && e.target !== last) {
+          addCellToSelection(e.target);
+        }
+      }
+    }
+    function handleMouseUp(e) {
+      if (selecting) {
+        selecting = false;
+        checkSelection();
+      }
+    }
+    function handleTouchStart(e) {
+      const touch = e.touches[0];
+      const el = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (el && el.classList.contains("cell")) {
+        selecting = true;
+        clearCurrentSelection();
+        addCellToSelection(el);
+      }
+      e.preventDefault();
+    }
+    function handleTouchMove(e) {
+      const touch = e.touches[0];
+      const el = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (selecting && el && el.classList.contains("cell")) {
+        const last = selectedCells[selectedCells.length - 1];
+        if (!selectedCells.includes(el) && el !== last) {
+          addCellToSelection(el);
+        }
+      }
+      e.preventDefault();
+    }
+    function handleTouchEnd(e) {
+      if (selecting) {
+        selecting = false;
+        checkSelection();
+      }
+      e.preventDefault();
+    }
+
+    // === 5. Modal-/Popup-Logik für Multiple-Choice-Fragen ===
+    const modalOverlay   = document.getElementById("modal-overlay");
+    const modalQuestion  = document.getElementById("modal-question");
+    const modalChoices   = document.getElementById("modal-choices");
+    const modalFeedback  = document.getElementById("modal-feedback");
+    const modalSubmit    = document.getElementById("modal-submit");
+    let currentCorrectText = null;
+
+    // Fisher-Yates Shuffle
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function showModalForWord(word) {
+      const data = wordData[word];
+      modalQuestion.innerHTML = `<p>${data.question}</p>`;
+      modalChoices.innerHTML = "";
+
+      // Optionen zu Objekten umwandeln und mischen
+      let options = data.options.map(opt => ({
+        text: opt,
+        isCorrect: opt === data.correctText
+      }));
+      options = shuffleArray(options);
+
+      options.forEach((optObj, idx) => {
+        const label = document.createElement("label");
+        label.style.display = "block";
+        label.style.marginBottom = "6px";
+        const radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = "choice";
+        radio.value = optObj.text;
+        if (idx === 0) radio.checked = true;
+        label.appendChild(radio);
+        label.insertAdjacentHTML("beforeend", ` ${optObj.text}`);
+        modalChoices.appendChild(label);
+      });
+
+      currentCorrectText = data.correctText;
+      modalFeedback.textContent = "";
+      modalOverlay.style.display = "flex";
+    }
+
+    function hideModal() {
+      modalOverlay.style.display = "none";
+    }
+
+    modalSubmit.addEventListener("click", () => {
+      const selected = document.querySelector('input[name="choice"]:checked');
+      if (!selected) return;
+      const chosenText = selected.value;
+      if (chosenText === currentCorrectText) {
+        // Richtig: Zellen dauerhaft markieren
+        currentMatchedCells.forEach(cell => {
+          cell.classList.remove("selected");
+          cell.classList.add("found");
+        });
+        foundWords.add(currentMatchedWord);
+        currentMatchedWord = null;
+        currentMatchedCells = [];
+        modalFeedback.style.color = "green";
+        modalFeedback.textContent = "Richtig!";
+        setTimeout(() => {
+          hideModal();
+          // Prüfen, ob alle Wörter gefunden sind
+          if (foundWords.size === words.length) {
+            document.getElementById("completion-message").style.display = "block";
+          }
+        }, 800);
+      } else {
+        modalFeedback.style.color = "red";
+        modalFeedback.textContent = "Falsch, versuche es erneut.";
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modalOverlay.style.display === "flex") {
+        hideModal();
+      }
+    });
+
+    // === 6. Event-Listener registrieren ===
+    gridContainer.addEventListener("mousedown", handleMouseDown);
+    gridContainer.addEventListener("mouseenter", handleMouseEnter, true);
+    window.addEventListener("mouseup", handleMouseUp);
+    gridContainer.addEventListener("touchstart", handleTouchStart, {passive: false});
+    gridContainer.addEventListener("touchmove", handleTouchMove, {passive: false});
+    window.addEventListener("touchend", handleTouchEnd, {passive: false});
+
+    // === 7. Bei jedem Neuladen: neues Grid generieren und rendern ===
+    // Wenn du während der Session manuell neu sortieren möchtest, rufe einfach:
+    // letterGrid = generateGrid(); renderGrid(letterGrid);
+  </script>
+</body>
+</html>
