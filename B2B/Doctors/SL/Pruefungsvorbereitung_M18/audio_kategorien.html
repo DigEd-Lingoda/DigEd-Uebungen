@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="de" style="background: transparent !important; border: none !important;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio Drag-&-Drop Übung (Feste Positionen)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      font-family: 'Open Sans', sans-serif;
+      margin: 0;
+      padding: 5px;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+    
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 20px;
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    /* Festes 5er-Grid für die Audio-Karten */
+    #audios {
+      display: grid;
+      grid-template-columns: repeat(5, 80px); 
+      gap: 10px; 
+      justify-content: center;
+      width: auto;
+    }
+    
+    #action-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      width: 100%;
+    }
+    
+    #dropzones {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+    }
+    
+    #result {
+      text-align: center;
+      font-size: 1.1em;
+      height: 1.3em;
+      margin: 0;
+      font-weight: bold;
+    }
+
+    /* Ein Slot hält die Position im Grid starr besetzt */
+    .slot {
+      width: 80px;
+      height: 80px;
+    }
+
+    .audio-item, .placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      user-select: none;
+    }
+    
+    .audio-item {
+      border: 2px solid #153BFF;
+      background: #153BFF;
+      color: #fff;
+      font-size: 1.8em;
+      cursor: grab;
+      transition: transform 0.2s;
+    }
+    .audio-item:active {
+      cursor: grabbing;
+    }
+    
+    .dropzone {
+      border: 3px dashed #888;
+      width: 260px;        
+      min-height: 90px;    
+      height: auto;        
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      user-select: none;
+      font-size: 0.9em;
+      color: #333;
+      font-weight: 600;
+      text-align: center;
+      padding: 12px;       
+      box-sizing: border-box;
+      transition: background 0.3s, border-color 0.3s, color 0.3s;
+      white-space: normal;
+      word-wrap: break-word;
+    }
+    
+    .dropzone.over {
+      background-color: #FF33CC;
+      color: #fff;
+      border-color: #FF33CC;
+    }
+    .dropzone.correct-flash {
+      background-color: #FF33CC !important;
+      border-color: #FF33CC !important;
+      color: #fff;
+    }
+    
+    /* Der leere Kasten, der exakt an der alten Stelle liegen bleibt */
+    .placeholder {
+      border: 3px dashed #ccc;
+      background: none;
+      box-sizing: border-box;
+    }
+    
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%,60% { transform: translateX(-6px); }
+      40%,80% { transform: translateX(6px); }
+    }
+    .shake {
+      animation: shake 0.5s;
+      border-color: red;
+    }
+    
+    @media (max-width: 480px) {
+      #audios {
+        grid-template-columns: repeat(3, 70px); 
+        gap: 8px;
+      }
+      .slot {
+        width: 70px;
+        height: 70px;
+      }
+      .audio-item {
+        font-size: 1.4em;
+      }
+      .dropzone {
+        width: 100%; 
+        min-height: 70px;
+        font-size: 0.8em;
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div id="audios"></div>
+    <div id="action-area">
+      <div id="dropzones"></div>
+      <div id="result"></div>
+    </div>
+  </div>
+
+  <script>
+    let isPlaying = false;
+    let activeCardsCount = 0;
+
+    // Kategorien
+    const categories = [
+      { id: "kat_a", name: "Bestätigung des Hauptverdachts" },
+      { id: "kat_b", name: "Ausschluss von Differenzialdiagnosen" }
+    ];
+
+    // 10 Audio-Dateien
+    const audioData = [
+      { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Pruefungsvorbereitung_M18/Audio1.mp3', category: 'kat_a' },
+      { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Pruefungsvorbereitung_M18/Audio2.mp3', category: 'kat_a' },
+      { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Pruefungsvorbereitung_M18/Audio3.mp3', category: 'kat_a' },
+      { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Pruefungsvorbereitung_M18/Audio4.mp3', category: 'kat_a' },
+      { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Pruefungsvorbereitung_M18/Audio5.mp3', category: 'kat_a' },
+      { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Pruefungsvorbereitung_M18/Audio6.mp3', category: 'kat_b' },
+      { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Pruefungsvorbereitung_M18/Audio7.mp3', category: 'kat_b' },
+      { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Pruefungsvorbereitung_M18/Audio8.mp3', category: 'kat_b' },
+      { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Pruefungsvorbereitung_M18/Audio9.mp3', category: 'kat_b' },
+      { src: 'https://raw.githubusercontent.com/DigEd-Lingoda/DigEd-Uebungen/main/B2B/Doctors/SL/Pruefungsvorbereitung_M18/Audio10.mp3', category: 'kat_b' }
+    ];
+
+    const origin = document.getElementById('audios');
+    const dropzoneContainer = document.getElementById('dropzones');
+    const resultBox = document.getElementById('result');
+    activeCardsCount = audioData.length;
+
+    // Dropzones rendern
+    categories.forEach(cat => {
+      const zone = document.createElement('div');
+      zone.className = 'dropzone';
+      zone.id = cat.id;
+      zone.textContent = cat.name;
+      dropzoneContainer.appendChild(zone);
+    });
+
+    const dropzones = document.querySelectorAll('.dropzone');
+
+    // Fisher-Yates Shuffle für die initiale Zufallsanordnung
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function createCard(data, uniqueId) {
+      const card = document.createElement('div');
+      card.className = 'audio-item';
+      card.dataset.src = data.src;
+      card.dataset.category = data.category;
+      card.id = 'item_' + uniqueId;
+      card.textContent = '🔊';
+
+      card.addEventListener('click', () => {
+        if (isPlaying) return;
+        isPlaying = true;
+        const audio = new Audio(card.dataset.src);
+        audio.play();
+        audio.addEventListener('ended', () => { isPlaying = false; });
+      });
+
+      card.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', card.id);
+      });
+      card.draggable = true;
+      return card;
+    }
+
+    // Initiales Generieren, Mischen und festes Platzieren im Grid
+    function initializeGame() {
+      origin.innerHTML = '';
+      
+      // Kopie der Daten erstellen und mit einer ID versehen, damit wir sie mischen können
+      let indexedData = audioData.map((data, index) => ({ data, id: index }));
+      indexedData = shuffleArray(indexedData);
+
+      indexedData.forEach(obj => {
+        // Jeder Slot behält seine feste Koordinate im Grid
+        const slot = document.createElement('div');
+        slot.className = 'slot';
+        slot.id = 'slot_' + obj.id;
+        
+        const card = createCard(obj.data, obj.id);
+        slot.appendChild(card);
+        origin.appendChild(slot);
+      });
+    }
+
+    initializeGame();
+
+    dropzones.forEach(zone => {
+      zone.addEventListener('dragover', e => {
+        e.preventDefault();
+        zone.classList.add('over');
+      });
+      zone.addEventListener('dragleave', () => {
+        zone.classList.remove('over');
+      });
+      zone.addEventListener('drop', e => {
+        e.preventDefault();
+        zone.classList.remove('over');
+        
+        const id = e.dataTransfer.getData('text/plain');
+        const card = document.getElementById(id);
+        if (!card) return;
+        
+        const targetCategory = card.dataset.category;
+        const currentZoneId = zone.id;
+
+        if (targetCategory === currentZoneId) {
+          zone.classList.add('correct-flash');
+          setTimeout(() => zone.classList.remove('correct-flash'), 500);
+
+          // FIX: Anstatt das gesamte Grid neu zu zeichnen, ersetzen wir NUR das gezogene Kärtchen 
+          // in seinem eigenen, festen Slot durch einen gestrichelten Kasten.
+          const parentSlot = card.parentElement;
+          parentSlot.innerHTML = ''; // Karte aus dem Slot werfen
+          
+          const placeholder = document.createElement('div');
+          placeholder.className = 'placeholder';
+          parentSlot.appendChild(placeholder); // Gestrichelten Platzhalter einsetzen
+
+          activeCardsCount--;
+
+          if (activeCardsCount === 0) {
+            resultBox.style.color = 'green';
+            resultBox.textContent = '✔ Super! Du hast alle 10 richtig zugeordnet.';
+          } else {
+            resultBox.style.color = 'green';
+            resultBox.textContent = '✔ Richtig!';
+          }
+        } else {
+          resultBox.style.color = 'red';
+          resultBox.textContent = '❌ Das passt hier nicht hin!';
+          card.classList.add('shake');
+          card.addEventListener('animationend', () => card.classList.remove('shake'), { once: true });
+        }
+
+        setTimeout(() => { resultBox.textContent = ''; }, 2000);
+      });
+    });
+  </script>
+</body>
+</html>
