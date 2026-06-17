@@ -104,10 +104,10 @@
     
     <div class="inputs" id="input-container">
         <label for="seconds-input">Dauer in Sekunden:</label>
-        <input type="number" id="seconds-input" min="1" value="10">
+        <input type="number" id="seconds-input" min="1" value="660">
     </div>
 
-    <div class="display" id="time-display">00:10</div>
+    <div class="display" id="time-display">11:00</div>
 
     <div class="buttons">
         <button class="btn-start" id="start-btn" onclick="startTimer()">Starten</button>
@@ -182,7 +182,7 @@
     function resetTimer() {
         clearInterval(countdown);
         resetTimerState();
-        const totalSeconds = parseInt(secondsInput.value) || 10;
+        const totalSeconds = parseInt(secondsInput.value) || 660;
         timeLeft = totalSeconds;
         display.textContent = formatTime(timeLeft);
     }
@@ -195,7 +195,6 @@
         secondsInput.disabled = false;
     }
 
-    /* AUF 2 SEKUNDEN ANGEPASST */
     function playBeep() {
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -206,18 +205,14 @@
             oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
             
             gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-            
-            // Hält die Lautstärke konstant bis Sekunde 1.8
             gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime + 1.8);
-            
-            // Blendet in den letzten 0.2 Sekunden sanft aus
             gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.0);
 
             oscillator.connect(gainNode);
             gainNode.connect(audioCtx.destination);
 
             oscillator.start();
-            oscillator.stop(audioCtx.currentTime + 2.0); // Stoppt nach 2 Sekunden
+            oscillator.stop(audioCtx.currentTime + 2.0);
         } catch (e) {
             console.error("Audio konnte nicht abgespielt werden:", e);
         }
