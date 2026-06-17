@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timer / Stoppuhr mit Signalton</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 {
+            font-size: 24px;
+            color: #1a365d;
+            margin-bottom: 20px;
+        }
+        .inputs {
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+        }
+        input[type="number"] {
+            width: 80px;
+            padding: 8px;
+            font-size: 16px;
+            border: 2px solid #cbd5e0;
+            border-radius: 6px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input[type="number"]:focus {
+            border-color: #4299e1;
+        }
+        .display {
+            font-size: 48px;
+            font-weight: bold;
+            color: #2d3748;
+            margin: 20px 0;
+            font-variant-numeric: tabular-nums;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        .btn-start {
+            background-color: #153BFF;
+            color: white;
+        }
+        .btn-start:hover {
+            background-color: #0026e6;
+        }
+        .btn-stop {
+            background-color: #e53e3e;
+            color: white;
+        }
+        .btn-stop:hover {
+            background-color: #c53030;
+        }
+        .btn-reset {
+            background-color: #a0aec0;
+            color: white;
+        }
+        .btn-reset:hover {
+            background-color: #718096;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div class="inputs" id="input-container">
+        <label for="seconds-input">Dauer in Sekunden:</label>
+        <input type="number" id="seconds-input" min="1" value="10">
+    </div>
+
+    <div class="display" id="time-display">00:10</div>
+
+    <div class="buttons">
+        <button class="btn-start" id="start-btn" onclick="startTimer()">Starten</button>
+        <button class="btn-stop" id="stop-btn" onclick="stopTimer()" style="display: none;">Stoppen</button>
+        <button class="btn-reset" id="reset-btn" onclick="resetTimer()">Zurücksetzen</button>
+    </div>
+</div>
+
+<script>
+    let countdown;
+    let timeLeft;
+    let isRunning = false;
+
+    const display = document.getElementById('time-display');
+    const inputContainer = document.getElementById('input-container');
+    const secondsInput = document.getElementById('seconds-input');
+    const startBtn = document.getElementById('start-btn');
+    const stopBtn = document.getElementById('stop-btn');
+
+    function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    secondsInput.addEventListener('input', () => {
+        if (!isRunning) {
+            let val = parseInt(secondsInput.value) || 0;
+            display.textContent = formatTime(val);
+        }
+    });
+
+    function startTimer() {
+        if (isRunning) return;
+
+        if (timeLeft === undefined || timeLeft <= 0) {
+            const totalSeconds = parseInt(secondsInput.value);
+            if (isNaN(totalSeconds) || totalSeconds <= 0) {
+                alert("Bitte gib eine gültige Sekundenzahl ein!");
+                return;
+            }
+            timeLeft = totalSeconds;
+        }
+
+        isRunning = true;
+        startBtn.style.display = 'none';
+        stopBtn.style.display = 'inline-block';
+        inputContainer.style.opacity = '0.5';
+        secondsInput.disabled = true;
+
+        display.textContent = formatTime(timeLeft);
+
+        countdown = setInterval(() => {
+            timeLeft--;
+            display.textContent = formatTime(timeLeft);
+
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                playBeep();
+                resetTimerState();
+            }
+        }, 1000);
+    }
+
+    function stopTimer() {
+        clearInterval(countdown);
+        isRunning = false;
+        startBtn.style.display = 'inline-block';
+        stopBtn.style.display = 'none';
+    }
+
+    function resetTimer() {
+        clearInterval(countdown);
+        resetTimerState();
+        const totalSeconds = parseInt(secondsInput.value) || 10;
+        timeLeft = totalSeconds;
+        display.textContent = formatTime(timeLeft);
+    }
+
+    function resetTimerState() {
+        isRunning = false;
+        startBtn.style.display = 'inline-block';
+        stopBtn.style.display = 'none';
+        inputContainer.style.opacity = '1';
+        secondsInput.disabled = false;
+    }
+
+    /* AUF 2 SEKUNDEN ANGEPASST */
+    function playBeep() {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+            
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            
+            // Hält die Lautstärke konstant bis Sekunde 1.8
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime + 1.8);
+            
+            // Blendet in den letzten 0.2 Sekunden sanft aus
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.0);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 2.0); // Stoppt nach 2 Sekunden
+        } catch (e) {
+            console.error("Audio konnte nicht abgespielt werden:", e);
+        }
+    }
+</script>
+
+</body>
+</html>
