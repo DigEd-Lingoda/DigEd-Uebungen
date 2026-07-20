@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fremdanamnese-Szenario</title>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Open Sans', sans-serif; }
+    .page { display: none; }
+    .active { display: block; }
+    .container { max-width: 600px; margin: 50px auto; }
+    h2 { color: #333; }
+    .btn {
+      padding: 8px 16px;
+      margin-top: 10px;
+      background-color: #153BFF;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .message { margin-left: 10px; font-size: 0.9em; color: red; }
+    .message.success { color: green; }
+    form label {
+      display: block;
+      margin: 8px 0;
+      padding-left: 24px;
+      text-indent: -24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Seite 1 -->
+    <div id="page1" class="page active">
+      <h2>Was versteht man unter einer endogenen Infektion?</h2>
+      <form id="form1">
+        <label><input type="radio" name="q1" value="A"> eine Infektion durch Erreger der eigenen Körperflora</label>
+        <label><input type="radio" name="q1" value="B"> eine Infektion, die genetisch bedingt ist</label>
+        <label><input type="radio" name="q1" value="C"> eine Infektion durch Erreger aus der Umwelt</label>
+        <button type="button" class="btn" onclick="validate(1,'A')">Weiter</button>
+        <span id="msg1" class="message"></span>
+      </form>
+    </div>
+
+    <!-- Seite 2 -->
+    <div id="page2" class="page">
+      <h2>Welches Ereignis beschreibt eine exogene Infektion?</h2>
+      <form id="form2">
+        <label><input type="radio" name="q2" value="A"> die Ansteckung mit Influenza durch Tröpfchen eines Besuchers</label>
+        <label><input type="radio" name="q2" value="B"> die Bakterielle Besiedlung einer Wunde mit eigenen Hautkeimen</label>
+        <label><input type="radio" name="q2" value="C"> die Entstehung einer Blasenentzündung durch eigene Darmkeime</label>
+        <button type="button" class="btn" onclick="validate(2,'A')">Weiter</button>
+        <span id="msg2" class="message"></span>
+      </form>
+    </div>
+
+    <!-- Seite 3 -->
+    <div id="page3" class="page">
+      <h2>Welches ist ein klassisches Beispiel für eine endogene Infektion im Pflegealltag?</h2>
+      <form id="form3">
+        <label><input type="radio" name="q3" value="A"> eine Harnwegsentzündung nach dem Legen eines Blasenkatheters</label>
+        <label><input type="radio" name="q3" value="B"> eine Tuberkulose-Erkrankung nach dem Einatmen von Aerosolen</label>
+        <label><input type="radio" name="q3" value="C"> eine Norovirus-Gastroenteritis durch kontaminierte Flächen</label>
+        <button type="button" class="btn" onclick="validate(3,'A')">Weiter</button>
+        <span id="msg3" class="message"></span>
+      </form>
+    </div>
+
+    <!-- Seite 4 -->
+    <div id="page4" class="page">
+      <h2>Wie können Pflegekräfte das Risiko für endogene Infektionen bei Patienten aktiv senken?</h2>
+      <form id="form4">
+        <label><input type="radio" name="q4" value="A"> durch das strikte Einhalten von aseptischen Arbeitstechniken</label>
+        <label><input type="radio" name="q4" value="B"> durch die präventive Gabe von Antibiotika</label>
+        <label><input type="radio" name="q4" value="C"> durch die tägliche Ganzkörperwaschung mit Desinfektionsmitteln</label>
+        <button type="button" class="btn" onclick="validate(4,'A')">Weiter</button>
+        <span id="msg4" class="message"></span>
+      </form>
+    </div>
+
+    <!-- Abschluss -->
+    <div id="success" class="page">
+      <h2>Gut gemacht!</h2>
+      <p>Du hast alle Fragen erfolgreich beantwortet.</p>
+    </div>
+  </div>
+
+  <script>
+    const TOTAL_PAGES = 4; // Dynamisch festgelegt für spätere Erweiterungen
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    function shuffleForm(formId) {
+      const form = document.getElementById(formId);
+      if (!form) return;
+      const labels = Array.from(form.querySelectorAll('label'));
+      shuffle(labels);
+      labels.forEach(label => form.insertBefore(label, form.querySelector('button')));
+    }
+
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      if (id.startsWith('page')) {
+        const num = id.replace('page','');
+        shuffleForm('form' + num);
+      }
+    }
+
+    // Beim Erstanfange nur existierende Formulare mischen
+    for (let i = 1; i <= TOTAL_PAGES; i++) {
+      shuffleForm('form' + i);
+    }
+
+    function validate(page, correct) {
+      const form = document.getElementById('form' + page);
+      const msg = document.getElementById('msg' + page);
+      const sel = form.querySelector('input[name="q' + page + '"]:checked');
+      
+      msg.textContent = '';
+      msg.classList.remove('success');
+
+      if (!sel) { 
+        msg.textContent = 'Bitte wähle eine Antwort aus!'; 
+        return; 
+      }
+
+      if (sel.value === correct) {
+        msg.textContent = 'Super, das war die richtige Antwort!'; 
+        msg.classList.add('success');
+        
+        // Prüft, ob noch Fragen folgen oder die Erfolgsseite gezeigt werden soll
+        setTimeout(() => {
+          if (page < TOTAL_PAGES) {
+            showPage('page' + (page + 1));
+          } else {
+            showPage('success');
+          }
+        }, 1000);
+      } else {
+        msg.textContent = 'Falsch – bitte erneut versuchen.';
+      }
+    }
+  </script>
+</body>
+</html>
