@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Memory-Spiel: Pflegemodelle</title>
+  <title>Memory-Spiel: Pflegemodelle & Schwerpunkte</title>
   <!-- Open Sans einbinden -->
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet"/>
   <style>
@@ -87,7 +87,7 @@
       -moz-hyphens: auto;
       overflow: hidden;
       line-height: 1.2;
-      font-size: 15px;
+      font-size: 14px;
     }
 
     /* Umrandung für aufgedeckte Karten */
@@ -151,7 +151,7 @@
         gap: 10px;
       }
       .card { width: 160px; }
-      .card-back { font-size: 13px; }
+      .card-back { font-size: 12px; }
     }
   </style>
 </head>
@@ -164,13 +164,34 @@
 
   <script>
     const pairs = [
-      ["Florence Nightingale (Umweltmodell)", "Fokus auf saubere Luft, Licht, Wasser & Hygiene"],
-      ["Virginia Henderson (Bedürfnismodell)", "Unterstützung bei 14 grundlegenden Bedürfnissen"],
-      ["Roper-Logan-Tierney", "12 Aktivitäten des täglichen Lebens (ATL)"],
-      ["Monika Krohwinkel (ABEDL)", "13 Bereiche inkl. existenzieller Erfahrungen"],
-      ["Erwin Böhm", "Psychobiografisches Modell & Milieu-Therapie"],
-      ["Madeleine Leininger", "Sunrise Modell & Transkulturelle Pflege"],
-      ["Marie-Luise Friedemann", "Familienorientierte Pflege (Genogramme & Ökomaps)"]
+      [
+        "Umweltmodell (Florence Nightingale)", 
+        "stellt Umweltfaktoren wie saubere Luft, Wasser, Sauberkeit, Licht und Ruhe in den Mittelpunkt der Genesung"
+      ],
+      [
+        "Bedürfnismodell (Virginia Henderson)", 
+        "teilt die Pflegebedürfnisse in 14 grundlegende menschliche Bedürfnisse ein (z. B. Sinn und Religion erleben, Lernen)"
+      ],
+      [
+        "Modell der Aktivitäten des täglichen Lebens / ATL (Liliane Juchli)", 
+        "dient als Leitfaden für die systematische Pflegeplanung anhand von ATL-Kategorien (wie z. B. sich als Mann/Frau fühlen und verhalten)"
+      ],
+      [
+        "Aktivitäten und existenzielle Erfahrungen des Lebens / ABEDL (Monika Krohwinkel)", 
+        "umfasst 13 Bereiche und legt besonderes Augenmerk auf die Erhaltung der Selbstständigkeit und den Umgang mit existenziellen Erfahrungen"
+      ],
+      [
+        "Psychobiografisches Pflegemodell (Erwin Böhm)", 
+        "basiert auf der individuellen Lebensgeschichte sowie der Milieu-Therapie, um Erinnerungen und Fähigkeiten (z. B. bei Demenz) zu aktivieren"
+      ],
+      [
+        "Sunrise Modell / Transkulturelle Pflege (Madeleine Leininger)", 
+        "bezieht kulturelle, religiöse und soziale Faktoren ein, um eine kultursensitive Pflege zu gewährleisten"
+      ],
+      [
+        "Familienorientierte Pflege (Marie-Luise Friedemann)", 
+        "fokussiert sich auf die Einbeziehung des familiären Umfelds sowie das systemische Gleichgewicht und nutzt Instrumente wie Genogramme und Ökomaps"
+      ]
     ];
 
     let cardsArray = [];
@@ -243,7 +264,7 @@
 
           // Wenn alle Paare gefunden sind
           if (matchedPairs === pairs.length) {
-            endMessage.innerText = "Super, du hast alle Pflegemodelle richtig zugeordnet!";
+            endMessage.innerText = "Super, du hast alle Paare gefunden!";
           }
         } else {
           busy = true;
