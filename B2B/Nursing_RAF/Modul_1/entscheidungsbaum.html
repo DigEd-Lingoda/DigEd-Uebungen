@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schritt 6: Evaluation & Dynamik im Pflegeprozess</title>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background: #f0f4f8;
+      padding: 20px;
+      color: #333;
+    }
+    .card {
+      background: #fff;
+      max-width: 750px;
+      margin: 0 auto;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+    h3 {
+      color: #153BFF;
+      margin-top: 0;
+    }
+    .progress-bar {
+      font-size: 14px;
+      font-weight: bold;
+      color: #666;
+      margin-bottom: 15px;
+    }
+    .scenario {
+      background: #eef2ff;
+      border-left: 4px solid #153BFF;
+      padding: 15px;
+      margin-bottom: 20px;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    button.opt-btn {
+      padding: 12px 15px;
+      font-size: 14px;
+      border: 2px solid #cbd5e0;
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      text-align: left;
+      line-height: 1.4;
+      transition: all 0.2s;
+    }
+    button.opt-btn:hover {
+      border-color: #153BFF;
+      background: #f8fafc;
+    }
+    #feedback {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 1.5;
+      display: none;
+    }
+    .next-btn {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #153BFF;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      display: none;
+    }
+    .next-btn:hover {
+      background: #0026e6;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h3>Schritt 6: Evaluation in der Pflegepraxis</h3>
+  <div class="progress-bar" id="progress">Situation 1 von 6</div>
+  
+  <div class="scenario" id="scenario-text">
+    <!-- Dynamischer Inhalt -->
+  </div>
+
+  <div class="btn-group" id="options-container">
+    <!-- Dynamische Optionen -->
+  </div>
+
+  <div id="feedback"></div>
+  <button class="next-btn" id="next-btn" onclick="nextQuestion()">Nächste Situation</button>
+</div>
+
+<script>
+  const questions = [
+    {
+      text: "<strong>Situation 1:</strong> Frau Bauer sollte nach ihrer Hüft-OP bis zum 10.05. mit Unterstützung 10 Meter am Rollator gehen. Bei der heutigen Re-Evaluation (10.05.) stellt die Pflegekraft fest: Frau Bauer geht bereits mühelos 30 Meter alleine und ist schmerzfrei. Wie reagierst du?",
+      options: [
+        { text: "A) Das Ziel wird als 'erreicht' evaluiert und der Pflegeplan bleibt so bestehen, da die Maßnahme gut funktioniert hat.", correct: false, reason: "Falsch. Die Pflegeplanung ist dynamisch! Wenn ein Ziel übertroffen wird, muss das Ziel angepasst werden, um neue Ressourcen zu fördern." },
+        { text: "B) Die Maßnahme wird gestrichen und beendet, da Frau Bauer den Rollator nicht mehr benötigt.", correct: false, reason: "Falsch. Eine Maßnahme wird nicht einfach ohne Anpassung/Evaluierung gestrichen. Es muss ein neues Ziel mit angepasster Maßnahme festgelegt werden." },
+        { text: "C) Das Ziel wird als 'erreicht' evaluiert. Das Ziel und die Maßnahmen werden angepasst, um z. B. Spaziergänge im Garten zur weiteren Selbstständigkeit zu fördern.", correct: true, reason: "Richtig! Die Pflegeplanung ist flexibel. Da Frau Bauer neue Fähigkeiten hat, werden Wünsche, Ziele und Maßnahmen aktualisiert." },
+        { text: "D) Da das Ziel erreicht wurde, schließt die Pflegekraft die Maßnahme ab und führt erst nach 4 Wochen das nächste Assessment durch.", correct: false, reason: "Falsch. Nach Erreichen des Ziels muss der Pflegeprozess direkt neu angepasst und fortgeführt werden." }
+      ]
+    },
+    {
+      text: "<strong>Situation 2:</strong> Für Herrn Kaluza war geplant: <i>'Ist nach 1 Woche sturzfrei und schmerzfrei mobil'</i>. Nach einer Woche gibt er bei der Schmerzeinschätzung (NRS) immer noch Schmerzstufe 6 an und traut sich nicht aufzustehen. Wie gehst du vor?",
+      options: [
+        { text: "A) Die Maßnahme wird als fehlgeschlagen dokumentiert und die Mobilisation wird beendet, um den Patienten zu schonen.", correct: false, reason: "Falsch. Das Ziel wird nicht einfach aufgegeben. Bei Nicht-Erreichen müssen Ursachen analysiert und Maßnahmen verändert werden." },
+        { text: "B) Es wird evaluiert, warum das Ziel nicht erreicht wurde. Zusammen mit dem Arzt wird die Schmerztherapie angepasst und das Nahziel angepasst.", correct: true, reason: "Richtig! Die Evaluation prüft Wirkungen. Bei Schmerzen muss erst die Ursache (Schmerztherapie) angepasst werden, um das Mobilisationsziel erreichbar zu machen." },
+        { text: "C) Die Mobilisation wird weiter wie geplant durchgeführt, da Herr Kaluza sich an den festgelegten Pflegeplan halten sollte.", correct: false, reason: "Falsch. Der Pflegeplan ist nicht statisch. Wenn Schmerzen die Mobilisation verhindern, muss der Plan angepasst werden." },
+        { text: "D) Das Ziel wird im Pflegeplan gelöscht und als 'nicht erreichbar' in die Anamnese zurückübertragen.", correct: false, reason: "Falsch. Nicht erreichte Ziele bleiben im Pflegeprozess bestehen und werden neu evaluiert und angepasst." }
+      ]
+    },
+    {
+      text: "<strong>Situation 3:</strong> Frau Stern (85 Jahre) erholt sich gut von einer Lungenentzündung. Beim heutigen Dekubitus-Assessment im Rahmen der Evaluation bemerkt die Pflegekraft jedoch eine Rötung am Steißbein, die auf Druck nicht abblasst. Was bedeutet das für den Pflegeprozess?",
+      options: [
+        { text: "A) Die Rötung wird im Pflegebericht notiert. Der Pflegeplan für die Lungenentzündung läuft unverändert weiter.", correct: false, reason: "Falsch. Es ist ein neues kritisches Risiko aufgetreten, das sofort in den Pflegeprozess integriert werden muss." },
+        { text: "B) Bei der Evaluation wird erkannt, dass ein neues potenzielles/aktuelles Pflegeproblem (Dekubitus) vorliegt. Der Pflegeplan muss sofort um ein neues Ziel und Prophylaxe-Maßnahmen ergänzt werden.", correct: true, reason: "Richtig! Evaluationen dienen auch dazu, Veränderungen und neue Risiken frühzeitig zu erkennen und den Plan dynamisch zu erweitern." },
+        { text: "C) Die Pflegekraft wartet die morgige ärztliche Visite ab, bevor Anpassungen im Pflegeplan vorgenommen werden dürfen.", correct: false, reason: "Falsch. Pflegefachkräfte müssen bei pflegerischen Risiken (wie Dekubitus) sofort eigenständig pflegerische Prophylaxen einleiten." },
+        { text: "D) Da das Hauptziel (Lungenentzündung) noch nicht evaluiert ist, dürfen keine neuen Maßnahmen in den bestehenden Plan aufgenommen werden.", correct: false, reason: "Falsch. Der Pflegeprozess ist fortlaufend und nimmt neue Probleme jederzeit auf." }
+      ]
+    },
+    {
+      text: "<strong>Situation 4:</strong> Bei der Dienstübergabe berichtet eine Pflegekraft, dass Herr Meier beim Waschen vollständig übernommen werden musste. Im aktuellen Barthel-Index (Assessment) vor 2 Tagen steht jedoch, dass er den Oberkörper selbstständig wäscht. Wie evaluiert die Pflegefachkraft diese Situation?",
+      options: [
+        { text: "A) Das schriftliche Assessment ist ein standardisiertes Instrument und gilt daher automatisch als die einzig richtige Information.", correct: false, reason: "Falsch. Das Assessment ist nur ein Hilfsmittel und muss mit aktuellen Beobachtungen und Gesprächen abgeglichen werden." },
+        { text: "B) Der Eintrag der Kollegin aus der Übergabe wird ignoriert, da Tagesformschwankungen in der Evaluation nicht berücksichtigt werden müssen.", correct: false, reason: "Falsch. Tagesform und Veränderungen müssen beobachtet und hinterfragt werden." },
+        { text: "C) Sie sucht das Gespräch mit Herrn Meier und beobachtet die Maßnahme, um zu klären, ob ein vorübergehendes Problem oder ein dauerhafter Verlust von Fähigkeiten vorliegt.", correct: true, reason: "Richtig! Evaluation erfordert das Zusammenspiel aus Beobachtung, Übergabe und Re-Assessment, um Ursachen zu ermitteln." },
+        { text: "D) Die Pflegekraft ändert das Pflegemodell  auf 'vollständige Übernahme', um den Personalbedarf anzupassen, und den Pflegeanforderungen gerecht zu werden.", correct: false, reason: "Falsch. Eine voreilige Übernahme zerstört vorhandene Ressourcen des Pflegeempfängers." }
+      ]
+    },
+    {
+      text: "<strong>Situation 5:</strong> Bei der wöchentlichen multiprofessionellen Visite berichtet die Ergotherapeutin, dass Frau Berg gelernt hat, spezialisiertes Besteck zu nutzen. Die Pflegekraft füttert Frau Berg beim Mittagessen jedoch weiterhin vollständig. Welcher Fehler könnte hier vorliegen?",
+      options: [
+        { text: "A) Die Ergotherapeutin hätte die Maßnahme selbstständig in den Pflegedokumentationsbogen eintragen müssen.", correct: false, reason: "Falsch. Die Führung des Pflegeprozesses obliegt der Pflegefachkraft." },
+        { text: "B) Es liegt kein Fehler vor, da die Pflegekraft in der Spätschicht keine Zeit für Anleitungen beim Essen hat.", correct: false, reason: "Falsch. Ressourcenförderung hat Vorrang vor Zeitersparnis." },
+        { text: "C) Die Evaluation bei der Visite wurde nicht in den Pflegealltag übertragen. Das Pflegeziel und die Maßnahme wurden nicht angepasst.", correct: true, reason: "Richtig! Evaluation findet auch in Visiten statt. Neue Erkenntnisse anderer Berufsgruppen müssen genutzt werden, um Maßnahmen zur Selbstständigkeit anzupassen." },
+        { text: "D) Frau Berg hätte der Pflegekraft selbst mitteilen müssen, dass sie das neue Besteck nutzen möchte.", correct: false, reason: "Falsch. Es ist Aufgabe der PFK, Entwicklungen zu evaluieren und anzuwenden." }
+      ]
+    },
+    {
+      text: "<strong>Situation 6:</strong> Herr Hoffmann hat das Ziel: <i>'Nimmt täglich an der Seniorengruppe im Heim teil'</i>. Nach 2 Wochen sagt er der Pflegekraft: 'Ich möchte dort nicht mehr hin, das ist mir zu laut. Ich lese lieber ruhig in meinem Zimmer.' Wie sollte die PFK reagieren?",
+      options: [
+        { text: "A) Das Ziel bleibt im Pflegeplan, da soziale Kontakte wissenschaftlich nachgewiesen wichtig für die Psyche sind.", correct: false, reason: "Falsch. Ziele müssen individuell akzeptiert sein. Der Wille des Pflegeempfängers steht im Mittelpunkt." },
+        { text: "B) Die PFK evaluiert das Ziel als 'nicht mehr bedürfnisgerecht'. In Absprache wird das Ziel angepasst.", correct: true, reason: "Richtig! Die Pflegeplanung ist dynamisch und orientiert sich an den subjektiven Wünschen und geänderten Bedürfnissen der Person." },
+        { text: "C) Die Maßnahme wird gestrichen und Herr Hoffmann wird künftig im Pflegebericht als 'unkooperativ' dokumentiert.", correct: false, reason: "Falsch. Das Äußern von Wünschen ist kein unkooperatives Verhalten, sondern Grundlage individueller Pflege." },
+        { text: "D) Die PFK motiviert Herrn Hoffmann solange weiter, bis der Bewertungszeitraum des Pflegeziels nach 4 Wochen abgelaufen ist.", correct: false, reason: "Falsch. Wenn ein Ziel nicht mehr akzeptiert wird, wird die Evaluation sofort durchgeführt und nicht bis zum Fristende abgewartet." }
+      ]
+    }
+  ];
+
+  let currentQ = 0;
+
+  function loadQuestion() {
+    const q = questions[currentQ];
+    document.getElementById('progress').innerText = `Situation ${currentQ + 1} von ${questions.length}`;
+    document.getElementById('scenario-text').innerHTML = q.text;
+    
+    const container = document.getElementById('options-container');
+    container.innerHTML = '';
+    
+    const feedback = document.getElementById('feedback');
+    feedback.style.display = 'none';
+    
+    const nextBtn = document.getElementById('next-btn');
+    nextBtn.style.display = 'none';
+
+    q.options.forEach((opt, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'opt-btn';
+      btn.innerText = opt.text;
+      btn.onclick = () => checkAnswer(idx);
+      container.appendChild(btn);
+    });
+  }
+
+  function checkAnswer(selectedIdx) {
+    const q = questions[currentQ];
+    const selectedOpt = q.options[selectedIdx];
+    const feedback = document.getElementById('feedback');
+    const buttons = document.querySelectorAll('.opt-btn');
+
+    buttons.forEach(b => b.disabled = true);
+
+    feedback.style.display = 'block';
+    if (selectedOpt.correct) {
+      feedback.style.background = '#dcfce7';
+      feedback.style.color = '#166534';
+      feedback.innerHTML = `<strong>Richtig!</strong> ${selectedOpt.reason}`;
+    } else {
+      feedback.style.background = '#fee2e2';
+      feedback.style.color = '#991b1b';
+      feedback.innerHTML = `<strong>Nicht ganz richtig!</strong> ${selectedOpt.reason}`;
+    }
+
+    const nextBtn = document.getElementById('next-btn');
+    if (currentQ < questions.length - 1) {
+      nextBtn.innerText = "Nächste Situation";
+      nextBtn.style.display = 'inline-block';
+    } else {
+      nextBtn.innerText = "Übung abgeschlossen!";
+      nextBtn.style.display = 'inline-block';
+    }
+  }
+
+  function nextQuestion() {
+    if (currentQ < questions.length - 1) {
+      currentQ++;
+      loadQuestion();
+    } else {
+      alert("Hervorragend! Du hast alle 6 Situationen zur Evaluation erfolgreich bearbeitet.");
+    }
+  }
+
+  // Erstes Laden
+  loadQuestion();
+</script>
+
+</body>
+</html>
