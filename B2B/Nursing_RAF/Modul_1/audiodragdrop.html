@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maslow-Bedürfnispyramide Training</title>
+    <style>
+        :root {
+            --primary-blue: #153BFF;
+            --success-green: #28a745;
+            --error-red: #dc3545;
+            --bg: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Open Sans', Arial, sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h2 { color: var(--primary-blue); margin-bottom: 5px; }
+
+        .main-container {
+            display: flex;
+            gap: 25px;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        /* Audio Bank links */
+        .audio-bank {
+            flex: 1;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .audio-card {
+            background: #fff;
+            border: 2px solid #dee2e6;
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            user-select: none;
+        }
+
+        .audio-card:hover { border-color: var(--primary-blue); background: #f0f4ff; }
+        .audio-card.playing { border-color: var(--primary-blue); background: #eef2ff; font-weight: bold; }
+        .audio-card.hidden { opacity: 0.2; pointer-events: none; filter: grayscale(1); }
+
+        .play-icon {
+            font-size: 1.1rem;
+        }
+
+        /* Maslow-Stufen rechts */
+        .maslow-list {
+            flex: 1.5;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .maslow-row {
+            display: flex;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            min-height: 85px;
+            overflow: hidden;
+            border: 1px solid #eee;
+        }
+
+        .maslow-number {
+            background-color: var(--primary-blue);
+            color: #ffffff;
+            width: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+
+        .maslow-label {
+            width: 170px;
+            padding: 10px 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            font-size: 0.85rem;
+            border-right: 1px solid #f0f0f0;
+            flex-shrink: 0;
+        }
+
+        .maslow-label b { font-size: 1rem; color: #333; }
+
+        .drop-zone {
+            flex-grow: 1;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            justify-content: center;
+            background: #fff;
+            transition: 0.3s;
+            min-height: 65px;
+        }
+
+        .drop-zone.drag-over { background: #f0f4ff; box-shadow: inset 0 0 10px rgba(0,0,255,0.1); }
+        .drop-zone.complete { background: #e8f5e9; }
+
+        .dropped-item {
+            background: #eef2ff;
+            border: 1px solid var(--primary-blue);
+            color: #153BFF;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        #feedback { 
+            margin-top: 20px; 
+            font-weight: bold; 
+            font-size: 1.2rem; 
+            min-height: 1.5em; 
+            text-align: center;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .feedback-success-final {
+            background-color: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <!-- Audio Bank links -->
+        <div class="audio-bank" id="audioBank"></div>
+
+        <!-- 5 Maslow Stufen rechts -->
+        <div class="maslow-list">
+            <div class="maslow-row">
+                <div class="maslow-number">1</div>
+                <div class="maslow-label"><b>Grundbedürfnisse</b></div>
+                <div class="drop-zone" data-accept="1"></div>
+            </div>
+            <div class="maslow-row">
+                <div class="maslow-number">2</div>
+                <div class="maslow-label"><b>Sicherheits-bedürfnisse</b></div>
+                <div class="drop-zone" data-accept="2"></div>
+            </div>
+            <div class="maslow-row">
+                <div class="maslow-number">3</div>
+                <div class="maslow-label"><b>Soziale Bedürfnisse</b></div>
+                <div class="drop-zone" data-accept="3"></div>
+            </div>
+            <div class="maslow-row">
+                <div class="maslow-number">4</div>
+                <div class="maslow-label"><b>Wertschätzung</b></div>
+                <div class="drop-zone" data-accept="4"></div>
+            </div>
+            <div class="maslow-row">
+                <div class="maslow-number">5</div>
+                <div class="maslow-label"><b>Selbst-verwirklichung</b></div>
+                <div class="drop-zone" data-accept="5"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="feedback"></div>
+
+    <script>
+        const audioData = [
+            { id: '1', match: '1', text: 'Audio', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
+            { id: '2', match: '1', text: 'Audio', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
+            { id: '3', match: '2', text: 'Audio', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
+            { id: '4', match: '2', text: 'Audio', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
+            { id: '5', match: '3', text: 'Audio', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3' },
+            { id: '6', match: '3', text: 'Audio', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3' },
+            { id: '7', match: '4', text: 'Audio', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3' }
+        ];
+
+        let currentAudio = null;
+        let currentCardId = null;
+        let solvedCount = 0;
+
+        function init() {
+            const bank = document.getElementById('audioBank');
+            [...audioData].sort(() => Math.random() - 0.5).forEach(data => {
+                const card = document.createElement('div');
+                card.className = 'audio-card';
+                card.draggable = true;
+                card.id = 'card-' + data.id;
+                card.innerHTML = `<span><span class="play-icon" id="icon-${data.id}">▶</span> ${data.text}</span> <span>🔊</span>`;
+                
+                card.addEventListener('dragstart', e => e.dataTransfer.setData('text', data.id));
+                card.addEventListener('click', () => toggleAudio(data.id, data.url));
+                bank.appendChild(card);
+            });
+
+            // Dynamische Berechnung der Gesamtzahl pro Stufe
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                const targetStage = zone.dataset.accept;
+                const totalMatching = audioData.filter(d => d.match === targetStage).length;
+                zone.dataset.total = totalMatching;
+            });
+        }
+
+        function toggleAudio(id, url) {
+            const card = document.getElementById('card-' + id);
+            const icon = document.getElementById('icon-' + id);
+
+            if (currentCardId === id && currentAudio) {
+                if (!currentAudio.paused) {
+                    currentAudio.pause();
+                    card.classList.remove('playing');
+                    icon.innerText = '▶';
+                    return;
+                } else {
+                    currentAudio.play();
+                    card.classList.add('playing');
+                    icon.innerText = '⏸';
+                    return;
+                }
+            }
+
+            if (currentAudio) {
+                currentAudio.pause();
+                if (currentCardId) {
+                    const prevCard = document.getElementById('card-' + currentCardId);
+                    const prevIcon = document.getElementById('icon-' + currentCardId);
+                    if (prevCard) prevCard.classList.remove('playing');
+                    if (prevIcon) prevIcon.innerText = '▶';
+                }
+            }
+
+            currentAudio = new Audio(url);
+            currentCardId = id;
+            card.classList.add('playing');
+            icon.innerText = '⏸';
+
+            currentAudio.play().catch(e => console.log("Audioabspielen verhindert:", e));
+
+            currentAudio.onended = () => {
+                card.classList.remove('playing');
+                icon.innerText = '▶';
+                currentAudio = null;
+                currentCardId = null;
+            };
+        }
+
+        document.querySelectorAll('.drop-zone').forEach(zone => {
+            zone.addEventListener('dragover', e => {
+                e.preventDefault();
+                zone.classList.add('drag-over');
+            });
+            zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+            zone.addEventListener('drop', e => {
+                e.preventDefault();
+                zone.classList.remove('drag-over');
+                
+                const id = e.dataTransfer.getData('text');
+                const data = audioData.find(d => d.id === id);
+
+                if (!data) return;
+
+                const feedback = document.getElementById('feedback');
+                feedback.className = ''; // Reset CSS-Klassen
+
+                if (data.match === zone.dataset.accept) {
+                    if (currentCardId === id && currentAudio) {
+                        currentAudio.pause();
+                        currentAudio = null;
+                        currentCardId = null;
+                    }
+
+                    const droppedElem = document.createElement('div');
+                    droppedElem.className = 'dropped-item';
+                    droppedElem.innerHTML = `✓ ${data.text}`;
+                    zone.appendChild(droppedElem);
+
+                    document.getElementById('card-' + id).classList.add('hidden');
+
+                    solvedCount++;
+
+                    const currentCount = zone.querySelectorAll('.dropped-item').length;
+                    const requiredTotal = parseInt(zone.dataset.total);
+                    
+                    if (requiredTotal > 0 && currentCount >= requiredTotal) {
+                        zone.classList.add('complete');
+                    }
+
+                    // Überprüfung, ob alle Karten gelöst wurden
+                    if (solvedCount === audioData.length) {
+                        feedback.innerText = "Super, du hast alles richtig zugeordnet!";
+                        feedback.classList.add('feedback-success-final');
+                    } else {
+                        feedback.innerText = `Richtig! "${data.text}" passt zu Stufe ${zone.dataset.accept}.`;
+                        feedback.style.color = "var(--success-green)";
+                    }
+                } else {
+                    feedback.innerText = `Das gehört nicht zu Stufe ${zone.dataset.accept}. Versuche es noch einmal!`;
+                    feedback.style.color = "var(--error-red)";
+                }
+            });
+        });
+
+        init();
+    </script>
+</body>
+</html>
