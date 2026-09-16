@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vokabelübung: Wort-Scramble mit Quiz</title>
+  <!-- Open Sans einbinden -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Open Sans', sans-serif;
+      margin: 2em auto;
+      padding: 1em;
+    }
+    h1 {
+      text-align: center;
+    }
+    #exercise {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 1.5em;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    #scrambled-word {
+      font-size: 1.6em;
+      font-weight: bold;
+      margin: 0.8em 0;
+      text-align: center;
+      overflow-wrap: break-word;
+      color: #9900CC;
+    }
+    input[type="text"] {
+      width: 100%;
+      max-width: 100%;
+      padding: 0.6em;
+      font-size: 1em;
+      margin-bottom: 0.8em;
+      font-family: 'Open Sans', sans-serif;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5em;
+    }
+    .controls button, #modal-submit, #restart-btn {
+      padding: 0.6em 1.2em;
+      font-size: 1em;
+      font-family: 'Open Sans', sans-serif;
+      background-color: #9900CC;
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .controls button:hover, #modal-submit:hover, #restart-btn:hover {
+      background-color: #770099;
+    }
+    .controls button:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+    .controls span {
+      flex: 1 1 auto;
+      overflow-wrap: break-word;
+      font-weight: bold;
+    }
+    #restart-btn {
+      display: none;
+      margin: 1em auto 0 auto;
+    }
+
+    /* Modal / Quiz Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal {
+      background-color: #fff;
+      padding: 24px;
+      border-radius: 8px;
+      width: 500px;
+      max-width: 90%;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    .modal h3 {
+      margin-top: 0;
+      font-size: 1.2em;
+    }
+    .modal .choices {
+      margin-top: 12px;
+    }
+    .modal label {
+      display: block;
+      margin-bottom: 8px;
+      cursor: pointer;
+      line-height: 1.4;
+    }
+    .modal .feedback {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="exercise">
+    <p id="scrambled-word">–</p>
+    <input id="answer" type="text" placeholder="Lösung eingeben">
+    <div class="controls">
+      <button id="check-btn">Überprüfen</button>
+      <span id="feedback"></span>
+    </div>
+    <button id="restart-btn">Nochmal versuchen</button>
+  </div>
+
+  <!-- Modal-Overlay für die Multiple-Choice-Frage -->
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal">
+      <form id="modal-form">
+        <div id="modal-question"></div>
+        <div class="choices" id="modal-choices"></div>
+        <div class="feedback" id="modal-feedback"></div>
+        <button type="button" id="modal-submit">Antwort prüfen</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // === 1. Begriffs- und Quiz-Datenbank ===
+    const wordData = {
+      "Pflegebericht": {
+        correct: "Teil der Pflegedokumentation für Auffälligkeiten/Abweichungen",
+        options: [
+          "Teil der Pflegedokumentation für Auffälligkeiten/Abweichungen",
+          "Standardisierte Erfassung des individuellen täglichen Pflegebedarfs",
+          "Rechtlich bindendes Übergabeprotokoll bei Schichtwechsel",
+          "Zusammenfassender Bericht für den Medizinischen Dienst bei Pflegegradeinstufung"
+        ]
+      },
+      "Pflegecharta": {
+        correct: "Charta der Rechte hilfe- und pflegebedürftiger Menschen (8 Artikel)",
+        options: [
+          "Charta der Rechte hilfe- und pflegebedürftiger Menschen (8 Artikel)",
+          "Ethik-Richtlinie der Weltgesundheitsorganisation für Pflegekräfte",
+          "Verbindliche Tarifvereinbarung für Angestellte in der Pflegepraxis",
+          "Katalog zur Bemessung der Personalausstattung in Pflegeheimen"
+        ]
+      },
+      "Pflegediagnose": {
+        correct: "Standardisierte, wissenschaftlich geprüfte Formulierung eines Pflegeproblems",
+        options: [
+          "Standardisierte, wissenschaftlich geprüfte Formulierung eines Pflegeproblems",
+          "Ärztliche Feststellung einer behandlungsbedürftigen Erkrankung",
+          "Einschätzung der Pflegebedürftigkeit durch den Medizinischen Dienst",
+          "Ergebnis der Erstaufnahmeuntersuchung bei Heimeinzug"
+        ]
+      },
+      "Pflegeempfänger": {
+        correct: "Allgemeiner Begriff für die zu pflegende Person",
+        options: [
+          "Allgemeiner Begriff für die zu pflegende Person",
+          "Pflegekraft, die Anweisungen der Pflegedienstleitung entgegennimmt",
+          "Kostenträger, der für die Abrechnung von Pflegeleistungen zuständig ist",
+          "Bevollmächtigte Person für rechtliche Entscheidungen des Patienten"
+        ]
+      },
+      "Pflegefachkraft": {
+        correct: "Ausgebildete, anerkannte Fachkraft mit Vorbehaltsaufgaben",
+        options: [
+          "Ausgebildete, anerkannte Fachkraft mit Vorbehaltsaufgaben",
+          "Pflegekraft nach Absolvierung eines einjährigen Grundkurses",
+          "Leitende Person einer Pflegeeinrichtung mit betriebswirtschaftlicher Qualifikation",
+          "Person mit akademischem Abschluss in Pflegewissenschaften"
+        ]
+      },
+      "Pflegekammer": {
+        correct: "Berufsständische Interessenvertretung der Pflegefachkräfte",
+        options: [
+          "Berufsständische Interessenvertretung der Pflegefachkräfte",
+          "Staatliche Prüfungsbehörde für Ausbildungsabschlüsse in der Pflege",
+          "Gewerkschaftliche Ausrichtung zur Verhandlung von Pflegetarifen",
+          "Schlichtungsstelle bei Behandlungsfehlern in Pflegeeinrichtungen"
+        ]
+      },
+      "Pflegeprozess": {
+        correct: "Systematischer, zielgerichteter Problemlösungsprozess in der Pflege",
+        options: [
+          "Systematischer, zielgerichteter Problemlösungsprozess in der Pflege",
+          "Ablaufplan für die tägliche Grundpflege im Früh- und Spätdienst",
+          "Gesetzlich vorgegebenes Verfahren zur Feststellung von Pflegegraden",
+          "Strukturierte Einarbeitung neuer Mitarbeiter in einer Pflegeeinrichtung"
+        ]
+      },
+      "Pflegequalität": {
+        correct: "Übereinstimmung von geplanter und tatsächlich geleisteter Pflege",
+        options: [
+          "Übereinstimmung von geplanter und tatsächlich geleisteter Pflege",
+          "Note der MDK-Prüfung für stationäre Altenhilfeeinrichtungen",
+          "Prozentuale Zufriedenheit der Angehörigen mit der Pflegekraft",
+          "Verhältnis zwischen Pflegepersonal und Anzahl der Bewohner"
+        ]
+      },
+      "Pflegestandard": {
+        correct: "Hausinterne, schriftlich festgelegte Regel zur Durchführung einer Maßnahme",
+        options: [
+          "Hausinterne, schriftlich festgelegte Regel zur Durchführung einer Maßnahme",
+          "Bundesweit einheitliche Vorgabe des DNQP zur Prophylaxenanwendung",
+          "Gesetzliche Mindestanforderung für die Raumgröße in Pflegeheimen",
+          "Leitlinie der medizinischen Fachgesellschaften zur Wundversorgung"
+        ]
+      },
+      "Pflegevisite": {
+        correct: "Regelmäßiger strukturierter Austausch zwischen PFK und PE zur Überprüfung der Pflege",
+        options: [
+          "Regelmäßiger strukturierter Austausch zwischen PFK und PE zur Überprüfung der Pflege",
+          "Ärztliche Visite zur Anordnung von Medikamenten und Behandlungspflege",
+          "Prüfung der Pflegedokumentation durch die Pflegedienstleitung",
+          "Überwachungsbesuch der Heimaufsicht in einer Wohngruppe"
+        ]
+      },
+      "Pflegewissenschaft": {
+        correct: "Wissenschaftliche Disziplin, die Pflegepraxis erforscht und begründet",
+        options: [
+          "Wissenschaftliche Disziplin, die Pflegepraxis erforscht und begründet",
+          "Teilbereich der Medizin zur Erforschung von Alterserkrankungen",
+          "Lehre von der betriebswirtschaftlichen Führung von Pflegeheimen",
+          "Soziologisches Forschungsfeld zum Fachkräftemangel im Gesundheitswesen"
+        ]
+      },
+      "Prophylaxe": {
+        correct: "Vorbeugende Maßnahme (z. B. Dekubitus-, Sturzprophylaxe)",
+        options: [
+          "Vorbeugende Maßnahme (z. B. Dekubitus-, Sturzprophylaxe)",
+          "Therapeutische Behandlung zur Linderung bestehender Symptome",
+          "Standardisierte Pflegediagnose nach NANDA-International",
+          "Rehabilitationsmaßnahme nach Wiederherstellung der Gehfähigkeit"
+        ]
+      },
+      "Ressource": {
+        correct: "Fähigkeit/Stärke/Möglichkeit, die eine Person zur Problembewältigung nutzen kann",
+        options: [
+          "Fähigkeit/Stärke/Möglichkeit, die eine Person zur Problembewältigung nutzen kann",
+          "Finanzieller Hilfsfonds der Pflegekasse für Hilfsmittelversorgungen",
+          "Personelle Kapazität des Pflegedienstes für Zusatzleistungen",
+          "Medizinisch-technische Ausstattung einer Pflegeeinrichtung"
+        ]
+      },
+      "Screening": {
+        correct: "Systematische Erfassung von Risikofaktoren vor Problementstehung",
+        options: [
+          "Systematische Erfassung von Risikofaktoren vor Problementstehung",
+          "Abschließende Evaluation einer durchgeführten Pflegemaßnahme",
+          "Kontinuierliche Überwachung der Vitalparameter bei Intensivpatienten",
+          "Ersterhebung des Hilfebedarfs beim Aufnahmegespräch"
+        ]
+      }
+    };
+
+    const words = Object.keys(wordData);
+    let remaining = [], currentWord = "", attemptsLeft = 3, correctCount = 0;
+
+    // === 2. Hilfsfunktionen ===
+    function scramble(word) {
+      const letters = word.split("");
+      for (let i = letters.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [letters[i], letters[j]] = [letters[j], letters[i]];
+      }
+      return letters.join("");
+    }
+
+    function shuffleArray(arr) {
+      const array = [...arr];
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    // === 3. Ablauf-Logik ===
+    function loadNext() {
+      const fb = document.getElementById("feedback");
+      const answerEl = document.getElementById("answer");
+      const checkBtn = document.getElementById("check-btn");
+      const restartBtn = document.getElementById("restart-btn");
+
+      fb.textContent = "";
+      answerEl.value = "";
+      checkBtn.disabled = false;
+      answerEl.disabled = false;
+      attemptsLeft = 3;
+
+      if (remaining.length === 0) {
+        document.getElementById("scrambled-word").textContent = "Super, du hast alles beantwortet!";
+        fb.style.color = "black";
+        fb.textContent = `Du hattest ${correctCount} von ${words.length} Aufgaben komplett richtig.`;
+        answerEl.disabled = true;
+        checkBtn.disabled = true;
+        restartBtn.style.display = "block"; // Restart-Button anzeigen
+        return;
+      }
+
+      const idx = Math.floor(Math.random() * remaining.length);
+      currentWord = remaining.splice(idx, 1)[0];
+      let scrambled = scramble(currentWord);
+      while (scrambled.toLowerCase() === currentWord.toLowerCase()) {
+        scrambled = scramble(currentWord);
+      }
+      document.getElementById("scrambled-word").textContent = scrambled;
+    }
+
+    function checkAnswer() {
+      const answerEl = document.getElementById("answer");
+      const checkBtn = document.getElementById("check-btn");
+      const fb = document.getElementById("feedback");
+
+      const ans = answerEl.value.trim().toLowerCase();
+      checkBtn.disabled = true;
+      answerEl.disabled = true;
+
+      if (ans === currentWord.toLowerCase()) {
+        fb.style.color = "green";
+        fb.textContent = "Wort richtig! Bitte wähle nun die passende Definition:";
+        setTimeout(() => {
+          showQuizModal(currentWord);
+        }, 600);
+      } else {
+        attemptsLeft--;
+        if (attemptsLeft > 0) {
+          fb.style.color = "red";
+          fb.textContent = `Leider falsch. Du hast noch ${attemptsLeft} Versuch${attemptsLeft > 1 ? 'e' : ''}.`;
+          checkBtn.disabled = false;
+          answerEl.disabled = false;
+        } else {
+          fb.style.color = "red";
+          fb.textContent = `Keine Versuche mehr. Das gesuchte Wort war "${currentWord}".`;
+          setTimeout(loadNext, 2500);
+        }
+      }
+    }
+
+    // === 4. Modal / Multiple Choice Logik ===
+    const modalOverlay  = document.getElementById("modal-overlay");
+    const modalQuestion = document.getElementById("modal-question");
+    const modalChoices  = document.getElementById("modal-choices");
+    const modalFeedback = document.getElementById("modal-feedback");
+    const modalSubmit   = document.getElementById("modal-submit");
+    let currentCorrectDefinition = "";
+
+    function showQuizModal(word) {
+      const data = wordData[word];
+      currentCorrectDefinition = data.correct;
+
+      modalQuestion.innerHTML = `<h3>Welche Definition passt zu <strong>„${word}“</strong>?</h3>`;
+      modalChoices.innerHTML = "";
+      modalFeedback.textContent = "";
+
+      const shuffledOptions = shuffleArray(data.options);
+
+      shuffledOptions.forEach((optText, idx) => {
+        const label = document.createElement("label");
+        const radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = "def-choice";
+        radio.value = optText;
+        if (idx === 0) radio.checked = true;
+
+        label.appendChild(radio);
+        label.insertAdjacentHTML("beforeend", ` ${optText}`);
+        modalChoices.appendChild(label);
+      });
+
+      modalOverlay.style.display = "flex";
+    }
+
+    function hideQuizModal() {
+      modalOverlay.style.display = "none";
+    }
+
+    modalSubmit.addEventListener("click", () => {
+      const selected = document.querySelector('input[name="def-choice"]:checked');
+      if (!selected) return;
+
+      if (selected.value === currentCorrectDefinition) {
+        modalFeedback.style.color = "green";
+        modalFeedback.textContent = "Richtig!";
+        correctCount++;
+        setTimeout(() => {
+          hideQuizModal();
+          loadNext();
+        }, 1000);
+      } else {
+        modalFeedback.style.color = "red";
+        modalFeedback.textContent = "Falsch, versuche es erneut.";
+      }
+    });
+
+    // === 5. Event Listener & Initialisierung ===
+    document.getElementById("check-btn").addEventListener("click", checkAnswer);
+    document.getElementById("answer").addEventListener("keyup", e => {
+      if (e.key === "Enter" && !document.getElementById("check-btn").disabled) {
+        checkAnswer();
+      }
+    });
+
+    document.getElementById("restart-btn").addEventListener("click", init);
+
+    function init() {
+      remaining = [...words];
+      correctCount = 0;
+      document.getElementById("restart-btn").style.display = "none";
+      loadNext();
+    }
+
+    init();
+  </script>
+</body>
+</html>
