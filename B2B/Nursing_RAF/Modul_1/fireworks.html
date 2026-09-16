@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Geschafft! Feuerwerk 🎆</title>
+  <!-- 1) Open Sans laden -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    /* Vollbild-Canvas über allem, aber klickdurchlässig */
+    #fireworks-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    /* Dein Abschluss-Text zentriert, mit Open Sans */
+    .message {
+      position: relative;
+      margin-top: 40vh;
+      text-align: center;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 2rem;
+      color: #9900CC; /* Auf Lila geändert */
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="fireworks-canvas"></canvas>
+  <div class="message">
+    Herzlichen Glückwunsch!<br>
+    Du hast das Modul beendet!
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <script>
+    const canvas = document.getElementById('fireworks-canvas');
+    const myConfetti = confetti.create(canvas, { resize: true, useWorker: true });
+
+    function launchFireworkBurst() {
+      [150, 80, 40].forEach((count, i) => {
+        setTimeout(() => {
+          myConfetti({
+            particleCount: count,
+            spread: 140 - i * 20,
+            startVelocity: 55 + i * 15,
+            decay: 0.9,
+            ticks: 120 - i * 20,
+            scalar: 2 - (i * 0.3), // Größere Partikel
+            // Streuung direkt um die Schrift herum
+            origin: { 
+              x: 0.5 + (Math.random() * 0.4 - 0.2), // x zwischen 0.3 und 0.7
+              y: 0.45 + (Math.random() * 0.2 - 0.1) // y zwischen 0.35 und 0.55
+            }
+          });
+        }, i * 400);
+      });
+    }
+
+    window.addEventListener('load', () => {
+      // Entzerrtes Timing: Explosionen alle 2 bis 2,5 Sekunden
+      launchFireworkBurst();
+      setTimeout(launchFireworkBurst, 2000);
+      setTimeout(launchFireworkBurst, 4500);
+      setTimeout(launchFireworkBurst, 7000);
+      setTimeout(launchFireworkBurst, 9500);
+    });
+  </script>
+</body>
+</html>
