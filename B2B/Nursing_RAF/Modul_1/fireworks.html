@@ -31,7 +31,7 @@
   <canvas id="fireworks-canvas"></canvas>
   <div class="message">
     Herzlichen Glückwunsch!<br>
-    Du hast das Modul beendet!
+    Du hast alles geschafft!
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
@@ -49,7 +49,7 @@
             decay: 0.9,
             ticks: 120 - i * 20,
             scalar: 2 - (i * 0.3), // Größere Partikel
-            // Streuung direkt um die Schrift herum
+            // Großzügigere Streuung direkt um die Schrift herum
             origin: { 
               x: 0.5 + (Math.random() * 0.4 - 0.2), // x zwischen 0.3 und 0.7
               y: 0.45 + (Math.random() * 0.2 - 0.1) // y zwischen 0.35 und 0.55
@@ -60,12 +60,11 @@
     }
 
     window.addEventListener('load', () => {
-      // Entzerrtes Timing: Explosionen alle 2 bis 2,5 Sekunden
+      // Sofort starten
       launchFireworkBurst();
-      setTimeout(launchFireworkBurst, 2000);
-      setTimeout(launchFireworkBurst, 4500);
-      setTimeout(launchFireworkBurst, 7000);
-      setTimeout(launchFireworkBurst, 9500);
+      
+      // Endlos alle 2.5 Sekunden neu starten
+      setInterval(launchFireworkBurst, 2500);
     });
   </script>
 </body>
