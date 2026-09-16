@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="de" style="background: transparent !important; border: none !important;">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Drag & Drop Stapel-Spiel: Pflegebegriffe</title>
+  <!-- Open Sans einbinden -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    html, body, iframe {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Open Sans', sans-serif;
+      padding: 20px;
+      color: #333;
+    }
+
+    .game-wrapper {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .instruction {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 15px;
+      color: #444;
+    }
+
+    /* Grid-Layout für die offenen Karten */
+    .matching-game {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      width: 100%;
+      margin-bottom: 25px;
+    }
+
+    .card-slot {
+      position: relative;
+      min-height: 110px;
+    }
+
+    .card {
+      width: 100%;
+      height: 100%;
+      min-height: 110px;
+      background: #ffffff;
+      border: 2px solid #9900CC;
+      border-radius: 8px;
+      padding: 10px;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      cursor: grab;
+      user-select: none;
+      font-size: 13px;
+      line-height: 1.3;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s, border-color 0.3s;
+      word-wrap: break-word;
+      hyphens: auto;
+    }
+
+    .card.term {
+      font-weight: 700;
+      color: #9900CC;
+      background: #f7e6ff;
+    }
+
+    .card.dragging {
+      opacity: 0.6;
+      cursor: grabbing;
+    }
+
+    .card-slot.drag-over .card {
+      border-color: #ff00ff;
+      background: #faf0ff;
+      transform: scale(1.03);
+    }
+
+    /* Gestapelter Zustand bei Erfolg */
+    .card-slot.stacked {
+      position: relative;
+    }
+
+    .card-slot.stacked .card.base-card {
+      background: #e8f5e9;
+      border-color: #28a745;
+      color: #155724;
+      cursor: default;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .card-slot.stacked .card.top-card {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      width: 100%;
+      height: 100%;
+      background: #28a745;
+      border-color: #1e7e34;
+      color: #ffffff;
+      cursor: default;
+      z-index: 2;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    /* Mismatch Animtion & Rote Farbe */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    .card.mismatch {
+      animation: shake 0.5s ease-in-out;
+      border-color: #ff0000 !important;
+      background-color: #ffe6e6 !important;
+      color: #cc0000 !important;
+    }
+
+    #end-message {
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: #28a745;
+      margin-bottom: 15px;
+      min-height: 25px;
+    }
+
+    #restart {
+      display: block;
+      margin: 0 auto;
+      padding: 10px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      background: #9900CC;
+      color: #ffffff;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(153,0,204,0.2);
+    }
+
+    #restart:hover {
+      opacity: 0.9;
+    }
+
+    @media (max-width: 768px) {
+      .matching-game {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .card {
+        font-size: 12px;
+        min-height: 100px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-wrapper">
+    
+    <div class="matching-game" id="game"></div>
+    <div id="end-message"></div>
+    <button id="restart">Noch einmal spielen!</button>
+  </div>
+
+  <script>
+    const pairsData = [
+      ["ABEDL", "Aktivitäten, Beziehungen und existenzielle Erfahrungen des Lebens (Pflegemodell nach Krohwinkel)"],
+      ["ATL", "Aktivitäten des täglichen Lebens (Pflegemodell nach Juchli/Roper-Logan-Tierney)"],
+      ["Anamnese / Anamnesebogen", "Informationssammlung zu Beginn der Pflege mittels strukturiertem Dokument"],
+      ["Assessment", "Standardisiertes Instrument zur Einschätzung einer Pflegesituation"],
+      ["Ätiologie", "Ursache/Einflussfaktor eines Problems (das „Ä“ in P-Ä-S-R)"],
+      ["Barthel-Index", "Assessment zur Selbstständigkeit bei Alltagsaktivitäten"],
+      ["Bewohner:in (Bew.)", "Person in einer Langzeitpflegeeinrichtung"],
+      ["CIRS", "Critical Incident Reporting System – anonymes Meldesystem für kritische Ereignisse"],
+      ["Defizitbescheid", "Bescheid, der festlegt, in welchen Kompetenzbereichen eine Person geprüft wird / Wissenslücken bestehen"],
+      ["Dekubitus", "Druckgeschwür durch anhaltenden Druck auf die Haut"],
+      ["DNQP", "Deutsches Netzwerk für Qualitätsentwicklung in der Pflege – entwickelt Expertenstandards"],
+      ["Donabedian-Modell", "Qualitätsmodell mit Struktur-, Prozess- und Ergebnisqualität"],
+      ["Entlassungsmanagement", "Planung und Koordination der Entlassung von Pflegeempfänger:innen"],
+      ["Erwartungshorizont", "Musterlösung/Bewertungsraster zu einer Prüfungs- oder Fallaufgabe"],
+      ["Evaluation", "Überprüfung/Bewertung der Wirksamkeit von Pflegemaßnahmen"],
+      ["Evidence-based Nursing (EBN)", "Pflege auf Basis wissenschaftlicher Erkenntnisse"]
+    ];
+
+    const gameBoard = document.getElementById('game');
+    const restartBtn = document.getElementById('restart');
+    const endMessage = document.getElementById('end-message');
+
+    let draggedCard = null;
+    let matchedCount = 0;
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function initGame() {
+      gameBoard.innerHTML = '';
+      endMessage.innerText = '';
+      matchedCount = 0;
+      draggedCard = null;
+
+      let allCards = [];
+      pairsData.forEach((pair, index) => {
+        allCards.push({ id: index, text: pair[0], isTerm: true });
+        allCards.push({ id: index, text: pair[1], isTerm: false });
+      });
+
+      shuffle(allCards);
+
+      allCards.forEach((cardData, idx) => {
+        const slot = document.createElement('div');
+        slot.className = 'card-slot';
+        slot.dataset.slotIndex = idx;
+
+        const card = document.createElement('div');
+        card.className = `card ${cardData.isTerm ? 'term' : 'def'}`;
+        card.draggable = true;
+        card.innerText = cardData.text;
+        card.dataset.pairId = cardData.id;
+
+        // Drag & Drop Events
+        card.addEventListener('dragstart', handleDragStart);
+        card.addEventListener('dragend', handleDragEnd);
+
+        slot.addEventListener('dragover', handleDragOver);
+        slot.addEventListener('dragleave', handleDragLeave);
+        slot.addEventListener('drop', handleDrop);
+
+        slot.appendChild(card);
+        gameBoard.appendChild(slot);
+      });
+    }
+
+    function handleDragStart(e) {
+      if (this.parentElement.classList.contains('stacked')) {
+        e.preventDefault();
+        return;
+      }
+      draggedCard = this;
+      this.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', this.dataset.pairId);
+    }
+
+    function handleDragEnd() {
+      if (draggedCard) {
+        draggedCard.classList.remove('dragging');
+        draggedCard = null;
+      }
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      if (!this.classList.contains('stacked') && draggedCard && !this.contains(draggedCard)) {
+        this.classList.add('drag-over');
+      }
+    }
+
+    function handleDragLeave() {
+      this.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      this.classList.remove('drag-over');
+
+      if (!draggedCard || this.classList.contains('stacked') || this.contains(draggedCard)) {
+        return;
+      }
+
+      const targetCard = this.querySelector('.card');
+      if (!targetCard) return;
+
+      const draggedId = draggedCard.dataset.pairId;
+      const targetId = targetCard.dataset.pairId;
+
+      if (draggedId === targetId) {
+        // MATCH! -> Stapel bilden
+        const sourceSlot = draggedCard.parentElement;
+        
+        // Ziel-Slot als gestapelt markieren
+        this.classList.add('stacked');
+        targetCard.classList.add('base-card');
+        
+        // Gezogene Karte in den Ziel-Slot verschieben
+        draggedCard.classList.remove('dragging', 'term', 'def');
+        draggedCard.classList.add('top-card');
+        draggedCard.draggable = false;
+        targetCard.draggable = false;
+        
+        this.appendChild(draggedCard);
+
+        // Ursprungs-Slot leeren / ausblenden
+        sourceSlot.style.visibility = 'hidden';
+
+        matchedCount++;
+
+        if (matchedCount === pairsData.length) {
+          endMessage.innerText = "Perfekt! Du hast alle Begriffe erfolgreich als Stapel zugeordnet! 🎉";
+        }
+      } else {
+        // NO MATCH -> Zeitlich begrenztes rot schütteln
+        const currentDragged = draggedCard;
+        
+        targetCard.classList.add('mismatch');
+        currentDragged.classList.add('mismatch');
+
+        setTimeout(() => {
+          targetCard.classList.remove('mismatch');
+          currentDragged.classList.remove('mismatch');
+        }, 600);
+      }
+    }
+
+    restartBtn.addEventListener('click', initGame);
+
+    // Spiel beim Laden starten
+    initGame();
+  </script>
+</body>
+</html>
