@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio-Reihenfolge: Anamnesegespräch</title>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #9900CC;
+    }
+
+    p.instruction {
+      font-size: 0.95em;
+      color: #555;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .drag-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .drag-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #fff;
+      border: 2px solid #e0e0e0;
+      padding: 12px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      cursor: grab;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+
+    .drag-item:active {
+      cursor: grabbing;
+      background-color: #f9f9f9;
+    }
+
+    .drag-item.dragging {
+      opacity: 0.5;
+      border-color: #9900CC;
+    }
+
+    .handle {
+      font-size: 1.4em;
+      color: #888;
+      user-select: none;
+      padding: 0 4px;
+    }
+
+    .item-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    select.title-select {
+      font-family: 'Open Sans', sans-serif;
+      font-size: 0.95em;
+      font-weight: 600;
+      padding: 8px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      outline: none;
+      background-color: #fff;
+      color: #333;
+    }
+
+    audio {
+      width: 100%;
+      height: 36px;
+    }
+
+    .drag-item.correct {
+      border-color: #28a745;
+      background-color: #f0fff4;
+    }
+
+    .drag-item.incorrect {
+      border-color: #dc3545;
+      background-color: #fff0f0;
+    }
+
+    .controls {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    button.check-btn {
+      font-family: 'Open Sans', sans-serif;
+      font-size: 1em;
+      font-weight: 700;
+      background-color: #9900CC;
+      color: #ffffff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button.check-btn:hover {
+      background-color: #770099;
+    }
+
+    #result {
+      font-weight: 700;
+      font-size: 0.95em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Anamnesegespräch: Reihenfolge & Zuordnung</h2>
+    <p class="instruction">
+      1. Höre dir die Hörbeispiele an.<br>
+      2. Wähle für jedes Audio den passenden <strong>Teil der Anamnese</strong> aus.<br>
+      3. Bringe die Karten per Drag-and-Drop in die <strong>richtige Reihenfolge des Gesprächs (Schritte 1–11)</strong>.
+    </p>
+
+    <ul class="drag-list" id="audio-list">
+      
+      <!-- Element ID 4 -->
+      <li class="drag-item" draggable="true" data-id="4">
+        <span class="handle">☰</span>
+        <div class="item-content">
+          <select class="title-select">
+            <option value="">-- Teil der Anamnese wählen --</option>
+            <option value="Allergien & Unverträglichkeiten">Allergien & Unverträglichkeiten</option>
+            <option value="Aktuelle Anamnese (Einstieg / Leitsymptom)">Aktuelle Anamnese (Einstieg / Leitsymptom)</option>
+            <option value="Sozialanamnese">Sozialanamnese</option>
+            <option value="Vorstellung der eigenen Person & Gesprächseinleitung">Vorstellung der eigenen Person & Gesprächseinleitung</option>
+            <option value="Familienanamnese (mit Überleitung)">Familienanamnese (mit Überleitung)</option>
+            <option value="Medizinische Vorgeschichte (Eigenanamnese)">Medizinische Vorgeschichte (Eigenanamnese)</option>
+            <option value="Patientendaten / Identitätsabgleich">Patientendaten / Identitätsabgleich</option>
+            <option value="Vegetative Anamnese">Vegetative Anamnese</option>
+            <option value="Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)">Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)</option>
+            <option value="Noxen">Noxen</option>
+            <option value="Medikamentenanamnese">Medikamentenanamnese</option>
+          </select>
+          <audio controls><source src="https://raw.githubusercontent.com/LingodaStacy/Content/main/aufgabe4.mp3" type="audio/mp3"></audio>
+        </div>
+      </li>
+
+      <!-- Element ID 1 -->
+      <li class="drag-item" draggable="true" data-id="1">
+        <span class="handle">☰</span>
+        <div class="item-content">
+          <select class="title-select">
+            <option value="">-- Teil der Anamnese wählen --</option>
+            <option value="Allergien & Unverträglichkeiten">Allergien & Unverträglichkeiten</option>
+            <option value="Aktuelle Anamnese (Einstieg / Leitsymptom)">Aktuelle Anamnese (Einstieg / Leitsymptom)</option>
+            <option value="Sozialanamnese">Sozialanamnese</option>
+            <option value="Vorstellung der eigenen Person & Gesprächseinleitung">Vorstellung der eigenen Person & Gesprächseinleitung</option>
+            <option value="Familienanamnese (mit Überleitung)">Familienanamnese (mit Überleitung)</option>
+            <option value="Medizinische Vorgeschichte (Eigenanamnese)">Medizinische Vorgeschichte (Eigenanamnese)</option>
+            <option value="Patientendaten / Identitätsabgleich">Patientendaten / Identitätsabgleich</option>
+            <option value="Vegetative Anamnese">Vegetative Anamnese</option>
+            <option value="Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)">Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)</option>
+            <option value="Noxen">Noxen</option>
+            <option value="Medikamentenanamnese">Medikamentenanamnese</option>
+          </select>
+          <audio controls><source src="https://raw.githubusercontent.com/LingodaStacy/Content/main/aufgabe1.mp3" type="audio/mp3"></audio>
+        </div>
+      </li>
+
+      <!-- Element ID 7 -->
+      <li class="drag-item" draggable="true" data-id="7">
+        <span class="handle">☰</span>
+        <div class="item-content">
+          <select class="title-select">
+            <option value="">-- Teil der Anamnese wählen --</option>
+            <option value="Allergien & Unverträglichkeiten">Allergien & Unverträglichkeiten</option>
+            <option value="Aktuelle Anamnese (Einstieg / Leitsymptom)">Aktuelle Anamnese (Einstieg / Leitsymptom)</option>
+            <option value="Sozialanamnese">Sozialanamnese</option>
+            <option value="Vorstellung der eigenen Person & Gesprächseinleitung">Vorstellung der eigenen Person & Gesprächseinleitung</option>
+            <option value="Familienanamnese (mit Überleitung)">Familienanamnese (mit Überleitung)</option>
+            <option value="Medizinische Vorgeschichte (Eigenanamnese)">Medizinische Vorgeschichte (Eigenanamnese)</option>
+            <option value="Patientendaten / Identitätsabgleich">Patientendaten / Identitätsabgleich</option>
+            <option value="Vegetative Anamnese">Vegetative Anamnese</option>
+            <option value="Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)">Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)</option>
+            <option value="Noxen">Noxen</option>
+            <option value="Medikamentenanamnese">Medikamentenanamnese</option>
+          </select>
+          <audio controls><source src="https://raw.githubusercontent.com/LingodaStacy/Content/main/aufgabe7.mp3" type="audio/mp3"></audio>
+        </div>
+      </li>
+
+      <!-- Element ID 2 -->
+      <li class="drag-item" draggable="true" data-id="2">
+        <span class="handle">☰</span>
+        <div class="item-content">
+          <select class="title-select">
+            <option value="">-- Teil der Anamnese wählen --</option>
+            <option value="Allergien & Unverträglichkeiten">Allergien & Unverträglichkeiten</option>
+            <option value="Aktuelle Anamnese (Einstieg / Leitsymptom)">Aktuelle Anamnese (Einstieg / Leitsymptom)</option>
+            <option value="Sozialanamnese">Sozialanamnese</option>
+            <option value="Vorstellung der eigenen Person & Gesprächseinleitung">Vorstellung der eigenen Person & Gesprächseinleitung</option>
+            <option value="Familienanamnese (mit Überleitung)">Familienanamnese (mit Überleitung)</option>
+            <option value="Medizinische Vorgeschichte (Eigenanamnese)">Medizinische Vorgeschichte (Eigenanamnese)</option>
+            <option value="Patientendaten / Identitätsabgleich">Patientendaten / Identitätsabgleich</option>
+            <option value="Vegetative Anamnese">Vegetative Anamnese</option>
+            <option value="Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)">Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)</option>
+            <option value="Noxen">Noxen</option>
+            <option value="Medikamentenanamnese">Medikamentenanamnese</option>
+          </select>
+          <audio controls><source src="https://raw.githubusercontent.com/LingodaStacy/Content/main/aufgabe2.mp3" type="audio/mp3"></audio>
+        </div>
+      </li>
+
+      <!-- Element ID 10 -->
+      <li class="drag-item" draggable="true" data-id="10">
+        <span class="handle">☰</span>
+        <div class="item-content">
+          <select class="title-select">
+            <option value="">-- Teil der Anamnese wählen --</option>
+            <option value="Allergien & Unverträglichkeiten">Allergien & Unverträglichkeiten</option>
+            <option value="Aktuelle Anamnese (Einstieg / Leitsymptom)">Aktuelle Anamnese (Einstieg / Leitsymptom)</option>
+            <option value="Sozialanamnese">Sozialanamnese</option>
+            <option value="Vorstellung der eigenen Person & Gesprächseinleitung">Vorstellung der eigenen Person & Gesprächseinleitung</option>
+            <option value="Familienanamnese (mit Überleitung)">Familienanamnese (mit Überleitung)</option>
+            <option value="Medizinische Vorgeschichte (Eigenanamnese)">Medizinische Vorgeschichte (Eigenanamnese)</option>
+            <option value="Patientendaten / Identitätsabgleich">Patientendaten / Identitätsabgleich</option>
+            <option value="Vegetative Anamnese">Vegetative Anamnese</option>
+            <option value="Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)">Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)</option>
+            <option value="Noxen">Noxen</option>
+            <option value="Medikamentenanamnese">Medikamentenanamnese</option>
+          </select>
+          <audio controls><source src="https://raw.githubusercontent.com/LingodaStacy/Content/main/aufgabe10.mp3" type="audio/mp3"></audio>
+        </div>
+      </li>
+
+      <!-- Element ID 3 -->
+      <li class="drag-item" draggable="true" data-id="3">
+        <span class="handle">☰</span>
+        <div class="item-content">
+          <select class="title-select">
+            <option value="">-- Teil der Anamnese wählen --</option>
+            <option value="Allergien & Unverträglichkeiten">Allergien & Unverträglichkeiten</option>
+            <option value="Aktuelle Anamnese (Einstieg / Leitsymptom)">Aktuelle Anamnese (Einstieg / Leitsymptom)</option>
+            <option value="Sozialanamnese">Sozialanamnese</option>
+            <option value="Vorstellung der eigenen Person & Gesprächseinleitung">Vorstellung der eigenen Person & Gesprächseinleitung</option>
+            <option value="Familienanamnese (mit Überleitung)">Familienanamnese (mit Überleitung)</option>
+            <option value="Medizinische Vorgeschichte (Eigenanamnese)">Medizinische Vorgeschichte (Eigenanamnese)</option>
+            <option value="Patientendaten / Identitätsabgleich">Patientendaten / Identitätsabgleich</option>
+            <option value="Vegetative Anamnese">Vegetative Anamnese</option>
+            <option value="Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)">Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)</option>
+            <option value="Noxen">Noxen</option>
+            <option value="Medikamentenanamnese">Medikamentenanamnese</option>
+          </select>
+          <audio controls><source src="https://raw.githubusercontent.com/LingodaStacy/Content/main/aufgabe3.mp3" type="audio/mp3"></audio>
+        </div>
+      </li>
+
+      <!-- Element ID 5 -->
+      <li class="drag-item" draggable="true" data-id="5">
+        <span class="handle">☰</span>
+        <div class="item-content">
+          <select class="title-select">
+            <option value="">-- Teil der Anamnese wählen --</option>
+            <option value="Allergien & Unverträglichkeiten">Allergien & Unverträglichkeiten</option>
+            <option value="Aktuelle Anamnese (Einstieg / Leitsymptom)">Aktuelle Anamnese (Einstieg / Leitsymptom)</option>
+            <option value="Sozialanamnese">Sozialanamnese</option>
+            <option value="Vorstellung der eigenen Person & Gesprächseinleitung">Vorstellung der eigenen Person & Gesprächseinleitung</option>
+            <option value="Familienanamnese (mit Überleitung)">Familienanamnese (mit Überleitung)</option>
+            <option value="Medizinische Vorgeschichte (Eigenanamnese)">Medizinische Vorgeschichte (Eigenanamnese)</option>
+            <option value="Patientendaten / Identitätsabgleich">Patientendaten / Identitätsabgleich</option>
+            <option value="Vegetative Anamnese">Vegetative Anamnese</option>
+            <option value="Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)">Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)</option>
+            <option value="Noxen">Noxen</option>
+            <option value="Medikamentenanamnese">Medikamentenanamnese</option>
+          </select>
+          <audio controls><source src="https://raw.githubusercontent.com/LingodaStacy/Content/main/aufgabe5.mp3" type="audio/mp3"></audio>
+        </div>
+      </li>
+
+      <!-- Element ID 8 -->
+      <li class="drag-item" draggable="true" data-id="8">
+        <span class="handle">☰</span>
+        <div class="item-content">
+          <select class="title-select">
+            <option value="">-- Teil der Anamnese wählen --</option>
+            <option value="Allergien & Unverträglichkeiten">Allergien & Unverträglichkeiten</option>
+            <option value="Aktuelle Anamnese (Einstieg / Leitsymptom)">Aktuelle Anamnese (Einstieg / Leitsymptom)</option>
+            <option value="Sozialanamnese">Sozialanamnese</option>
+            <option value="Vorstellung der eigenen Person & Gesprächseinleitung">Vorstellung der eigenen Person & Gesprächseinleitung</option>
+            <option value="Familienanamnese (mit Überleitung)">Familienanamnese (mit Überleitung)</option>
+            <option value="Medizinische Vorgeschichte (Eigenanamnese)">Medizinische Vorgeschichte (Eigenanamnese)</option>
+            <option value="Patientendaten / Identitätsabgleich">Patientendaten / Identitätsabgleich</option>
+            <option value="Vegetative Anamnese">Vegetative Anamnese</option>
+            <option value="Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)">Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)</option>
+            <option value="Noxen">Noxen</option>
+            <option value="Medikamentenanamnese">Medikamentenanamnese</option>
+          </select>
+          <audio controls><source src="https://raw.githubusercontent.com/LingodaStacy/Content/main/aufgabe8.mp3" type="audio/mp3"></audio>
+        </div>
+      </li>
+
+      <!-- Element ID 6 -->
+      <li class="drag-item" draggable="true" data-id="6">
+        <span class="handle">☰</span>
+        <div class="item-content">
+          <select class="title-select">
+            <option value="">-- Teil der Anamnese wählen --</option>
+            <option value="Allergien & Unverträglichkeiten">Allergien & Unverträglichkeiten</option>
+            <option value="Aktuelle Anamnese (Einstieg / Leitsymptom)">Aktuelle Anamnese (Einstieg / Leitsymptom)</option>
+            <option value="Sozialanamnese">Sozialanamnese</option>
+            <option value="Vorstellung der eigenen Person & Gesprächseinleitung">Vorstellung der eigenen Person & Gesprächseinleitung</option>
+            <option value="Familienanamnese (mit Überleitung)">Familienanamnese (mit Überleitung)</option>
+            <option value="Medizinische Vorgeschichte (Eigenanamnese)">Medizinische Vorgeschichte (Eigenanamnese)</option>
+            <option value="Patientendaten / Identitätsabgleich">Patientendaten / Identitätsabgleich</option>
+            <option value="Vegetative Anamnese">Vegetative Anamnese</option>
+            <option value="Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)">Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)</option>
+            <option value="Noxen">Noxen</option>
+            <option value="Medikamentenanamnese">Medikamentenanamnese</option>
+          </select>
+          <audio controls><source src="https://raw.githubusercontent.com/LingodaStacy/Content/main/aufgabe6.mp3" type="audio/mp3"></audio>
+        </div>
+      </li>
+
+      <!-- Element ID 11 -->
+      <li class="drag-item" draggable="true" data-id="11">
+        <span class="handle">☰</span>
+        <div class="item-content">
+          <select class="title-select">
+            <option value="">-- Teil der Anamnese wählen --</option>
+            <option value="Allergien & Unverträglichkeiten">Allergien & Unverträglichkeiten</option>
+            <option value="Aktuelle Anamnese (Einstieg / Leitsymptom)">Aktuelle Anamnese (Einstieg / Leitsymptom)</option>
+            <option value="Sozialanamnese">Sozialanamnese</option>
+            <option value="Vorstellung der eigenen Person & Gesprächseinleitung">Vorstellung der eigenen Person & Gesprächseinleitung</option>
+            <option value="Familienanamnese (mit Überleitung)">Familienanamnese (mit Überleitung)</option>
+            <option value="Medizinische Vorgeschichte (Eigenanamnese)">Medizinische Vorgeschichte (Eigenanamnese)</option>
+            <option value="Patientendaten / Identitätsabgleich">Patientendaten / Identitätsabgleich</option>
+            <option value="Vegetative Anamnese">Vegetative Anamnese</option>
+            <option value="Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)">Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)</option>
+            <option value="Noxen">Noxen</option>
+            <option value="Medikamentenanamnese">Medikamentenanamnese</option>
+          </select>
+          <audio controls><source src="https://raw.githubusercontent.com/LingodaStacy/Content/main/aufgabe11.mp3" type="audio/mp3"></audio>
+        </div>
+      </li>
+
+      <!-- Element ID 9 -->
+      <li class="drag-item" draggable="true" data-id="9">
+        <span class="handle">☰</span>
+        <div class="item-content">
+          <select class="title-select">
+            <option value="">-- Teil der Anamnese wählen --</option>
+            <option value="Allergien & Unverträglichkeiten">Allergien & Unverträglichkeiten</option>
+            <option value="Aktuelle Anamnese (Einstieg / Leitsymptom)">Aktuelle Anamnese (Einstieg / Leitsymptom)</option>
+            <option value="Sozialanamnese">Sozialanamnese</option>
+            <option value="Vorstellung der eigenen Person & Gesprächseinleitung">Vorstellung der eigenen Person & Gesprächseinleitung</option>
+            <option value="Familienanamnese (mit Überleitung)">Familienanamnese (mit Überleitung)</option>
+            <option value="Medizinische Vorgeschichte (Eigenanamnese)">Medizinische Vorgeschichte (Eigenanamnese)</option>
+            <option value="Patientendaten / Identitätsabgleich">Patientendaten / Identitätsabgleich</option>
+            <option value="Vegetative Anamnese">Vegetative Anamnese</option>
+            <option value="Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)">Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)</option>
+            <option value="Noxen">Noxen</option>
+            <option value="Medikamentenanamnese">Medikamentenanamnese</option>
+          </select>
+          <audio controls><source src="https://raw.githubusercontent.com/LingodaStacy/Content/main/aufgabe9.mp3" type="audio/mp3"></audio>
+        </div>
+      </li>
+
+    </ul>
+
+    <div class="controls">
+      <button class="check-btn" onclick="checkOrderAndTitles()">Ergebnis prüfen</button>
+      <span id="result"></span>
+    </div>
+  </div>
+
+  <script>
+    const correctSolutions = {
+      "1": { correctPos: 0, correctTitle: "Vorstellung der eigenen Person & Gesprächseinleitung" },
+      "2": { correctPos: 1, correctTitle: "Patientendaten / Identitätsabgleich" },
+      "3": { correctPos: 2, correctTitle: "Aktuelle Anamnese (Einstieg / Leitsymptom)" },
+      "4": { correctPos: 3, correctTitle: "Aktuelle Anamnese (Schmerzpräzisierung / OPQRST)" },
+      "5": { correctPos: 4, correctTitle: "Vegetative Anamnese" },
+      "6": { correctPos: 5, correctTitle: "Medizinische Vorgeschichte (Eigenanamnese)" },
+      "7": { correctPos: 6, correctTitle: "Medikamentenanamnese" },
+      "8": { correctPos: 7, correctTitle: "Allergien & Unverträglichkeiten" },
+      "9": { correctPos: 8, correctTitle: "Noxen" },
+      "10": { correctPos: 9, correctTitle: "Familienanamnese (mit Überleitung)" },
+      "11": { correctPos: 10, correctTitle: "Sozialanamnese" }
+    };
+
+    const list = document.getElementById('audio-list');
+    let draggedItem = null;
+
+    list.addEventListener('dragstart', (e) => {
+      if (e.target.classList.contains('drag-item')) {
+        draggedItem = e.target;
+        e.target.classList.add('dragging');
+      }
+    });
+
+    list.addEventListener('dragend', (e) => {
+      if (e.target.classList.contains('drag-item')) {
+        e.target.classList.remove('dragging');
+        draggedItem = null;
+      }
+    });
+
+    list.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      const afterElement = getDragAfterElement(list, e.clientY);
+      if (afterElement == null) {
+        list.appendChild(draggedItem);
+      } else {
+        list.insertBefore(draggedItem, afterElement);
+      }
+    });
+
+    function getDragAfterElement(container, y) {
+      const draggableElements = [...container.querySelectorAll('.drag-item:not(.dragging)')];
+      return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child };
+        } else {
+          return closest;
+        }
+      }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    function checkOrderAndTitles() {
+      const items = [...list.querySelectorAll('.drag-item')];
+      let correctCount = 0;
+      const totalItems = items.length;
+
+      items.forEach((item, index) => {
+        const id = item.dataset.id;
+        const selectedTitle = item.querySelector('.title-select').value;
+        const solution = correctSolutions[id];
+
+        const isPositionCorrect = index === solution.correctPos;
+        const isTitleCorrect = selectedTitle === solution.correctTitle;
+
+        if (isPositionCorrect && isTitleCorrect) {
+          item.classList.add('correct');
+          item.classList.remove('incorrect');
+          correctCount++;
+        } else {
+          item.classList.add('incorrect');
+          item.classList.remove('correct');
+        }
+      });
+
+      const resultEl = document.getElementById('result');
+      if (correctCount === totalItems) {
+        resultEl.style.color = '#28a745';
+        resultEl.textContent = 'Hervorragend! Alle 11 Abschnitte sind in der richtigen Reihenfolge und korrekt benannt.';
+      } else {
+        resultEl.style.color = '#dc3545';
+        resultEl.textContent = `${correctCount} von ${totalItems} Karten sind vollständig richtig. Überprüfe Position und Zuordnung!`;
+      }
+    }
+  </script>
+
+</body>
+</html>
