@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="de" style="background: transparent !important; border: none !important;">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Drag & Drop Stapel-Spiel: Lungenuntersuchung</title>
+  <!-- Open Sans einbinden -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    html, body, iframe {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Open Sans', sans-serif;
+      padding: 20px;
+      color: #333;
+    }
+
+    .game-wrapper {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* Grid-Layout für die offenen Karten */
+    .matching-game {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      width: 100%;
+      margin-bottom: 25px;
+    }
+
+    .card-slot {
+      position: relative;
+      height: 120px;
+      box-sizing: border-box;
+    }
+
+    .card {
+      width: 100%;
+      height: 100%;
+      background: #ffffff;
+      border: 2px solid #9900CC;
+      border-radius: 8px;
+      padding: 10px;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      cursor: grab;
+      user-select: none;
+      font-size: 13px;
+      line-height: 1.3;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s, border-color 0.3s;
+      word-wrap: break-word;
+      hyphens: auto;
+    }
+
+    .card.term {
+      font-weight: 700;
+      color: #9900CC;
+      background: #f7e6ff;
+    }
+
+    .card.method {
+      font-weight: 600;
+      color: #660099;
+      background: #f0ccff;
+    }
+
+    .card.dragging {
+      opacity: 0.6;
+      cursor: grabbing;
+    }
+
+    .card-slot.drag-over .card {
+      border-color: #ff00ff;
+      background: #faf0ff;
+      transform: scale(1.03);
+    }
+
+    /* Zwischenzustand bei 2 Karten im Slot */
+    .card-slot.partial-stack .card:nth-child(2) {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      width: 100%;
+      height: 100%;
+      background: #a5d6a7;
+      border-color: #28a745;
+      color: #0d3c15;
+      z-index: 2;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Gestapelter Endzustand bei Erfolg (3 Karten) */
+    .card-slot.stacked {
+      position: relative;
+    }
+
+    .card-slot.stacked .card.base-card {
+      background: #e8f5e9;
+      border-color: #28a745;
+      color: #155724;
+      cursor: default;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .card-slot.stacked .card.mid-card {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      width: 100%;
+      height: 100%;
+      background: #a5d6a7;
+      border-color: #28a745;
+      color: #0d3c15;
+      cursor: default;
+      z-index: 2;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .card-slot.stacked .card.top-card {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      width: 100%;
+      height: 100%;
+      background: #28a745;
+      border-color: #1e7e34;
+      color: #ffffff;
+      cursor: default;
+      z-index: 3;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    /* Mismatch Animation & Rote Farbe */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    .card.mismatch {
+      animation: shake 0.5s ease-in-out;
+      border-color: #ff0000 !important;
+      background-color: #ffe6e6 !important;
+      color: #cc0000 !important;
+    }
+
+    #end-message {
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: #28a745;
+      margin-bottom: 15px;
+      min-height: 25px;
+    }
+
+    #restart {
+      display: block;
+      margin: 0 auto;
+      padding: 10px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      background: #9900CC;
+      color: #ffffff;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(153,0,204,0.2);
+    }
+
+    #restart:hover {
+      opacity: 0.9;
+    }
+
+    @media (max-width: 768px) {
+      .matching-game {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .card-slot {
+        height: 110px;
+      }
+      .card {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-wrapper">
+    <div class="matching-game" id="game"></div>
+    <div id="end-message"></div>
+    <button id="restart">Noch einmal spielen!</button>
+  </div>
+
+  <script>
+    const tripletsData = [
+      ["Hypersonorer Klopfschall", "Perkussion (Abklopfen)", "Lauter, schachtelartiger/hohler Schall bei vermehrtem Luftgehalt der Lunge."],
+      ["Hyposonorer / Dämpfender Klopfschall", "Perkussion (Abklopfen)", "Leiser, gedämpfter (\"schenkelschallartiger\") Toneindruck bei vermindertem Luftgehalt."],
+      ["Stimmfremitus", "Palpation (Hand auflegen)", "Taktiles Handauflegen auf den Rücken, während der Patient mit tiefer Stimme „99“ spricht."],
+      ["Bronchophonie", "Auskultation (Abhören)", "Abhören der Lunge mit dem Stethoskop, während der Patient hochtönig „66“ flüstert."]
+    ];
+
+    const gameBoard = document.getElementById('game');
+    const restartBtn = document.getElementById('restart');
+    const endMessage = document.getElementById('end-message');
+
+    let draggedCard = null;
+    let matchedTripletsCount = 0;
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function initGame() {
+      gameBoard.innerHTML = '';
+      endMessage.innerText = '';
+      matchedTripletsCount = 0;
+      draggedCard = null;
+
+      let allCards = [];
+      tripletsData.forEach((triplet, index) => {
+        allCards.push({ id: index, text: triplet[0], type: 'term' });
+        allCards.push({ id: index, text: triplet[1], type: 'method' });
+        allCards.push({ id: index, text: triplet[2], type: 'def' });
+      });
+
+      shuffle(allCards);
+
+      allCards.forEach((cardData, idx) => {
+        const slot = document.createElement('div');
+        slot.className = 'card-slot';
+        slot.dataset.slotIndex = idx;
+
+        const card = document.createElement('div');
+        card.className = `card ${cardData.type}`;
+        card.draggable = true;
+        card.innerText = cardData.text;
+        card.dataset.pairId = cardData.id;
+        card.dataset.type = cardData.type;
+
+        // Drag & Drop Events
+        card.addEventListener('dragstart', handleDragStart);
+        card.addEventListener('dragend', handleDragEnd);
+
+        slot.addEventListener('dragover', handleDragOver);
+        slot.addEventListener('dragleave', handleDragLeave);
+        slot.addEventListener('drop', handleDrop);
+
+        slot.appendChild(card);
+        gameBoard.appendChild(slot);
+      });
+    }
+
+    function handleDragStart(e) {
+      if (this.parentElement.classList.contains('stacked')) {
+        e.preventDefault();
+        return;
+      }
+      draggedCard = this;
+      this.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', this.dataset.pairId);
+    }
+
+    function handleDragEnd() {
+      if (draggedCard) {
+        draggedCard.classList.remove('dragging');
+        draggedCard = null;
+      }
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      if (!this.classList.contains('stacked') && draggedCard && !this.contains(draggedCard)) {
+        this.classList.add('drag-over');
+      }
+    }
+
+    function handleDragLeave() {
+      this.classList.remove('drag-over');
+    }
+
+    function isMatch(idA, idB) {
+      // Exakter Treffer (z.B. Stimmfremitus & Palpation)
+      if (idA === idB) return true;
+      // Beide sind Perkussion (ID 0 oder 1)
+      if ((idA === "0" || idA === "1") && (idB === "0" || idB === "1")) return true;
+      return false;
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      this.classList.remove('drag-over');
+
+      if (!draggedCard || this.classList.contains('stacked') || this.contains(draggedCard)) {
+        return;
+      }
+
+      const currentCardsInSlot = Array.from(this.querySelectorAll('.card'));
+      if (currentCardsInSlot.length === 0) return;
+
+      const draggedType = draggedCard.dataset.type;
+      const draggedId = draggedCard.dataset.pairId;
+
+      // Keine doppelten Typen im selben Slot (z.B. nicht 2x Begriff oder 2x Methode)
+      const hasSameType = currentCardsInSlot.some(c => c.dataset.type === draggedType);
+      
+      // Prüfe, ob die gezogene Karte zu allen bisherigen Karten im Slot passt
+      const matchesAllInSlot = currentCardsInSlot.every(c => isMatch(draggedId, c.dataset.pairId));
+
+      if (!hasSameType && matchesAllInSlot) {
+        const sourceSlot = draggedCard.parentElement;
+
+        // Verschiebe die gezogene Karte in das Ziel
+        draggedCard.classList.remove('dragging');
+        this.appendChild(draggedCard);
+        
+        // Verstecke den leeren Ursprungsslot
+        sourceSlot.style.visibility = 'hidden';
+
+        const updatedCardsInSlot = Array.from(this.querySelectorAll('.card'));
+
+        if (updatedCardsInSlot.length === 2) {
+          // 2 Karten da -> Zwischenzustand aktivieren
+          this.classList.add('partial-stack');
+        } else if (updatedCardsInSlot.length === 3) {
+          // 3 Karten da -> Vollständig gestapelt
+          this.classList.remove('partial-stack');
+          this.classList.add('stacked');
+          
+          updatedCardsInSlot[0].className = 'card base-card';
+          updatedCardsInSlot[1].className = 'card mid-card';
+          updatedCardsInSlot[2].className = 'card top-card';
+
+          updatedCardsInSlot.forEach(c => c.draggable = false);
+
+          matchedTripletsCount++;
+
+          if (matchedTripletsCount === tripletsData.length) {
+            endMessage.innerText = "Perfekt! Du hast alle 3er-Stapel erfolgreich zugeordnet! 🎉";
+          }
+        }
+      } else {
+        // Fehler-Animation bei falschem Zuordnungsversuch
+        const currentDragged = draggedCard;
+        currentCardsInSlot.forEach(c => c.classList.add('mismatch'));
+        currentDragged.classList.add('mismatch');
+
+        setTimeout(() => {
+          currentCardsInSlot.forEach(c => c.classList.remove('mismatch'));
+          currentDragged.classList.remove('mismatch');
+        }, 600);
+      }
+    }
+
+    restartBtn.addEventListener('click', initGame);
+
+    // Spiel beim Laden starten
+    initGame();
+  </script>
+</body>
+</html>
